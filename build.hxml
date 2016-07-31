@@ -1,0 +1,8 @@
+-cp src/main/haxe
+
+-main Main
+
+-dce full
+
+-D js-flatten
+-js bin/flappy-bird.min.js
