@@ -1,3 +1,43 @@
-task build << {
-    println "HelloWorld!"
+ext {
+    binPath = "bin"
+    layoutPath = "src/layout"
+    shadersPath = "src/shaders"
+    hxmlFile = "build.hxml"
 }
+
+//compile the game using haxe compiler
+task compile(type: Exec) {
+    commandLine "haxe", hxmlFile
+}
+
+//copies html5 layout
+task copyLayout(type: Copy) {
+    from layoutPath
+    into binPath
+}
+
+//embed shaders into html5 layout
+task embedShaders << {
+    FileTree tree = fileTree(dir: shadersPath);
+    tree.include "**/*.glsl"
+
+    def tags = ["<body>"]
+
+    tree.each { File file ->
+        tags << "<script type=\"" << "text/glsl\"" << " id=\"" << file.name.replace(".glsl", "") << "\"" << " >" << file.text << "</script>"
+    }
+
+    def file = new File(binPath + "/index.html")
+    file.write file.text.replace("<body>", tags.join(""))
+}
+
+embedShaders.mustRunAfter copyLayout
+
+//build
+task build << {
+    println "Building..."
+}
+
+build.dependsOn compile
+build.dependsOn copyLayout
+build.dependsOn embedShaders
