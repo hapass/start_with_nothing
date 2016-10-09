@@ -37,17 +37,7 @@ class Main {
     }
 
     static function getVertexShader(gl: RenderingContext){
-        var shaderSource = '
-            // an attribute will receive data from a buffer
-            attribute vec4 a_position;
- 
-            // all shaders have a main function
-            void main() {
-                // gl_Position is a special variable a vertex shader
-                // is responsible for setting
-                gl_Position = a_position;
-            }
-        ';
+        var shaderSource = Browser.document.getElementById("VertexShader").innerText;
 
         var shader = gl.createShader(RenderingContext.VERTEX_SHADER);
         gl.shaderSource(shader, shaderSource);
@@ -64,17 +54,7 @@ class Main {
     }
 
     static function getFragmentShader(gl: RenderingContext){
-        var shaderSource = '
-            // fragment shaders don\'t have a default precision so we need
-            // to pick one. mediump is a good default
-            precision mediump float;
- 
-            void main() {
-                // gl_FragColor is a special variable a fragment shader
-                // is responsible for setting
-                gl_FragColor = vec4(0, 1, 1, 1);
-            }
-        ';
+        var shaderSource = Browser.document.getElementById("FragmentShader").innerText;
 
         var shader = gl.createShader(RenderingContext.FRAGMENT_SHADER);
         gl.shaderSource(shader, shaderSource);

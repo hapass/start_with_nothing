@@ -5,6 +5,10 @@ ext {
     hxmlFile = "build.hxml"
 }
 
+//------------------------------------------------
+//Build section.
+//------------------------------------------------
+
 //compile the game using haxe compiler
 task compile(type: Exec) {
     commandLine "haxe", hxmlFile
@@ -41,3 +45,22 @@ task build << {
 build.dependsOn compile
 build.dependsOn copyLayout
 build.dependsOn embedShaders
+
+//------------------------------------------------
+//Run section.
+//------------------------------------------------
+
+task startServer(type: Exec) {
+    workingDir "bin"
+    commandLine "screen", "-S", "flappy_bird_server", "-d", "-m", "python", "-m", "SimpleHTTPServer", "8000"
+}
+
+task killServer(type: Exec) {
+    commandLine "screen", "-S", "flappy_bird_server", "-X", "quit"
+}
+
+//run
+task run << {
+   java.awt.Desktop.desktop.browse "http://localhost:8000".toURI()
+}
+

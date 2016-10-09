@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <body><script type="text/glsl"id="FragmentShader" >// fragment shaders don\'t have a default precision so we need
+  <body><script type="text/glsl" id="FragmentShader" >// fragment shaders don\'t have a default precision so we need
 // to pick one. mediump is a good default
 precision mediump float;
 
@@ -8,7 +8,7 @@ void main() {
     // gl_FragColor is a special variable a fragment shader
     // is responsible for setting
     gl_FragColor = vec4(0, 1, 1, 1);
-}</script><script type="text/glsl"id="VertexShader" >// an attribute will receive data from a buffer
+}</script><script type="text/glsl" id="VertexShader" >// an attribute will receive data from a buffer
 attribute vec4 a_position;
 
 // all shaders have a main function
