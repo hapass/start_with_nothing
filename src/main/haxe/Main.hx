@@ -24,6 +24,8 @@ class Main {
         gl.enableVertexAttribArray(positionAttributeLocation);
         gl.vertexAttribPointer(positionAttributeLocation, 2, RenderingContext.FLOAT, false, 0, 0);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(RenderingContext.COLOR_BUFFER_BIT);
         gl.useProgram(program);
         gl.drawArrays(RenderingContext.TRIANGLES, 0, 3);
     }

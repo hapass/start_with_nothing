@@ -25,14 +25,14 @@ task embedShaders << {
     FileTree tree = fileTree(dir: shadersPath);
     tree.include "**/*.glsl"
 
-    def tags = ["<body>"]
+    def tags = []
 
     tree.each { File file ->
         tags << "<script type=\"" << "text/glsl\"" << " id=\"" << file.name.replace(".glsl", "") << "\"" << " >" << file.text << "</script>"
     }
 
     def file = new File(binPath + "/index.html")
-    file.write file.text.replace("<body>", tags.join(""))
+    file.write file.text.replace("<!-- INSERT_SHADERS -->", tags.join(""))
 }
 
 embedShaders.mustRunAfter copyLayout
