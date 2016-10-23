@@ -3,6 +3,8 @@ ext {
     layoutPath = "src/layout"
     shadersPath = "src/shaders"
     hxmlFile = "build.hxml"
+    shaderToken = "<!-- INSERT_SHADERS -->"
+    emptyString = ""
 }
 
 //------------------------------------------------
@@ -28,11 +30,11 @@ task embedShaders << {
     def tags = []
 
     tree.each { File file ->
-        tags << "<script type=\"" << "text/glsl\"" << " id=\"" << file.name.replace(".glsl", "") << "\"" << " >" << file.text << "</script>"
+        tags << "<script type=\"" << "text/glsl\"" << " id=\"" << file.name.replace(".glsl", "") << "\"" << " >" << "\n" << file.text << "\n" << "</script>" << "\n"
     }
 
     def file = new File(binPath + "/index.html")
-    file.write file.text.replace("<!-- INSERT_SHADERS -->", tags.join(""))
+    file.write file.text.replace(shaderToken, tags.join(emptyString))
 }
 
 embedShaders.mustRunAfter copyLayout
