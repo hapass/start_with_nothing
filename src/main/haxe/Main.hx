@@ -8,6 +8,9 @@ import drawing.utils.Vec2;
 import drawing.utils.Color;
 
 class Main {
+    static var renderer: Renderer;
+    static var triangle: Triangle;
+
     static function main(){
         var canvas = createCanvas();
 
@@ -17,13 +20,20 @@ class Main {
         if(gl == null)
             throw "Your browser doesn't support webgl. Please update your browser.";
        
-       var renderer = new Renderer(gl);
-       renderer.drawTriangle(
-           new Triangle(
-               new Vec2(0.0, 0.0),
-               new Vec2(100.0, 100.0),
-               new Vec2(200.0, 200.0),
-               new Color(10, 10, 10, 10)));        
+        renderer = new Renderer(gl);
+        triangle = new Triangle(
+               new Vec2(0, 0),
+               new Vec2(100, 100),
+               new Vec2(200, 300),
+               new Color(10, 10, 10, 10));
+
+        update();
+    }
+
+    static function update() {
+        triangle.move(new Vec2(2,0));
+        renderer.drawTriangle(triangle);
+        haxe.Timer.delay(update, 10);
     }
 
     static function createCanvas(){ 

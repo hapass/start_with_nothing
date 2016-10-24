@@ -19,6 +19,7 @@ class Renderer {
 
     public function drawTriangle(triangle: Triangle) {
         var program = compiler.getProgram(DEFAULT_PROGRAM);
+        context.useProgram(program);
 
         //bind buffer for vertices
         var positionAttributeLocation = context.getAttribLocation(program, "vertex_position");
@@ -35,8 +36,6 @@ class Renderer {
 
         //set screen size
         var resolutionUniformLocation = context.getUniformLocation(program, "screen_size");
-        context.useProgram(program);
-        
         context.uniform2f(resolutionUniformLocation, context.canvas.width, context.canvas.height);
 
         context.drawArrays(RenderingContext.TRIANGLES, 0, Triangle.VERTICES_NUMBER);
