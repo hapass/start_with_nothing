@@ -25,13 +25,13 @@ class Main {
                new Vec2(0, 0),
                new Vec2(100, 100),
                new Vec2(200, 300),
-               new Color(10, 10, 10, 10));
+               Color.BLUE);
 
         update();
     }
 
     static function update() {
-        triangle.move(new Vec2(2,0));
+        triangle.move(new Vec2(1,1));
         renderer.drawTriangle(triangle);
         haxe.Timer.delay(update, 10);
     }

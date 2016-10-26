@@ -1,4 +1,5 @@
 attribute vec2 vertex_position;
+
 uniform vec2 screen_size;
 
 void main() {

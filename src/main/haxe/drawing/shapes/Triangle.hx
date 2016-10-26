@@ -17,6 +17,7 @@ class Triangle {
         this.ver1 = ver1;
         this.ver2 = ver2;
         this.ver3 = ver3;
+        this.color = color;
     }
 
     public function move(vec: Vec2) {

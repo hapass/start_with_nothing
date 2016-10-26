@@ -4,12 +4,15 @@
 <script type="text/glsl" id="FragmentShader" >
 precision mediump float;
 
+uniform vec3 color;
+
 void main() {
-    gl_FragColor = vec4(1, 1, 1, 1);
+    gl_FragColor = vec4(color, 1);
 }
 </script>
 <script type="text/glsl" id="VertexShader" >
 attribute vec2 vertex_position;
+
 uniform vec2 screen_size;
 
 void main() {
