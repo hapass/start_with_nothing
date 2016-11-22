@@ -1,8 +1,9 @@
 -cp src/main/haxe
 
--main Main
+-main game.Main
 
 -dce full
 
+-D debug
 -D js-flatten
 -js bin/flappy-bird.min.js

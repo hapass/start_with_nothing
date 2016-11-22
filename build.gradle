@@ -1,7 +1,7 @@
 ext {
     binPath = "bin"
-    layoutPath = "src/layout"
-    shadersPath = "src/shaders"
+    layoutPath = "layout"
+    shadersPath = "src/main/glsl/engine/graphics/rendering"
     hxmlFile = "build.hxml"
     shaderToken = "<!-- INSERT_SHADERS -->"
     emptyString = ""
@@ -24,7 +24,7 @@ task copyLayout(type: Copy) {
 
 //embed shaders into html5 layout
 task embedShaders << {
-    FileTree tree = fileTree(dir: shadersPath);
+    FileTree tree = fileTree(dir: shadersPath)
     tree.include "**/*.glsl"
 
     def tags = []
@@ -53,7 +53,7 @@ build.dependsOn embedShaders
 //------------------------------------------------
 
 task startServer(type: Exec) {
-    workingDir "bin"
+    workingDir binPath
     commandLine "screen", "-S", "flappy_bird_server", "-d", "-m", "python", "-m", "SimpleHTTPServer", "8000"
 }
 
