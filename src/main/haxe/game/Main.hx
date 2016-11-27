@@ -10,6 +10,9 @@ import engine.graphics.drawing.shapes.Rectangle;
 import engine.loop.GameLoop;
 import engine.loop.GameLoopObserver;
 
+import engine.input.Key;
+import engine.input.Keyboard;
+
 class Main {
     static function main() {
         var game = new Game();
@@ -19,10 +22,12 @@ class Main {
 
 class Game implements GameLoopObserver {
     private var loop: GameLoop;
+    private var input: Keyboard;
     private var board: DrawingBoard;
     private var bird: Rectangle;
 
     public function new() {
+        this.input = new Keyboard([Key.SPACE]);
         this.loop = new GameLoop();
         this.loop.subscribe(this);
         this.board = new DrawingBoard(800, 600);
@@ -35,7 +40,12 @@ class Game implements GameLoopObserver {
     }
 
     public function update(timestamp: Float) {
-        this.bird.move(new Vec2(1, 0));
+        if(input.isKeyDown(Key.SPACE))
+            this.bird.move(new Vec2(1, 0));
+        
+        if(input.hasBeenPressed(Key.SPACE))
+            this.bird.move(new Vec2(200, 0));
+
         this.board.draw();
     }
 }
