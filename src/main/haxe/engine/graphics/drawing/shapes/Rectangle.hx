@@ -3,7 +3,7 @@ package engine.graphics.drawing.shapes;
 import engine.math.Vec2;
 import engine.graphics.drawing.Color;
 
-class Rectangle { 
+class Rectangle implements Shape { 
     public var color(default, null): Color;
 
     private var ver1: Vec2;

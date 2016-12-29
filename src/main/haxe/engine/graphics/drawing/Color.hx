@@ -19,6 +19,12 @@ class Color {
     public static var YELLOW(get, never): Color;
     static function get_YELLOW(): Color return new Color(255, 255, 0);
 
+    public static var WHITE(get, never): Color;
+    static function get_WHITE(): Color return new Color(255, 255, 255);
+
+    public static var BLACK(get, never): Color;
+    static function get_BLACK(): Color return new Color(0, 0, 0);
+
     public function new(r: Int, g: Int, b: Int) {
         this.r = correctColor(r);
         this.g = correctColor(g);

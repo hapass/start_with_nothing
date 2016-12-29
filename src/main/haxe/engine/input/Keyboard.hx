@@ -11,11 +11,13 @@ class Keyboard {
     private static inline var KEY_PRESSED = "KEY_PRESSED";
 
     private var trackedKeys: Array<Key>;
+    private var observers: Array<KeyboardObserver>;    
 
     public function new (trackedKeys: Array<Key>) {
         Browser.window.addEventListener("keydown", onKeyDown);
         Browser.window.addEventListener("keyup", onKeyUp);
         this.trackedKeys = new Array<Key>();
+        this.observers = new Array<KeyboardObserver>();        
         for(key in trackedKeys) {
             Debug.assert(this.trackedKeys[key.code] == null, "Tracked keys cannot repeat in keyboard."); 
             key.setState(KEY_UP);      
@@ -43,11 +45,27 @@ class Keyboard {
         key.setState(KEY_UP);
     }
 
-    public function isKeyDown(key: Key) {
+    public function subscribe(observer: KeyboardObserver) {
+        this.observers.push(observer);
+    }
+
+    public function unsubscribe(observer: KeyboardObserver) {
+        this.observers.remove(observer);
+    }
+
+    public function checkInput() {
+        for(observer in this.observers)
+            observer.onInput({
+                isKeyDown: this.isKeyDown,
+                hasBeenPressed: this.hasBeenPressed
+            });
+    }
+
+    private function isKeyDown(key: Key) {
         return key.currentState == KEY_DOWN;
     }
 
-    public function hasBeenPressed(key: Key) {
+    private function hasBeenPressed(key: Key) {
         var pressed = key.currentState == KEY_DOWN && key.previousState == KEY_UP;
         if(pressed)
             key.setState(KEY_PRESSED);

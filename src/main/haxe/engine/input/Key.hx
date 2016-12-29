@@ -24,4 +24,3 @@ class Key {
         this.currentState = state;
     }
 }
-
