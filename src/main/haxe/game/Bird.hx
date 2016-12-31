@@ -4,44 +4,69 @@ import engine.math.Vec2;
 import engine.math.Vec3;
 
 import engine.graphics.drawing.Color;
-import engine.graphics.drawing.shapes.Rectangle;
+import engine.graphics.drawing.shapes.RectangleShape;
+import engine.graphics.drawing.shapes.Shape;
 
 import engine.input.KeyboardState;
 import engine.input.Key;
 import engine.input.KeyboardObserver;
 
+import engine.collisions.Collider;
+
 class Bird extends GameObject implements KeyboardObserver {
-    private var shape: Rectangle;
+    private var shape: RectangleShape;
+    private var collider: Collider;
+    private var currentSpeed: Vec2;
+    private var acceleration: Vec2;
 
     public function new() {
-        this.shape = new Rectangle(new Vec2(0, 0), 10, 10, Color.YELLOW);
+        super();
+        var position = new Vec2(50, 50);
+        this.shape = new RectangleShape(position, 10, 10, Color.YELLOW);
+        this.collider = new Collider(position, 10, 10);
+        this.currentSpeed = new Vec2(0, 0);
+        this.acceleration = new Vec2(0, 0.1);
+        this.notifyAboutCollisions = true;
     }
 
     override public function update(timestamp: Float) {
-        //apply gravity
+        applyGravity();
+        move();
     }
 
     override public function getKeyboardObserver() {
         return this;
     }
 
-    override public function getShape() {
-        return this.shape;
+    override public function getCollider(): Array<Collider> {
+        return [this.collider];
     }
 
-    public function onInput(state: KeyboardState) {
-        if(state.isKeyDown(Key.SPACE))
-            this.shape.move(new Vec2(1, 0));
-        
+    override public function getShape(): Array<Shape> {
+        var array:Array<Shape> = new Array<Shape>();
+        array.push(this.shape);
+        return array;
+    }
+
+    override public function getCollisionGroupName(): String {
+        return "Bird";
+    }
+
+    public function onInput(state: KeyboardState): Void {
         if(state.hasBeenPressed(Key.SPACE))
-            this.shape.move(new Vec2(200, 0));
+            fly();
     }
 
-    function applyGravity(): Float {
-        /*
-            Draws bird down to earth.
-            Take bird. Move on a vector down to earth.
-        */
-        return 0;
+    private function fly() {
+        this.currentSpeed = new Vec2(0, -2);
+    }
+
+    private function applyGravity() {
+        this.currentSpeed = this.currentSpeed.add(this.acceleration);
+    }
+
+    private function move() {
+        this.shape.move(this.currentSpeed);
+        this.collider.move(this.currentSpeed);
     }
 }
