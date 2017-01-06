@@ -17,6 +17,10 @@ class DrawingBoard {
         this.shapes.push(shape);
     }
 
+    public function remove(shape: Shape) {
+        this.shapes.remove(shape);
+    }
+
     public function draw() {
         renderer.clear();
         for(shape in shapes) {

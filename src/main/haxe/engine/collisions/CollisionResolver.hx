@@ -2,16 +2,24 @@ package engine.collisions;
 
 class CollisionResolver {
     private var colliders: Map<String, Array<Collider>>;
-    private var observers: Map<String, CollisionObserver>;
+    private var observers: Array<CollisionObserver>;
     private var keys: Array<String>;
 
     public function new() {
         this.colliders = new Map<String, Array<Collider>>();
-        this.observers = new Map<String, CollisionObserver>();
+        this.observers = new Array<CollisionObserver>();
         this.keys = new Array<String>();
     }
 
-    public function addToCollisionGroup(groupName: String, collider: Collider, observer: CollisionObserver = null): Void {
+    public function subscribe(observer: CollisionObserver) {
+        this.observers.push(observer);
+    }
+
+    public function unsubscribe(observer: CollisionObserver) {
+        this.observers.remove(observer);
+    }
+
+    public function addToCollisionGroup(groupName: String, collider: Collider): Void {
         if(collider == null)
             return;
 
@@ -25,9 +33,14 @@ class CollisionResolver {
 
         colliderGroupArray.push(collider);
         this.colliders.set(groupName, colliderGroupArray);
-        
-        if(observer != null)
-            this.observers.set(groupName, observer);
+    }
+
+    public function removeFromCollisionGroup(groupName: String, collider: Collider) {
+        if(collider == null || !this.colliders.exists(groupName))
+            return;
+
+        var colliderGroupArray = this.colliders.get(groupName);
+        colliderGroupArray.remove(collider);
     }
 
     public function resolve(): Void {
@@ -42,11 +55,8 @@ class CollisionResolver {
             if(!doGroupsIntersect)
                 return;
 
-            if(this.observers.exists(oneGroupName))
-                this.observers.get(oneGroupName).onCollision();
-
-            if(this.observers.exists(otherGroupName))
-                this.observers.get(otherGroupName).onCollision();
+            for(observer in this.observers)
+                observer.onCollision();
         });
     }
 

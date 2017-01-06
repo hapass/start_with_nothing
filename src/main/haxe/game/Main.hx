@@ -43,6 +43,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
     public function start() {
         spawnBird();
 
+        this.collisionResolver.subscribe(this);
         this.loop.subscribe(this);
         this.loop.start();
     }
@@ -54,18 +55,28 @@ class Game implements GameLoopObserver implements CollisionObserver {
     public function update(timestamp: Float) {
         this.keyboard.checkInput();
 
-        removeDisposedGameObjects();
         spawnObstacleIfNecessary(timestamp);
-
         this.collisionResolver.resolve();
 
+        removeDisposedGameObjects();        
         updateAllGameObjects(timestamp);
 
         this.board.draw();
     }
 
     public function onCollision(): Void {
-        untyped __js__("alert('crash!')");
+        //stop game
+        stop();
+        
+        //show score
+        //show play again button
+    }
+
+    private function stop() {
+        this.loop.stop();
+        this.loop.unsubscribe(this);
+        this.collisionResolver.unsubscribe(this);
+        removeDisposedGameObjects(true);        
     }
 
     private function spawnObstacleIfNecessary(timestamp: Float) {
@@ -90,12 +101,25 @@ class Game implements GameLoopObserver implements CollisionObserver {
 
         var compositeCollider = gameObject.getCollider();
         for(collider in compositeCollider)
-            this.collisionResolver.addToCollisionGroup(gameObject.getCollisionGroupName(), collider, gameObject.notifyAboutCollisions ? this : null);
+            this.collisionResolver.addToCollisionGroup(gameObject.getCollisionGroupName(), collider);
 
         this.gameObjects.push(gameObject);
     }
 
-    private function removeDisposedGameObjects() {
-        this.gameObjects = [for(gameObject in this.gameObjects) if(!gameObject.disposed) gameObject];
+    private function removeDisposedGameObjects(force:Bool = false) {
+        var activeObjects = [];
+        for(gameObject in this.gameObjects) {
+            if(gameObject.disposed || force) {
+                for(shape in gameObject.getShape())
+                    this.board.remove(shape);
+                
+                for(collider in gameObject.getCollider())
+                    this.collisionResolver.removeFromCollisionGroup(gameObject.getCollisionGroupName(), collider);
+            }
+            else {
+                activeObjects.push(gameObject);
+            }
+        }
+        this.gameObjects = activeObjects;
     }
 }

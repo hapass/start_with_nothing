@@ -15,7 +15,7 @@ import engine.collisions.Collider;
 
 class Bird extends GameObject implements KeyboardObserver {
     private var shape: RectangleShape;
-    private var collider: Collider;
+    private var collider: Array<Collider>;
     private var currentSpeed: Vec2;
     private var acceleration: Vec2;
 
@@ -23,10 +23,9 @@ class Bird extends GameObject implements KeyboardObserver {
         super();
         var position = new Vec2(50, 50);
         this.shape = new RectangleShape(position, 10, 10, Color.YELLOW);
-        this.collider = new Collider(position, 10, 10);
+        this.collider = [new Collider(position, 10, 10)];
         this.currentSpeed = new Vec2(0, 0);
         this.acceleration = new Vec2(0, 0.1);
-        this.notifyAboutCollisions = true;
     }
 
     override public function update(timestamp: Float) {
@@ -39,7 +38,7 @@ class Bird extends GameObject implements KeyboardObserver {
     }
 
     override public function getCollider(): Array<Collider> {
-        return [this.collider];
+        return this.collider;
     }
 
     override public function getShape(): Array<Shape> {
@@ -67,6 +66,6 @@ class Bird extends GameObject implements KeyboardObserver {
 
     private function move() {
         this.shape.move(this.currentSpeed);
-        this.collider.move(this.currentSpeed);
+        this.collider[0].move(this.currentSpeed);
     }
 }
