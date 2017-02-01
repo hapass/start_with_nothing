@@ -20,10 +20,6 @@ class Main {
 }
 
 class Game implements GameLoopObserver implements CollisionObserver {
-
-    public static inline var WIDTH: Int = 800;
-    public static inline var HEIGHT: Int = 600;
-
     private var loop: GameLoop;
     private var keyboard: Keyboard;
     private var board: DrawingBoard;
@@ -33,7 +29,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE]);
-        this.board = new DrawingBoard(WIDTH, HEIGHT);
+        this.board = new DrawingBoard(GamePlayParameters.GAME_WIDTH, GamePlayParameters.GAME_HEIGHT);
         this.gameObjects = new Array<GameObject>();
         this.loop = new GameLoop();
         this.spawner = new ObstacleSpawner();

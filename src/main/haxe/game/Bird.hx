@@ -21,11 +21,11 @@ class Bird extends GameObject implements KeyboardObserver {
 
     public function new() {
         super();
-        var position = new Vec2(50, 50);
-        this.shape = new RectangleShape(position, 10, 10, Color.YELLOW);
-        this.collider = [new Collider(position, 10, 10)];
+        var position = new Vec2(GamePlayParameters.BIRD_LEFT_DISTANCE, GamePlayParameters.BIRD_UP_DISTANCE);
+        this.shape = new RectangleShape(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT, GamePlayParameters.BIRD_COLOR);
+        this.collider = [new Collider(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)];
         this.currentSpeed = new Vec2(0, 0);
-        this.acceleration = new Vec2(0, 0.1);
+        this.acceleration = new Vec2(0, GamePlayParameters.BIRD_FALL_ACCELERATION);
     }
 
     override public function update(timestamp: Float) {
@@ -57,7 +57,7 @@ class Bird extends GameObject implements KeyboardObserver {
     }
 
     private function fly() {
-        this.currentSpeed = new Vec2(0, -2);
+        this.currentSpeed = new Vec2(0, -GamePlayParameters.BIRD_FLIGHT_ACCELERATION);
     }
 
     private function applyGravity() {

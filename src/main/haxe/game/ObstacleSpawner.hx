@@ -12,11 +12,6 @@ import engine.collisions.Collider;
 import game.Main;
 
 class ObstacleSpawner {
-    private static inline var GAP_SIZE: Int = 50;
-    private static inline var WIDTH: Int = 20;
-    private static inline var WALL_HEIGHT_MIN: Int = 50;
-    private static inline var SPAWN_INTERVAL: Int = 2000;
-
     private var lastSpawnedTime: Float;
 
     public function new() {
@@ -24,9 +19,9 @@ class ObstacleSpawner {
     }
 
     public function spawn(timestamp: Float): SpawnResult {
-        if(timestamp - this.lastSpawnedTime > SPAWN_INTERVAL) {
+        if(timestamp - this.lastSpawnedTime > GamePlayParameters.WALL_SPAWN_INTERVAL) {
             this.lastSpawnedTime = timestamp;
-            return new SpawnResult(new Obstacle(Game.WIDTH, Game.HEIGHT, WIDTH, GAP_SIZE, WALL_HEIGHT_MIN));
+            return new SpawnResult(new Obstacle(GamePlayParameters.GAME_WIDTH, GamePlayParameters.GAME_HEIGHT, GamePlayParameters.WALL_WIDTH, GamePlayParameters.WALL_GAP_SIZE, GamePlayParameters.WALL_HEIGHT_MIN));
         }
         return new SpawnResult();
     }
@@ -82,8 +77,8 @@ private class Obstacle extends GameObject {
         var upperPartHeight = Std.random(wholeWallHeight - 2*heightMin) + heightMin;
         var lowerPartHeight = wholeWallHeight - upperPartHeight;
 
-        this.compositeShape.push(new RectangleShape(new Vec2(positionX, 0), this.width, upperPartHeight, Color.RED));
-        this.compositeShape.push(new RectangleShape(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight, Color.RED));
+        this.compositeShape.push(new RectangleShape(new Vec2(positionX, 0), this.width, upperPartHeight, GamePlayParameters.WALL_COLOR));
+        this.compositeShape.push(new RectangleShape(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight, GamePlayParameters.WALL_COLOR));
 
         this.compositeCollider.push(new Collider(new Vec2(positionX, 0), this.width, upperPartHeight));
         this.compositeCollider.push(new Collider(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight));
