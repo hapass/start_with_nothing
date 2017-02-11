@@ -61,7 +61,6 @@ class Game implements GameLoopObserver implements CollisionObserver {
     }
 
     public function onCollision(): Void {
-        //stop game
         stop();
         
         //show score
@@ -72,7 +71,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.loop.stop();
         this.loop.unsubscribe(this);
         this.collisionResolver.unsubscribe(this);
-        removeDisposedGameObjects(true);        
+        removeDisposedGameObjects(true);
     }
 
     private function spawnObstacleIfNecessary(timestamp: Float) {

@@ -6,7 +6,7 @@ class GamePlayParameters {
     public static inline var GAME_WIDTH: Int = 800;
     public static inline var GAME_HEIGHT: Int = 600;
 
-    public static var WALL_COLOR: Color = Color.RED;    
+    public static var WALL_COLOR: Color = Color.RED;
     public static inline var WALL_GAP_SIZE: Int = 100;
     public static inline var WALL_WIDTH: Int = 20;
     public static inline var WALL_HEIGHT_MIN: Int = 70;

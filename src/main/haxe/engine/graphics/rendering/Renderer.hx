@@ -14,6 +14,8 @@ import js.html.Float32Array;
 import js.Browser;
 
 class Renderer {
+    private var context: RenderingContext;
+
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
 
@@ -21,7 +23,7 @@ class Renderer {
 
     public function new(canvasWidth: Int, canvasHeight: Int) {
         var canvas = createCanvas(canvasWidth, canvasHeight);
-        var context: RenderingContext = canvas.getContextWebGL();
+        this.context = canvas.getContextWebGL();
 
         if(context == null)
             throw "Your browser doesn't support webgl. Please update your browser.";
@@ -43,7 +45,9 @@ class Renderer {
     }
 
     public function clear() {
-        drawingProgram.clearScreen();
+        context.viewport(0, 0, context.canvas.width, context.canvas.height);                
+        context.clearColor(0, 0, 0, 1);
+        context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
 }
 
@@ -64,7 +68,7 @@ private class SimpleDrawingProgram {
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
         this.context = context;
-        context.useProgram(program);      
+        context.useProgram(program);
     }
 
     public function draw(vertices: Array<Vec2>, color: Vec3, mode: Int = RenderingContext.TRIANGLE_STRIP) {
@@ -113,12 +117,6 @@ private class SimpleDrawingProgram {
         return color.x >= 0 && color.x <= 256 && 
                color.y >= 0 && color.y <= 256 && 
                color.z >= 0 && color.z <= 256;
-    }
-
-    public function clearScreen() {
-        context.viewport(0, 0, context.canvas.width, context.canvas.height);                
-        context.clearColor(0, 0, 0, 1);
-        context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
 }
 
