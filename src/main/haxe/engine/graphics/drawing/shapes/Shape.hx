@@ -7,4 +7,5 @@ interface Shape {
     public function move(vec: Vec2): Void;
     public function getVertices(): Array<Vec2>;
     public var color(default, null): Color;
+    public var texture(default, null): Texture;
 }

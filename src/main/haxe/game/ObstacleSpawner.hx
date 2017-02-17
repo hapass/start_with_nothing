@@ -77,8 +77,8 @@ private class Obstacle extends GameObject {
         var upperPartHeight = Std.random(wholeWallHeight - 2*heightMin) + heightMin;
         var lowerPartHeight = wholeWallHeight - upperPartHeight;
 
-        this.compositeShape.push(new RectangleShape(new Vec2(positionX, 0), this.width, upperPartHeight, GamePlayParameters.WALL_COLOR));
-        this.compositeShape.push(new RectangleShape(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight, GamePlayParameters.WALL_COLOR));
+        this.compositeShape.push(new RectangleShape(new Vec2(positionX, 0), this.width, upperPartHeight).setColor(GamePlayParameters.WALL_COLOR));
+        this.compositeShape.push(new RectangleShape(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight).setColor(GamePlayParameters.WALL_COLOR));
 
         this.compositeCollider.push(new Collider(new Vec2(positionX, 0), this.width, upperPartHeight));
         this.compositeCollider.push(new Collider(new Vec2(positionX, height - lowerPartHeight), this.width, lowerPartHeight));

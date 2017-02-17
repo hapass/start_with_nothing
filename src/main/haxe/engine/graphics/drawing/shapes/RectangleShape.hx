@@ -5,18 +5,28 @@ import engine.graphics.drawing.Color;
 
 class RectangleShape implements Shape { 
     public var color(default, null): Color;
+    public var texture(default, null): Texture;
 
     private var ver1: Vec2;
     private var ver2: Vec2;
     private var ver3: Vec2;
     private var ver4: Vec2;
 
-    public function new(coords: Vec2, width: Float, height: Float, color: Color) {
-        this.color = color;
+    public function new(coords: Vec2, width: Float, height: Float) {
         this.ver1 = coords.add(new Vec2(0, height));        
         this.ver2 = coords;
         this.ver3 = coords.add(new Vec2(width, height));
         this.ver4 = coords.add(new Vec2(width, 0));
+    }
+
+    public function setColor(color: Color) {
+        this.color = color;        
+        return this;
+    }
+
+    public function setTexture(texture: Texture) {
+        this.texture = texture;
+        return this;
     }
 
     public function move(vec: Vec2) {

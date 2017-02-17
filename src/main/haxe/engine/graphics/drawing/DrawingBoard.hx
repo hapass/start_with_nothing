@@ -25,8 +25,13 @@ class DrawingBoard {
         renderer.clear();
         for(shape in shapes) {
             var vertices = shape.getVertices();
-            if(vertices != null && vertices.length > 0)
-                renderer.drawTriangleStrip(vertices, new Vec3(shape.color.r, shape.color.g, shape.color.b));
+            if(vertices != null && vertices.length > 0) {
+                if(shape.color != null) {
+                    renderer.drawTriangleStrip(vertices, new Vec3(shape.color.r, shape.color.g, shape.color.b));
+                } else if (shape.texture != null) {
+                    renderer.drawTriangleStripTexture(vertices, shape.texture.data);
+                }
+            }
         }
     }
 }

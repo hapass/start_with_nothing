@@ -5,9 +5,10 @@ import engine.graphics.drawing.Color;
 
 class VoidShape implements Shape {
     public var color(default, null): Color;
+    public var texture(default, null): Texture;
 
-    public function new() {
-        this.color = Color.BLACK;
+    public function new() { 
+        //do nothing
     }
 
     public function move(vec: Vec2) {
