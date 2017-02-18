@@ -154,18 +154,18 @@ private class TextureDrawingProgram {
 
     private function setQuadPositionVertices(vertices: Array<Vec2>) {
         var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
-        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+        context.enableVertexAttribArray(positionAttributeLocation);                
         context.bindBuffer(RenderingContext.ARRAY_BUFFER, context.createBuffer());
         context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(vertices)), RenderingContext.STATIC_DRAW);
-        context.enableVertexAttribArray(positionAttributeLocation);        
+        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);        
     }
 
     private function setTexturePositionVertices() {
         var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
-        context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+        context.enableVertexAttribArray(texturePositionAttributeLocation);        
         context.bindBuffer(RenderingContext.ARRAY_BUFFER, context.createBuffer());
         context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getTexturePositionVertices())), RenderingContext.STATIC_DRAW);
-        context.enableVertexAttribArray(texturePositionAttributeLocation);        
+        context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
     private function setTexture(texture: Image) {
@@ -182,12 +182,10 @@ private class TextureDrawingProgram {
 
     private function getTexturePositionVertices() {
         return [
-            new Vec2(0.0, 0.0),
-            new Vec2(1.0, 0.0),
-            new Vec2(0.0, 1.0),
-            new Vec2(0.0, 1.0),
-            new Vec2(1.0, 0.0),
-            new Vec2(1.0, 1.0),
+            new Vec2(0, 1),
+            new Vec2(0, 0),
+            new Vec2(1, 1),
+            new Vec2(1, 0),
         ];
     }
 

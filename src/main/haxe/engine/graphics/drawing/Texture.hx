@@ -7,12 +7,14 @@ class Texture {
     @:allow(engine.graphics.drawing.DrawingBoard)    
     private var data: Image;
 
-    public function new() {
-        this.data = new Image();
-    }
+    public function new() {}
 
     public function load(url: String, loaded: Void -> Void) {
-        this.data.onload = loaded;        
-        this.data.src = url;
+        var image: Image = new Image();
+        image.onload = function() {
+            this.data = image;
+            loaded();
+        };
+        image.src = url;
     }
 }

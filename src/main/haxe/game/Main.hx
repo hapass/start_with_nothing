@@ -26,6 +26,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
     private var gameObjects: Array<GameObject>;
     private var spawner: ObstacleSpawner;
     private var collisionResolver: CollisionResolver;
+    private var started: Bool;
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE]);
@@ -34,6 +35,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.loop = new GameLoop();
         this.spawner = new ObstacleSpawner();
         this.collisionResolver = new CollisionResolver();
+        this.started = false;
     }
 
     public function start() {
