@@ -1,10 +1,7 @@
 package game;
 
 import engine.math.Vec2;
-import engine.math.Vec3;
 
-import engine.graphics.drawing.Color;
-import engine.graphics.drawing.Texture;
 import engine.graphics.drawing.shapes.RectangleShape;
 import engine.graphics.drawing.shapes.Shape;
 
@@ -15,6 +12,8 @@ import engine.input.KeyboardObserver;
 import engine.collisions.Collider;
 
 class Bird extends GameObject implements KeyboardObserver {
+    private static inline var BIRD_COLLISION_GROUP_NAME: String = "Bird";
+
     private var shape: RectangleShape;
     private var collider: Array<Collider>;
     private var currentSpeed: Vec2;
@@ -23,9 +22,7 @@ class Bird extends GameObject implements KeyboardObserver {
     public function new() {
         super();
         var position = new Vec2(GamePlayParameters.BIRD_LEFT_DISTANCE, GamePlayParameters.BIRD_UP_DISTANCE);
-        var texture = new Texture();
-        texture.load("bird.jpg", function(){});
-        this.shape = new RectangleShape(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT).setTexture(texture);
+        this.shape = new RectangleShape(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT).setColor(GamePlayParameters.BIRD_COLOR);
         this.collider = [new Collider(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)];
         this.currentSpeed = new Vec2(0, 0);
         this.acceleration = new Vec2(0, GamePlayParameters.BIRD_FALL_ACCELERATION);
@@ -51,12 +48,13 @@ class Bird extends GameObject implements KeyboardObserver {
     }
 
     override public function getCollisionGroupName(): String {
-        return "Bird";
+        return BIRD_COLLISION_GROUP_NAME;
     }
 
     public function onInput(state: KeyboardState): Void {
-        if(state.hasBeenPressed(Key.SPACE))
+        if(state.hasBeenPressed(Key.SPACE)) {
             fly();
+        }
     }
 
     private function fly() {

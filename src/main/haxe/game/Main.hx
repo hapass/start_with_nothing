@@ -9,7 +9,6 @@ import engine.input.Key;
 import engine.input.Keyboard;
 
 import engine.collisions.CollisionResolver;
-import engine.collisions.Collider;
 import engine.collisions.CollisionObserver;
 
 class Main {
@@ -85,20 +84,23 @@ class Game implements GameLoopObserver implements CollisionObserver {
     }
 
     private function updateAllGameObjects(timestamp: Float) {
-        for(gameObject in this.gameObjects)
+        for(gameObject in this.gameObjects) {
             gameObject.update(timestamp);
+        }
     }
 
     private function add(gameObject: GameObject): Void {
         this.keyboard.subscribe(gameObject.getKeyboardObserver());
 
         var compositeShape = gameObject.getShape();
-        for(shape in compositeShape)
+        for(shape in compositeShape) {
             this.board.add(shape);
+        }
 
         var compositeCollider = gameObject.getCollider();
-        for(collider in compositeCollider)
+        for(collider in compositeCollider) {
             this.collisionResolver.addToCollisionGroup(gameObject.getCollisionGroupName(), collider);
+        }
 
         this.gameObjects.push(gameObject);
     }
@@ -107,11 +109,13 @@ class Game implements GameLoopObserver implements CollisionObserver {
         var activeObjects = [];
         for(gameObject in this.gameObjects) {
             if(gameObject.disposed || force) {
-                for(shape in gameObject.getShape())
+                for(shape in gameObject.getShape()) {
                     this.board.remove(shape);
+                }
                 
-                for(collider in gameObject.getCollider())
+                for(collider in gameObject.getCollider()) {
                     this.collisionResolver.removeFromCollisionGroup(gameObject.getCollisionGroupName(), collider);
+                }
             }
             else {
                 activeObjects.push(gameObject);

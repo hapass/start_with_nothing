@@ -2,14 +2,10 @@ package game;
 
 import engine.graphics.drawing.shapes.Shape;
 import engine.graphics.drawing.shapes.RectangleShape;
-import engine.graphics.drawing.Color;
 
 import engine.math.Vec2;
-import engine.math.Vec3;
 
 import engine.collisions.Collider;
-
-import game.Main;
 
 class ObstacleSpawner {
     private var lastSpawnedTime: Float;
@@ -85,11 +81,13 @@ private class Obstacle extends GameObject {
     }
 
     private function move(): Void {
-        for(shape in compositeShape)
+        for(shape in compositeShape) {
             shape.move(this.speed);
+        }
 
-        for(collider in compositeCollider)
+        for(collider in compositeCollider) {
             collider.move(this.speed);
+        }
 
         this.position = this.position.add(this.speed);
     }

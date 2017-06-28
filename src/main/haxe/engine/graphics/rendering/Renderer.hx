@@ -5,12 +5,11 @@ import lang.Debug;
 import engine.math.Vec3;
 import engine.math.Vec2;
 
-import js.html.webgl.RenderingContext;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 
 import js.html.Image;
-
+import js.html.CanvasElement;
 import js.html.Float32Array;
 
 import js.Browser;
@@ -36,12 +35,16 @@ class Renderer {
         this.textureDrawingProgram = new TextureDrawingProgram(context, compiler);
     }
 
-    private function createCanvas(canvasWidth: Int, canvasHeight: Int){ 
+    private function createCanvas(canvasWidth: Int, canvasHeight: Int) { 
         var canvas = Browser.document.createCanvasElement();
         canvas.setAttribute(CANVAS_WIDTH_PROPERTY, Std.string(canvasWidth));
         canvas.setAttribute(CANVAS_HEIGHT_PROPERTY, Std.string(canvasHeight));
         Browser.document.body.appendChild(canvas);
         return canvas;
+    }
+
+    private function wrapCanvas(canvas: CanvasElement) {
+
     }
 
     public function drawTriangleStrip(vertices: Array<Vec2>, color: Vec3) {
@@ -51,6 +54,10 @@ class Renderer {
 
     public function drawTriangleStripTexture(vertices: Array<Vec2>, texture: Image) {
         textureDrawingProgram.draw(vertices, texture);
+    }
+
+    public function drawText(text: String, position: Vec2, color: Vec3, size: Int) {
+        
     }
 
     public function clear() {

@@ -6,6 +6,10 @@ import engine.graphics.drawing.Color;
 class RectangleShape implements Shape { 
     public var color(default, null): Color;
     public var texture(default, null): Texture;
+    public var text(default, null): String;
+    public var height(default, null): Float;
+
+    public var position(get, never): Vec2;
 
     private var ver1: Vec2;
     private var ver2: Vec2;
@@ -17,6 +21,8 @@ class RectangleShape implements Shape {
         this.ver2 = coords;
         this.ver3 = coords.add(new Vec2(width, height));
         this.ver4 = coords.add(new Vec2(width, 0));
+
+        this.height = height;
     }
 
     public function setColor(color: Color) {
@@ -43,5 +49,9 @@ class RectangleShape implements Shape {
             this.ver3,
             this.ver4
         ];
+    }
+
+    public function get_position(): Vec2 {
+        return this.ver2;
     }
 }
