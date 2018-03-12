@@ -9,7 +9,6 @@ class GameLoop {
 
     public function new() {
         this.observers = new Array<GameLoopObserver>();
-        this.shouldExitLoop = false;
     }
 
     public function subscribe(observer: GameLoopObserver) {
@@ -31,6 +30,7 @@ class GameLoop {
     }
 
     public function start() {
+        this.shouldExitLoop = false;
         tick(0);
     }
 

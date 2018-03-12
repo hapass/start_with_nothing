@@ -16,6 +16,7 @@ import js.Browser;
 
 class Renderer {
     private var context: RenderingContext;
+    private var canvas: CanvasElement;
 
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
@@ -24,7 +25,7 @@ class Renderer {
     private var textureDrawingProgram: TextureDrawingProgram;
 
     public function new(canvasWidth: Int, canvasHeight: Int) {
-        var canvas = createCanvas(canvasWidth, canvasHeight);
+        this.canvas = createCanvas(canvasWidth, canvasHeight);
         this.context = canvas.getContextWebGL();
 
         if(context == null)
@@ -61,7 +62,7 @@ class Renderer {
     }
 
     public function clear() {
-        context.viewport(0, 0, context.canvas.width, context.canvas.height);                
+        context.viewport(0, 0, context.canvas.width, context.canvas.height);
         context.clearColor(0, 0, 0, 1);
         context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
@@ -70,6 +71,10 @@ class Renderer {
         return color.x >= 0 && color.x <= 256 && 
                color.y >= 0 && color.y <= 256 && 
                color.z >= 0 && color.z <= 256;
+    }
+
+    public function dispose() {
+        Browser.document.body.removeChild(this.canvas);
     }
 }
 
@@ -150,7 +155,7 @@ private class TextureDrawingProgram {
     }
 
     public function draw(vertices: Array<Vec2>, texture: Image, mode: Int = RenderingContext.TRIANGLE_STRIP) {
-        context.useProgram(program);        
+        context.useProgram(program);
         setQuadPositionVertices(vertices);
         setTexturePositionVertices();
         setTexture(texture);

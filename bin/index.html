@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html>
   <body>
-<script type="text/glsl" id="PrimitiveFragmentShader" >
-precision mediump float;
-
-uniform vec3 color;
-
-void main() {
-    gl_FragColor = vec4(color, 1);
-}
-</script>
 <script type="text/glsl" id="PrimitiveVertexShader" >
 attribute vec2 vertex_position;
 
@@ -28,6 +19,15 @@ varying vec2 texture_position_interpolated;
 
 void main() {
     gl_FragColor = texture2D(u_image, texture_position_interpolated);
+}
+</script>
+<script type="text/glsl" id="PrimitiveFragmentShader" >
+precision mediump float;
+
+uniform vec3 color;
+
+void main() {
+    gl_FragColor = vec4(color, 1);
 }
 </script>
 <script type="text/glsl" id="TextureVertexShader" >

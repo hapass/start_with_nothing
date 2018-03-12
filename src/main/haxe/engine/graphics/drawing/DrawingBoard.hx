@@ -29,7 +29,7 @@ class DrawingBoard {
                 if(shape.color != null) {
                     var vecColor: Vec3 = new Vec3(shape.color.r, shape.color.g, shape.color.b);
                     if(shape.text != null) {
-                        renderer.drawText(shape.text, shape.position, vecColor, Std.int(shape.height))
+                        renderer.drawText(shape.text, shape.position, vecColor, Std.int(shape.height));
                     } else {
                         renderer.drawTriangleStrip(vertices, vecColor);
                     }
@@ -38,5 +38,9 @@ class DrawingBoard {
                 }
             }
         }
+    }
+
+    public function dispose() {
+        this.renderer.dispose();
     }
 }

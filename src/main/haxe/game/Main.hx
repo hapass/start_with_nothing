@@ -12,8 +12,14 @@ import engine.collisions.CollisionResolver;
 import engine.collisions.CollisionObserver;
 
 class Main {
+    private static var game:Game;
+
     static function main() {
-        var game = new Game();
+        launch();
+    }
+
+    public static function launch() {
+        game = new Game();
         game.start();
     }
 }
@@ -34,7 +40,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.loop = new GameLoop();
         this.spawner = new ObstacleSpawner();
         this.collisionResolver = new CollisionResolver();
-        this.started = false;
+        this.started = false; 
     }
 
     public function start() {
@@ -55,7 +61,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         spawnObstacleIfNecessary(timestamp);
         this.collisionResolver.resolve();
 
-        removeDisposedGameObjects();        
+        removeDisposedGameObjects();
         updateAllGameObjects(timestamp);
 
         this.board.draw();
@@ -66,6 +72,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         
         //show score
         //show play again button
+        Main.launch();
     }
 
     private function stop() {
@@ -73,6 +80,8 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.loop.unsubscribe(this);
         this.collisionResolver.unsubscribe(this);
         removeDisposedGameObjects(true);
+        this.board.dispose();
+        this.keyboard.dispose();
     }
 
     private function spawnObstacleIfNecessary(timestamp: Float) {

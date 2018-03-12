@@ -17,7 +17,7 @@ class Keyboard {
         Browser.window.addEventListener("keydown", onKeyDown);
         Browser.window.addEventListener("keyup", onKeyUp);
         this.trackedKeys = new Array<Key>();
-        this.observers = new Array<KeyboardObserver>();        
+        this.observers = new Array<KeyboardObserver>();
         for(key in trackedKeys) {
             Debug.assert(this.trackedKeys[key.code] == null, "Tracked keys cannot repeat in keyboard."); 
             key.setState(KEY_UP);      
@@ -70,5 +70,10 @@ class Keyboard {
         if(pressed)
             key.setState(KEY_PRESSED);
         return pressed;
+    }
+
+    public function dispose() {
+        Browser.window.removeEventListener("keydown", onKeyDown);
+        Browser.window.removeEventListener("keyup", onKeyUp);
     }
 }
