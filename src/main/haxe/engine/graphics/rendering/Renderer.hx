@@ -7,6 +7,7 @@ import engine.math.Vec2;
 
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
+import js.html.webgl.Buffer;
 
 import js.html.Image;
 import js.html.CanvasElement;
@@ -24,9 +25,14 @@ class Renderer {
     private var primitiveDrawingProgram: PrimitiveDrawingProgram;
     private var textureDrawingProgram: TextureDrawingProgram;
 
+    private var buffer:Buffer;
+
     public function new(canvasWidth: Int, canvasHeight: Int) {
         this.canvas = createCanvas(canvasWidth, canvasHeight);
         this.context = canvas.getContextWebGL();
+        this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
+        this.buffer = context.createBuffer();
+        this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
 
         if(context == null)
             throw "Your browser doesn't support webgl. Please update your browser.";
@@ -44,10 +50,6 @@ class Renderer {
         return canvas;
     }
 
-    private function wrapCanvas(canvas: CanvasElement) {
-
-    }
-
     public function drawTriangleStrip(vertices: Array<Vec2>, color: Vec3) {
         Debug.assert(isColorValid(color), "Color components should each have the value between 0 and 256.");  
         primitiveDrawingProgram.draw(vertices, color);
@@ -57,12 +59,9 @@ class Renderer {
         textureDrawingProgram.draw(vertices, texture);
     }
 
-    public function drawText(text: String, position: Vec2, color: Vec3, size: Int) {
-        
-    }
+    public function drawText(text: String, position: Vec2, color: Vec3, size: Int) {}
 
     public function clear() {
-        context.viewport(0, 0, context.canvas.width, context.canvas.height);
         context.clearColor(0, 0, 0, 1);
         context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
@@ -74,6 +73,7 @@ class Renderer {
     }
 
     public function dispose() {
+        context.deleteBuffer(this.buffer);
         Browser.document.body.removeChild(this.canvas);
     }
 }
@@ -97,17 +97,16 @@ private class PrimitiveDrawingProgram {
     }
 
     public function draw(vertices: Array<Vec2>, color: Vec3, mode: Int = RenderingContext.TRIANGLE_STRIP) {
-        context.useProgram(program);
         setVertices(vertices);
         setScreenSize();
         setColor(color);
+        context.useProgram(program);
         context.drawArrays(mode, 0, vertices.length);
     }
 
     private function setVertices(vertices: Array<Vec2>) {
         var positionAttributeLocation = context.getAttribLocation(program, VERTEX_ATTRIBUTE_NAME);        
         context.enableVertexAttribArray(positionAttributeLocation);
-        context.bindBuffer(RenderingContext.ARRAY_BUFFER, context.createBuffer());
         context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(vertices)), RenderingContext.STATIC_DRAW);
         context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);        
     }
@@ -151,7 +150,6 @@ private class TextureDrawingProgram {
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
         this.context = context;
-        context.useProgram(program);
     }
 
     public function draw(vertices: Array<Vec2>, texture: Image, mode: Int = RenderingContext.TRIANGLE_STRIP) {
@@ -166,16 +164,14 @@ private class TextureDrawingProgram {
 
     private function setQuadPositionVertices(vertices: Array<Vec2>) {
         var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
-        context.enableVertexAttribArray(positionAttributeLocation);                
-        context.bindBuffer(RenderingContext.ARRAY_BUFFER, context.createBuffer());
+        context.enableVertexAttribArray(positionAttributeLocation);
         context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(vertices)), RenderingContext.STATIC_DRAW);
-        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);        
+        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
     private function setTexturePositionVertices() {
         var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
-        context.enableVertexAttribArray(texturePositionAttributeLocation);        
-        context.bindBuffer(RenderingContext.ARRAY_BUFFER, context.createBuffer());
+        context.enableVertexAttribArray(texturePositionAttributeLocation);
         context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getTexturePositionVertices())), RenderingContext.STATIC_DRAW);
         context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }

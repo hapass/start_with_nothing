@@ -1,37 +1,37 @@
 package game;
 
 import engine.graphics.drawing.DrawingBoard;
-
 import engine.loop.GameLoop;
 import engine.loop.GameLoopObserver;
-
 import engine.input.Key;
 import engine.input.Keyboard;
-
 import engine.collisions.CollisionResolver;
 import engine.collisions.CollisionObserver;
+import lang.Promise;
 
 class Main {
-    private static var game:Game;
-
     static function main() {
         launch();
     }
 
     public static function launch() {
-        game = new Game();
-        game.start();
+        new Game().run().then(function(result:GameResult){
+            switch(result) {
+                case GameResult.Restart: launch();
+                case GameResult.Quit:
+            }
+        });
     }
 }
 
 class Game implements GameLoopObserver implements CollisionObserver {
-    private var loop: GameLoop;
-    private var keyboard: Keyboard;
-    private var board: DrawingBoard;
-    private var gameObjects: Array<GameObject>;
-    private var spawner: ObstacleSpawner;
-    private var collisionResolver: CollisionResolver;
-    private var started: Bool;
+    private var loop:GameLoop;
+    private var keyboard:Keyboard;
+    private var board:DrawingBoard;
+    private var gameObjects:Array<GameObject>;
+    private var spawner:ObstacleSpawner;
+    private var collisionResolver:CollisionResolver;
+    private var gameResult:Promise<GameResult>;
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE]);
@@ -40,22 +40,24 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.loop = new GameLoop();
         this.spawner = new ObstacleSpawner();
         this.collisionResolver = new CollisionResolver();
-        this.started = false; 
+        this.gameResult = new Promise<GameResult>();
     }
 
-    public function start() {
+    public function run():Promise<GameResult> {
         spawnBird();
 
         this.collisionResolver.subscribe(this);
         this.loop.subscribe(this);
         this.loop.start();
+
+        return this.gameResult;
     }
 
-    private function spawnBird(): Void {
+    private function spawnBird():Void {
         add(new Bird());
     }
 
-    public function update(timestamp: Float) {
+    public function update(timestamp: Float):Void {
         this.keyboard.checkInput();
 
         spawnObstacleIfNecessary(timestamp);
@@ -67,12 +69,9 @@ class Game implements GameLoopObserver implements CollisionObserver {
         this.board.draw();
     }
 
-    public function onCollision(): Void {
+    public function onCollision():Void {
         stop();
-        
-        //show score
-        //show play again button
-        Main.launch();
+        this.gameResult.resolve(GameResult.Restart);
     }
 
     private function stop() {
@@ -98,7 +97,7 @@ class Game implements GameLoopObserver implements CollisionObserver {
         }
     }
 
-    private function add(gameObject: GameObject): Void {
+    private function add(gameObject:GameObject):Void {
         this.keyboard.subscribe(gameObject.getKeyboardObserver());
 
         var compositeShape = gameObject.getShape();
