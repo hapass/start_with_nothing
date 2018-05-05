@@ -23,10 +23,10 @@ class GameLoop {
         if(shouldExitLoop)
             return;
 
-        Browser.window.requestAnimationFrame(tick);
-
         for(observer in this.observers)
             observer.update(timestamp);
+
+        Browser.window.requestAnimationFrame(tick);
     }
 
     public function start() {

@@ -2,8 +2,6 @@
 
 -main game.Main
 
--dce full
+-debug
 
--D debug
--D js-flatten
--js bin/flappy-bird.min.js
+-js bin/flappy-bird.js
