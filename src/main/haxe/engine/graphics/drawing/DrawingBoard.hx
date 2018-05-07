@@ -5,19 +5,17 @@ import engine.graphics.rendering.Renderer;
 import engine.math.Vec3;
 
 class DrawingBoard {
-    private var renderer: Renderer;
-    private var shapes: Array<Shape>;
+    private var renderer:Renderer;
 
     public function new(width: Int, height: Int) {
-        this.shapes = new Array<Shape>();
         this.renderer = new Renderer(width, height);
     }
 
-    public function add(shape: Shape) {
-        this.shapes.push(shape);
+    public function add(shape:Shape) {
+        this.renderer.add();
     }
 
-    public function remove(shape: Shape) {
+    public function remove(shape:Shape) {
         this.shapes.remove(shape);
     }
 

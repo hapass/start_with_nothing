@@ -22,23 +22,17 @@ class Renderer {
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
 
-    private var primitiveDrawingProgram: PrimitiveDrawingProgram;
-    private var textureDrawingProgram: TextureDrawingProgram;
-
-    private var buffer:Buffer;
+    private var textureDrawingProgram:TextureDrawingProgram;
 
     public function new(canvasWidth: Int, canvasHeight: Int) {
         this.canvas = createCanvas(canvasWidth, canvasHeight);
         this.context = canvas.getContextWebGL();
         this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
-        this.buffer = context.createBuffer();
-        this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
 
         if(context == null)
             throw "Your browser doesn't support webgl. Please update your browser.";
 
         var compiler = new ProgramCompiler(context);
-        this.primitiveDrawingProgram = new PrimitiveDrawingProgram(context, compiler);
         this.textureDrawingProgram = new TextureDrawingProgram(context, compiler);
     }
 
@@ -55,12 +49,6 @@ class Renderer {
         primitiveDrawingProgram.draw(vertices, color);
     }
 
-    public function drawTriangleStripTexture(vertices: Array<Vec2>, texture: Image) {
-        textureDrawingProgram.draw(vertices, texture);
-    }
-
-    public function drawText(text: String, position: Vec2, color: Vec3, size: Int) {}
-
     public function clear() {
         context.clearColor(0, 0, 0, 1);
         context.clear(RenderingContext.COLOR_BUFFER_BIT);
@@ -73,68 +61,12 @@ class Renderer {
     }
 
     public function dispose() {
-        context.deleteBuffer(this.buffer);
+        this.textureDrawingProgram.dispose();
         Browser.document.body.removeChild(this.canvas);
     }
 }
 
-private class PrimitiveDrawingProgram {
-    private static inline var COLOR_UNIFORM_NAME: String = "color";
-    private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "screen_size";
-    private static inline var VERTEX_ATTRIBUTE_NAME: String = "vertex_position";
-    private static inline var PROGRAM_ID: String = "simple_drawing_program";
-    private static inline var VERTEX_SHADER_NAME: String = "PrimitiveVertexShader";
-    private static inline var FRAGMENT_SHADER_NAME: String = "PrimitiveFragmentShader";
-    private static inline var VEC2_DIMENSIONS_NUMBER = 2;
-
-    private var program: Program;
-    private var context: RenderingContext;
-
-    public function new(context: RenderingContext, compiler: ProgramCompiler) {
-        compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
-        this.program = compiler.getProgram(PROGRAM_ID);
-        this.context = context;
-    }
-
-    public function draw(vertices: Array<Vec2>, color: Vec3, mode: Int = RenderingContext.TRIANGLE_STRIP) {
-        setVertices(vertices);
-        setScreenSize();
-        setColor(color);
-        context.useProgram(program);
-        context.drawArrays(mode, 0, vertices.length);
-    }
-
-    private function setVertices(vertices: Array<Vec2>) {
-        var positionAttributeLocation = context.getAttribLocation(program, VERTEX_ATTRIBUTE_NAME);        
-        context.enableVertexAttribArray(positionAttributeLocation);
-        context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(vertices)), RenderingContext.STATIC_DRAW);
-        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);        
-    }
-
-    private function flattenVecArray(vecArray: Array<Vec2>) {
-        var flattenedArray: Array<Float> = [];
-        for(vec in vecArray) {
-            flattenedArray.push(vec.x);
-            flattenedArray.push(vec.y);
-        }
-        return flattenedArray;
-    }
-
-    private function setScreenSize() {
-        var resolutionUniformLocation = context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
-        context.uniform2f(resolutionUniformLocation, context.canvas.width, context.canvas.height);
-    }
-
-    private function setColor(color: Vec3) {
-        var colorUniformLocation = context.getUniformLocation(program, COLOR_UNIFORM_NAME);
-        var r = (color.x / 255);
-        var g = (color.y / 255);
-        var b = (color.z / 255);
-        context.uniform3f(colorUniformLocation, r, g, b);
-    }
-}
-
-private class TextureDrawingProgram {
+private class QuadDrawingProgram {
     private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "screen_size";
     private static inline var TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME: String = "texture_quad_position";
     private static inline var TEXTURE_POSITION_ATTRIBUTE_NAME: String = "texture_position";
@@ -143,13 +75,16 @@ private class TextureDrawingProgram {
     private static inline var FRAGMENT_SHADER_NAME: String = "TextureFragmentShader";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
 
-    private var program: Program;
-    private var context: RenderingContext;
+    private var program:Program;
+    private var context:RenderingContext;
+    private var buffer:
 
-    public function new(context: RenderingContext, compiler: ProgramCompiler) {
+    public function new(context:RenderingContext, compiler:ProgramCompiler) {
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
         this.context = context;
+        this.buffer = context.createBuffer();
+        this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
     }
 
     public function draw(vertices: Array<Vec2>, texture: Image, mode: Int = RenderingContext.TRIANGLE_STRIP) {

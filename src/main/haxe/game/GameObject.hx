@@ -7,9 +7,9 @@ import engine.input.KeyboardObserver;
 import engine.collisions.Collider;
 
 class GameObject {
-    private static inline var DEFAULT_COLLISION_GROUP_NAME: String = "Default";
+    private static inline var DEFAULT_COLLISION_GROUP_NAME:String = "Default";
 
-    public var disposed(default, null): Bool;
+    public var disposed(default, null):Bool;
 
     public function new() {
         this.disposed = false;

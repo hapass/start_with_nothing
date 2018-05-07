@@ -51,7 +51,7 @@ class Bird extends GameObject implements KeyboardObserver {
         return BIRD_COLLISION_GROUP_NAME;
     }
 
-    public function onInput(state: KeyboardState): Void {
+    public function onInput(state:KeyboardState): Void {
         if(state.hasBeenPressed(Key.SPACE)) {
             fly();
         }
