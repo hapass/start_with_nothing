@@ -2,7 +2,6 @@ package engine.graphics.drawing;
 
 import engine.graphics.drawing.shapes.Shape;
 import engine.graphics.rendering.Renderer;
-import engine.math.Vec3;
 
 class DrawingBoard {
     private var renderer:Renderer;

@@ -54,7 +54,9 @@ class Game implements GameLoopObserver implements CollisionObserver {
     }
 
     private function spawnBird():Void {
-        add(new Bird());
+        Bird.create().then(function(bird:Bird) {
+            add(bird);
+        });
     }
 
     public function update(timestamp: Float):Void {

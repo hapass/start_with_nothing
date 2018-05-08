@@ -11,21 +11,36 @@ import engine.input.KeyboardObserver;
 
 import engine.collisions.Collider;
 
+import lang.Promise;
+
 class Bird extends GameObject implements KeyboardObserver {
     private static inline var BIRD_COLLISION_GROUP_NAME: String = "Bird";
 
-    private var shape: RectangleShape;
-    private var collider: Array<Collider>;
-    private var currentSpeed: Vec2;
-    private var acceleration: Vec2;
+    private var shape:Shape;
+    private var collider:Array<Collider>;
+    private var currentSpeed:Vec2;
+    private var acceleration:Vec2;
 
-    public function new() {
+    private function new() {
         super();
-        var position = new Vec2(GamePlayParameters.BIRD_LEFT_DISTANCE, GamePlayParameters.BIRD_UP_DISTANCE);
-        this.shape = new RectangleShape(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT).setColor(GamePlayParameters.BIRD_COLOR);
-        this.collider = [new Collider(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)];
         this.currentSpeed = new Vec2(0, 0);
         this.acceleration = new Vec2(0, GamePlayParameters.BIRD_FALL_ACCELERATION);
+    }
+
+    public static function create():Promise<Bird> {
+        var promise = new Promise<Bird>();
+        var bird = new Bird();
+
+        var position = new Vec2(GamePlayParameters.BIRD_LEFT_DISTANCE, GamePlayParameters.BIRD_UP_DISTANCE);
+        bird.collider = [new Collider(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)];
+
+        new RectangleShape(position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)
+            .setImageUrl("bird.jpg").then(function(shape:Shape) {
+                bird.shape = shape;
+                promise.resolve(bird);
+            });
+
+        return promise;
     }
 
     override public function update(timestamp: Float) {
@@ -43,7 +58,9 @@ class Bird extends GameObject implements KeyboardObserver {
 
     override public function getShape(): Array<Shape> {
         var array:Array<Shape> = new Array<Shape>();
-        array.push(this.shape);
+        if(this.shape != null) {
+            array.push(this.shape);
+        }
         return array;
     }
 

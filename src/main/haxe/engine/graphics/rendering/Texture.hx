@@ -16,7 +16,9 @@ class Texture {
         texture.data = TextureData.ImageElement(image);
 
         var promise:Promise<Texture> = new Promise<Texture>();
-        image.onload = promise.resolve.bind(texture);
+        image.onload = function() {
+            promise.resolve(texture);
+        };
         image.src = url;
 
         return promise;

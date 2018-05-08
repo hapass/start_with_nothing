@@ -3,6 +3,7 @@ package engine.graphics.drawing.shapes;
 import engine.math.Vec2;
 import engine.graphics.drawing.Color;
 import engine.graphics.rendering.Texture;
+import lang.Promise;
 
 class VoidShape implements Shape {
     public var position(default, null):Vec2;
@@ -16,6 +17,6 @@ class VoidShape implements Shape {
     public function new() { }
 
     public function move(vec:Vec2) {}
-    public function setImageUrl(url:String):Shape return this;
+    public function setImageUrl(url:String):Promise<Shape> return new Promise<Shape>().resolve(this);
     public function setColor(color:Color):Shape return this;
 }
