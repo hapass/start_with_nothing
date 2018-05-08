@@ -6,13 +6,16 @@ import engine.math.Vec3;
 
 class DrawingBoard {
     private var renderer:Renderer;
+    private var shapes:Array<Shape>;
 
-    public function new(width: Int, height: Int) {
+    public function new(width:Int, height:Int) {
         this.renderer = new Renderer(width, height);
+        this.shapes = new Array<Shape>();
     }
 
     public function add(shape:Shape) {
-        this.renderer.add();
+        this.shapes.push(shape);
+        this.renderer.loadTexture(shape.texture);
     }
 
     public function remove(shape:Shape) {
@@ -22,18 +25,8 @@ class DrawingBoard {
     public function draw() {
         renderer.clear();
         for(shape in shapes) {
-            var vertices = shape.getVertices();
-            if(vertices != null && vertices.length > 0) {
-                if(shape.color != null) {
-                    var vecColor: Vec3 = new Vec3(shape.color.r, shape.color.g, shape.color.b);
-                    if(shape.text != null) {
-                        renderer.drawText(shape.text, shape.position, vecColor, Std.int(shape.height));
-                    } else {
-                        renderer.drawTriangleStrip(vertices, vecColor);
-                    }
-                } else if (shape.texture != null) {
-                    renderer.drawTriangleStripTexture(vertices, shape.texture.data);
-                }
+            if(shape.isVisible) {
+                renderer.drawQuad(shape.position, Std.int(shape.width), Std.int(shape.height), shape.texture);
             }
         }
     }

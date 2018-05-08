@@ -2,28 +2,20 @@ package engine.graphics.drawing.shapes;
 
 import engine.math.Vec2;
 import engine.graphics.drawing.Color;
+import engine.graphics.rendering.Texture;
 
 class VoidShape implements Shape {
-    public var position(get, null):Vec2;
+    public var position(default, null):Vec2;
+    public var texture(default, null):Texture;
+    public var height(default, null):Float;
+    public var width(default, null):Float;
 
-    public var color(default, null): Color;
-    public var texture(default, null): Texture;
-    public var text(default, null): String;
-    public var height(default, null): Float;
+    public var isVisible(get, never):Bool;
+    private function get_isVisible():Bool return false;
 
-    public function new() { 
-        this.position = new Vec2(0, 0);
-    }
+    public function new() { }
 
-    public function move(vec: Vec2) {
-        //nothing to move
-    }
-
-    public function getVertices(): Array<Vec2> {
-        return [];
-    }
-
-    private function get_position(): Vec2 {
-        return this.position;
-    }
+    public function move(vec:Vec2) {}
+    public function setImageUrl(url:String):Shape return this;
+    public function setColor(color:Color):Shape return this;
 }

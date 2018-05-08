@@ -1,17 +1,7 @@
 <!DOCTYPE html>
 <html>
   <body>
-<script type="text/glsl" id="PrimitiveVertexShader" >
-attribute vec2 vertex_position;
-
-uniform vec2 screen_size;
-
-void main() {
-    vec2 real_position = (vertex_position / screen_size) * 2.0 - 1.0;
-    gl_Position = vec4(real_position * vec2(1, -1), 0, 1);
-}
-</script>
-<script type="text/glsl" id="TextureFragmentShader" >
+<script type="text/glsl" id="FragmentShader" >
 precision mediump float;
 
 uniform sampler2D u_image;
@@ -21,24 +11,18 @@ void main() {
     gl_FragColor = texture2D(u_image, texture_position_interpolated);
 }
 </script>
-<script type="text/glsl" id="PrimitiveFragmentShader" >
-precision mediump float;
-
-uniform vec3 color;
-
-void main() {
-    gl_FragColor = vec4(color, 1);
-}
-</script>
-<script type="text/glsl" id="TextureVertexShader" >
+<script type="text/glsl" id="VertexShader" >
 attribute vec2 texture_quad_position;
 attribute vec2 texture_position;
 
 uniform vec2 screen_size;
+uniform mat4 translation;
+uniform mat4 scale;
+
 varying vec2 texture_position_interpolated;
 
 void main() {
-    vec2 real_position = (texture_quad_position / screen_size) * 2.0 - 1.0;
+    vec2 real_position = ((scale * translation * vec4(texture_quad_position, 0, 1)).xy / screen_size) * 2.0 - 1.0;
     gl_Position = vec4(real_position * vec2(1, -1), 0, 1);
 
     texture_position_interpolated = texture_position;

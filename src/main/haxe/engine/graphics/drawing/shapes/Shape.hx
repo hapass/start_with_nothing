@@ -2,14 +2,18 @@ package engine.graphics.drawing.shapes;
 
 import engine.math.Vec2;
 import engine.graphics.drawing.Color;
+import engine.graphics.rendering.Texture;
 
 interface Shape {
-    public function move(vec: Vec2):Void;
-    public function getVertices():Array<Vec2>;
+    function move(vec:Vec2):Void;
+    function setImageUrl(url:String):Shape;
+    function setColor(color:Color):Shape;
 
-    public var position(get, never):Vec2;
+    var position(default, null):Vec2;
+    var height(default, null):Float;
+    var width(default, null):Float;
 
-    public var height(default, null):Float;
-    public var color(default, null):Color;
-    public var text(default, null):String;
+    var texture(default, null):Texture;
+
+    var isVisible(get, never):Bool;
 }

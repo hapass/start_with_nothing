@@ -2,29 +2,30 @@ package engine.graphics.rendering;
 
 import lang.Debug;
 
-import engine.math.Vec3;
 import engine.math.Vec2;
 
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;
 
-import js.html.Image;
 import js.html.CanvasElement;
 import js.html.Float32Array;
 
 import js.Browser;
 
+import js.html.webgl.UniformLocation;
+typedef GlTexture = js.html.webgl.Texture;
+
 class Renderer {
-    private var context: RenderingContext;
-    private var canvas: CanvasElement;
+    private var context:RenderingContext;
+    private var canvas:CanvasElement;
 
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
 
-    private var textureDrawingProgram:TextureDrawingProgram;
+    private var quadDrawingProgram:QuadDrawingProgram;
 
-    public function new(canvasWidth: Int, canvasHeight: Int) {
+    public function new(canvasWidth:Int, canvasHeight:Int) {
         this.canvas = createCanvas(canvasWidth, canvasHeight);
         this.context = canvas.getContextWebGL();
         this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
@@ -33,20 +34,23 @@ class Renderer {
             throw "Your browser doesn't support webgl. Please update your browser.";
 
         var compiler = new ProgramCompiler(context);
-        this.textureDrawingProgram = new TextureDrawingProgram(context, compiler);
+        this.quadDrawingProgram = new QuadDrawingProgram(context, compiler);
     }
 
-    private function createCanvas(canvasWidth: Int, canvasHeight: Int) { 
+    private function createCanvas(width:Int, height:Int) { 
         var canvas = Browser.document.createCanvasElement();
-        canvas.setAttribute(CANVAS_WIDTH_PROPERTY, Std.string(canvasWidth));
-        canvas.setAttribute(CANVAS_HEIGHT_PROPERTY, Std.string(canvasHeight));
+        canvas.setAttribute(CANVAS_WIDTH_PROPERTY, Std.string(width));
+        canvas.setAttribute(CANVAS_HEIGHT_PROPERTY, Std.string(height));
         Browser.document.body.appendChild(canvas);
         return canvas;
     }
 
-    public function drawTriangleStrip(vertices: Array<Vec2>, color: Vec3) {
-        Debug.assert(isColorValid(color), "Color components should each have the value between 0 and 256.");  
-        primitiveDrawingProgram.draw(vertices, color);
+    public function loadTexture(texture:Texture) {
+        this.quadDrawingProgram.loadTexture(texture);
+    }
+
+    public function drawQuad(translation:Vec2, width:Int, height:Int, texture:Texture) {
+        this.quadDrawingProgram.drawQuad(translation, width, height, texture);
     }
 
     public function clear() {
@@ -54,76 +58,135 @@ class Renderer {
         context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
 
-    private function isColorValid(color: Vec3) {
-        return color.x >= 0 && color.x <= 256 && 
-               color.y >= 0 && color.y <= 256 && 
-               color.z >= 0 && color.z <= 256;
-    }
-
     public function dispose() {
-        this.textureDrawingProgram.dispose();
+        this.quadDrawingProgram.dispose();
         Browser.document.body.removeChild(this.canvas);
     }
 }
 
 private class QuadDrawingProgram {
     private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "screen_size";
+    private static inline var TRANSLATION_UNIFORM_NAME: String = "translation";
+    private static inline var SCALE_UNIFORM_NAME: String = "scale";
     private static inline var TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME: String = "texture_quad_position";
     private static inline var TEXTURE_POSITION_ATTRIBUTE_NAME: String = "texture_position";
     private static inline var PROGRAM_ID: String = "texture_drawing_program";
-    private static inline var VERTEX_SHADER_NAME: String = "TextureVertexShader";
-    private static inline var FRAGMENT_SHADER_NAME: String = "TextureFragmentShader";
+    private static inline var VERTEX_SHADER_NAME: String = "VertexShader";
+    private static inline var FRAGMENT_SHADER_NAME: String = "FragmentShader";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
 
     private var program:Program;
     private var context:RenderingContext;
-    private var buffer:
+    private var quadVertexBuffer:Buffer;
+
+    private var resolution:UniformLocation;
+    private var translation:UniformLocation;
+    private var scale:UniformLocation;
+
+    private var textures:Map<Texture, GlTexture>;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler) {
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
         this.context = context;
-        this.buffer = context.createBuffer();
-        this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
+        this.textures = new Map<Texture, GlTexture>();
+        this.quadVertexBuffer = context.createBuffer();
+        this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, this.quadVertexBuffer);
+        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getQuadVertices())), RenderingContext.STATIC_DRAW);
+
+        setupQuadPositionAttribute();
+        setupQuadTexturePositionAttribute();
+
+        this.resolution = context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
+        this.translation = context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
+        this.scale = context.getUniformLocation(program, SCALE_UNIFORM_NAME);
+
+        this.context.activeTexture(RenderingContext.TEXTURE0);
     }
 
-    public function draw(vertices: Array<Vec2>, texture: Image, mode: Int = RenderingContext.TRIANGLE_STRIP) {
+    public function loadTexture(texture:Texture) {
+        if(!this.textures.exists(texture)) {
+            var glTexture = context.createTexture();
+
+            this.context.bindTexture(RenderingContext.TEXTURE_2D, glTexture);
+
+            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_S, RenderingContext.CLAMP_TO_EDGE);
+            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_T, RenderingContext.CLAMP_TO_EDGE);
+            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MIN_FILTER, RenderingContext.NEAREST);
+            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MAG_FILTER, RenderingContext.NEAREST);
+
+            switch(texture.data) {
+                case TextureData.ImageElement(element):
+                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, element);
+                case TextureData.ColorArray(array):
+                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, 1, 1, 0, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, array);
+            }
+            
+            this.textures.set(texture, glTexture);
+        }
+    }
+
+    public function drawQuad(position:Vec2, width:Int, height:Int, texture:Texture) {
         context.useProgram(program);
-        setQuadPositionVertices(vertices);
-        setTexturePositionVertices();
+
         setTexture(texture);
         setScreenSize();
+        setTranslation(position);
+        setScale(width, height);
 
-        context.drawArrays(mode, 0, vertices.length);
+        context.drawArrays(RenderingContext.TRIANGLE_STRIP, 0, 4);
     }
 
-    private function setQuadPositionVertices(vertices: Array<Vec2>) {
+    private function setTranslation(position:Vec2) {
+        var x = position.x;
+        var y = position.y;
+
+        this.context.uniformMatrix4fv(this.scale, false,
+            [
+                1, 0, 0, x,
+                0, 1, 0, y,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            ]);
+    }
+
+    private function setScale(width:Int, height:Int) {
+        var w = width;
+        var h = height;
+
+        this.context.uniformMatrix4fv(this.translation, false, 
+            [
+                w, 0, 0, 0,
+                0, h, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            ]);
+    }
+
+    private function setupQuadPositionAttribute() {
         var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
-        context.enableVertexAttribArray(positionAttributeLocation);
-        context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(vertices)), RenderingContext.STATIC_DRAW);
-        context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+        this.context.enableVertexAttribArray(positionAttributeLocation);
+        this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
-    private function setTexturePositionVertices() {
+    private function setupQuadTexturePositionAttribute() {
         var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
-        context.enableVertexAttribArray(texturePositionAttributeLocation);
-        context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getTexturePositionVertices())), RenderingContext.STATIC_DRAW);
-        context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+        this.context.enableVertexAttribArray(texturePositionAttributeLocation);
+        this.context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
-    private function setTexture(texture: Image) {
-        context.activeTexture(RenderingContext.TEXTURE0);
-        context.bindTexture(RenderingContext.TEXTURE_2D, context.createTexture());
+    private function setTexture(texture:Texture) {
+        Debug.assert(this.textures.exists(texture), "You should load textures before using them.");
 
-        context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_S, RenderingContext.CLAMP_TO_EDGE);
-        context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_T, RenderingContext.CLAMP_TO_EDGE);
-        context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MIN_FILTER, RenderingContext.NEAREST);
-        context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MAG_FILTER, RenderingContext.NEAREST);
+        this.context.bindTexture(RenderingContext.TEXTURE_2D, this.textures.get(texture));
 
-        context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, texture);
+        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_S, RenderingContext.CLAMP_TO_EDGE);
+        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_T, RenderingContext.CLAMP_TO_EDGE);
+        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MIN_FILTER, RenderingContext.NEAREST);
+        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MAG_FILTER, RenderingContext.NEAREST);
     }
 
-    private function getTexturePositionVertices() {
+    private function getQuadVertices() {
         return [
             new Vec2(0, 1),
             new Vec2(0, 0),
@@ -132,7 +195,7 @@ private class QuadDrawingProgram {
         ];
     }
 
-    private function flattenVecArray(vecArray: Array<Vec2>) {
+    private function flattenVecArray(vecArray:Array<Vec2>) {
         var flattenedArray: Array<Float> = [];
         for(vec in vecArray) {
             flattenedArray.push(vec.x);
@@ -142,22 +205,30 @@ private class QuadDrawingProgram {
     }
 
     private function setScreenSize() {
-        var resolutionUniformLocation = context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
-        context.uniform2f(resolutionUniformLocation, context.canvas.width, context.canvas.height);
+        this.context.uniform2f(this.resolution, context.canvas.width, context.canvas.height);
+    }
+
+    public function dispose() {
+        this.context.deleteProgram(this.program);
+        this.context.deleteBuffer(this.quadVertexBuffer);
+
+        for(texture in this.textures) {
+            this.context.deleteTexture(texture);
+        }
     }
 }
 
 private class ProgramCompiler {
 
-    private var programs: Map<String, Program>;
-    private var context: RenderingContext;
+    private var programs:Map<String, Program>;
+    private var context:RenderingContext;
 
-    public function new(context: RenderingContext) {
+    public function new(context:RenderingContext) {
         this.context = context;
         this.programs = new Map<String, Program>();
     }
 
-    public function compileProgram(name: String, vertexShaderName: String, fragmentShaderName: String): Void {
+    public function compileProgram(name:String, vertexShaderName:String, fragmentShaderName:String):Void {
         var program = context.createProgram();
 
         context.attachShader(program, compileShader(vertexShaderName, RenderingContext.VERTEX_SHADER));
@@ -173,7 +244,7 @@ private class ProgramCompiler {
         programs.set(name, program);
     }
 
-    private function compileShader(name: String, type: Int) {
+    private function compileShader(name:String, type:Int) {
         Debug.assert(Browser.document.getElementById(name) != null, "Shaders should be present in the html page.");
 
         var shaderSource = Browser.document.getElementById(name).innerText;

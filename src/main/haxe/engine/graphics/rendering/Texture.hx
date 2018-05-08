@@ -1,7 +1,7 @@
 package engine.graphics.rendering;
 
+import js.html.Uint8Array;
 import lang.Promise;
-import js.html.Uint8ClampedArray;
 import js.html.Image;
 
 class Texture {
@@ -24,7 +24,7 @@ class Texture {
 
     public static function fromColor(red:Int, green:Int, blue:Int):Texture {
         var texture = new Texture();
-        texture.data = TextureData.ColorArray(Uint8ClampedArray.from([red, green, blue, 1]));
+        texture.data = TextureData.ColorArray(new Uint8Array([red, green, blue, 1]));
         return texture;
     }
 }
