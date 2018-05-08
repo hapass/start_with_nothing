@@ -5,7 +5,7 @@ import engine.graphics.drawing.Color;
 import engine.graphics.rendering.Texture;
 import lang.Debug;
 
-class RectangleShape implements Shape { 
+class RectangleShape implements Shape {
     public var texture(default, null):Texture;
     public var height(default, null):Float;
     public var width(default, null):Float;
@@ -13,6 +13,8 @@ class RectangleShape implements Shape {
 
     public var isVisible(get, never):Bool;
     private function get_isVisible():Bool return true;
+
+    private static var colorTexturesCache:Map<Color, Texture> = new Map<Color, Texture>();
 
     public function new(coords:Vec2, width:Float, height:Float) {
         this.position = coords;
@@ -23,7 +25,14 @@ class RectangleShape implements Shape {
 
     public function setColor(color:Color) {
         Debug.assert(this.texture == null, "Texture is already set for a shape.");
-        this.texture = Texture.fromColor(color.r, color.g, color.b);
+
+        if(RectangleShape.colorTexturesCache.exists(color)) {
+            this.texture = RectangleShape.colorTexturesCache.get(color);
+        } else {
+            this.texture = Texture.fromColor(color.r, color.g, color.b);
+            RectangleShape.colorTexturesCache.set(color, this.texture);
+        }
+
         return this;
     }
 

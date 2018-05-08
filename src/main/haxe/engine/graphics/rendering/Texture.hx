@@ -24,7 +24,12 @@ class Texture {
 
     public static function fromColor(red:Int, green:Int, blue:Int):Texture {
         var texture = new Texture();
-        texture.data = TextureData.ColorArray(new Uint8Array([red, green, blue, 1]));
+        texture.data = TextureData.ColorArray(new Uint8Array([
+            red, green, blue, 255,
+            red, green, blue, 255,
+            red, green, blue, 255,
+            red, green, blue, 255,
+        ]));
         return texture;
     }
 }

@@ -119,7 +119,7 @@ private class QuadDrawingProgram {
                 case TextureData.ImageElement(element):
                     this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, element);
                 case TextureData.ColorArray(array):
-                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, 1, 1, 0, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, array);
+                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, 2, 2, 0, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, array);
             }
             
             this.textures.set(texture, glTexture);
@@ -141,20 +141,14 @@ private class QuadDrawingProgram {
         var x = position.x;
         var y = position.y;
 
-        this.context.uniformMatrix4fv(this.scale, false,
-            [
-                1, 0, 0, x,
-                0, 1, 0, y,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            ]);
+        this.context.uniform2f(this.translation, x, y);
     }
 
     private function setScale(width:Int, height:Int) {
         var w = width;
         var h = height;
 
-        this.context.uniformMatrix4fv(this.translation, false, 
+        this.context.uniformMatrix4fv(this.scale, false, 
             [
                 w, 0, 0, 0,
                 0, h, 0, 0,
