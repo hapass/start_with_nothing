@@ -60,6 +60,7 @@ class Renderer {
 
     public function dispose() {
         this.quadDrawingProgram.dispose();
+        this.context.finish();
         Browser.document.body.removeChild(this.canvas);
     }
 }
@@ -103,7 +104,20 @@ private class QuadDrawingProgram {
         this.translation = this.context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
         this.scale = this.context.getUniformLocation(program, SCALE_UNIFORM_NAME);
 
+        this.context.useProgram(program);
         this.context.activeTexture(RenderingContext.TEXTURE0);
+    }
+
+    private function setupQuadPositionAttribute() {
+        var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
+        this.context.enableVertexAttribArray(positionAttributeLocation);
+        this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+    }
+
+    private function setupQuadTexturePositionAttribute() {
+        var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
+        this.context.enableVertexAttribArray(texturePositionAttributeLocation);
+        this.context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
     public function loadTexture(texture:Texture) {
@@ -129,10 +143,8 @@ private class QuadDrawingProgram {
     }
 
     public function drawQuad(position:Vec2, width:Int, height:Int, texture:Texture) {
-        this.context.useProgram(program);
-
-        setTexture(texture);
         setProjection();
+        setTexture(texture);
         setTranslation(position);
         setScale(width, height);
 
@@ -173,18 +185,6 @@ private class QuadDrawingProgram {
               0,    0, 1, 0,
              -1,    1, 0, 1
         ]);
-    }
-
-    private function setupQuadPositionAttribute() {
-        var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
-        this.context.enableVertexAttribArray(positionAttributeLocation);
-        this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
-    }
-
-    private function setupQuadTexturePositionAttribute() {
-        var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
-        this.context.enableVertexAttribArray(texturePositionAttributeLocation);
-        this.context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
     private function setTexture(texture:Texture) {
