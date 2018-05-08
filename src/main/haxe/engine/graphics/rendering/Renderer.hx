@@ -65,7 +65,7 @@ class Renderer {
 }
 
 private class QuadDrawingProgram {
-    private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "screen_size";
+    private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "projection";
     private static inline var TRANSLATION_UNIFORM_NAME: String = "translation";
     private static inline var SCALE_UNIFORM_NAME: String = "scale";
     private static inline var TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME: String = "texture_quad_position";
@@ -79,27 +79,29 @@ private class QuadDrawingProgram {
     private var context:RenderingContext;
     private var quadVertexBuffer:Buffer;
 
-    private var resolution:UniformLocation;
+    private var projection:UniformLocation;
     private var translation:UniformLocation;
     private var scale:UniformLocation;
 
     private var textures:Map<Texture, GlTexture>;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler) {
+        this.textures = new Map<Texture, GlTexture>();
+        
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
+
         this.context = context;
-        this.textures = new Map<Texture, GlTexture>();
-        this.quadVertexBuffer = context.createBuffer();
+        this.quadVertexBuffer = this.context.createBuffer();
         this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, this.quadVertexBuffer);
         this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getQuadVertices())), RenderingContext.STATIC_DRAW);
 
         setupQuadPositionAttribute();
         setupQuadTexturePositionAttribute();
 
-        this.resolution = context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
-        this.translation = context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
-        this.scale = context.getUniformLocation(program, SCALE_UNIFORM_NAME);
+        this.projection = this.context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
+        this.translation = this.context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
+        this.scale = this.context.getUniformLocation(program, SCALE_UNIFORM_NAME);
 
         this.context.activeTexture(RenderingContext.TEXTURE0);
     }
@@ -127,34 +129,50 @@ private class QuadDrawingProgram {
     }
 
     public function drawQuad(position:Vec2, width:Int, height:Int, texture:Texture) {
-        context.useProgram(program);
+        this.context.useProgram(program);
 
         setTexture(texture);
-        setScreenSize();
+        setProjection();
         setTranslation(position);
         setScale(width, height);
 
-        context.drawArrays(RenderingContext.TRIANGLE_STRIP, 0, 4);
+        this.context.drawArrays(RenderingContext.TRIANGLE_STRIP, 0, 4);
     }
 
     private function setTranslation(position:Vec2) {
         var x = position.x;
         var y = position.y;
 
-        this.context.uniform2f(this.translation, x, y);
+        this.context.uniformMatrix4fv(this.translation, false, [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, 0, 1,
+        ]);
     }
 
     private function setScale(width:Int, height:Int) {
         var w = width;
         var h = height;
 
-        this.context.uniformMatrix4fv(this.scale, false, 
-            [
-                w, 0, 0, 0,
-                0, h, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            ]);
+        this.context.uniformMatrix4fv(this.scale, false, [
+            w, 0, 0, 0,
+            0, h, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ]);
+    }
+
+    private function setProjection() {
+        var w = this.context.canvas.width;
+        var h = this.context.canvas.height;
+
+        this.context.uniformMatrix4fv(this.projection, false, [
+            2/w,    0, 0, 0,
+              0, -2/h, 0, 0,
+              0,    0, 1, 0,
+             -1,    1, 0, 1
+        ]);
     }
 
     private function setupQuadPositionAttribute() {
@@ -171,13 +189,7 @@ private class QuadDrawingProgram {
 
     private function setTexture(texture:Texture) {
         Debug.assert(this.textures.exists(texture), "You should load textures before using them.");
-
         this.context.bindTexture(RenderingContext.TEXTURE_2D, this.textures.get(texture));
-
-        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_S, RenderingContext.CLAMP_TO_EDGE);
-        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_T, RenderingContext.CLAMP_TO_EDGE);
-        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MIN_FILTER, RenderingContext.NEAREST);
-        this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MAG_FILTER, RenderingContext.NEAREST);
     }
 
     private function getQuadVertices() {
@@ -196,10 +208,6 @@ private class QuadDrawingProgram {
             flattenedArray.push(vec.y);
         }
         return flattenedArray;
-    }
-
-    private function setScreenSize() {
-        this.context.uniform2f(this.resolution, context.canvas.width, context.canvas.height);
     }
 
     public function dispose() {
