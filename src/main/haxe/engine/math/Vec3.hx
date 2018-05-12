@@ -30,4 +30,8 @@ class Vec3 {
             this.z
         ];
     }
+
+    public function iterator():Iterator<Float> {
+        return this.toArray().iterator();
+    }
 }

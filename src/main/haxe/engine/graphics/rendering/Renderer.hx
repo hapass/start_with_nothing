@@ -1,19 +1,17 @@
 package engine.graphics.rendering;
 
 import lang.Debug;
-
 import engine.math.Vec2;
-
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;
-
+import js.html.webgl.UniformLocation;
 import js.html.CanvasElement;
 import js.html.Float32Array;
-
 import js.Browser;
 
-import js.html.webgl.UniformLocation;
+using Lambda;
+
 typedef GlTexture = js.html.webgl.Texture;
 
 class Renderer {
@@ -95,7 +93,7 @@ private class QuadDrawingProgram {
         this.context = context;
         this.quadVertexBuffer = this.context.createBuffer();
         this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, this.quadVertexBuffer);
-        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(flattenVecArray(getQuadVertices())), RenderingContext.STATIC_DRAW);
+        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(getQuadVertices().flatten().array()), RenderingContext.STATIC_DRAW);
 
         setupQuadPositionAttribute();
         setupQuadTexturePositionAttribute();
@@ -199,15 +197,6 @@ private class QuadDrawingProgram {
             new Vec2(1, 1),
             new Vec2(1, 0),
         ];
-    }
-
-    private function flattenVecArray(vecArray:Array<Vec2>) {
-        var flattenedArray: Array<Float> = [];
-        for(vec in vecArray) {
-            flattenedArray.push(vec.x);
-            flattenedArray.push(vec.y);
-        }
-        return flattenedArray;
     }
 
     public function dispose() {

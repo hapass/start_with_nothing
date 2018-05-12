@@ -27,4 +27,8 @@ class Vec2 {
             this.y
         ];
     }
+
+    public function iterator():Iterator<Float> {
+        return this.toArray().iterator();
+    }
 }
