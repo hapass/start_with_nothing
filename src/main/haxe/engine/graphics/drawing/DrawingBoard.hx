@@ -2,7 +2,6 @@ package engine.graphics.drawing;
 
 import engine.graphics.drawing.shapes.Shape;
 import engine.graphics.rendering.Renderer;
-import engine.math.Vec3;
 
 class DrawingBoard {
     private var renderer:Renderer;
@@ -25,7 +24,7 @@ class DrawingBoard {
         renderer.clear();
         for(shape in shapes) {
             if(shape.isVisible) {
-                renderer.drawQuad(shape.position, Std.int(shape.width), Std.int(shape.height), new Vec3(1, 1, 1));
+                renderer.drawQuad(shape.position, Std.int(shape.width), Std.int(shape.height), shape.color.toVec3());
             }
         }
     }

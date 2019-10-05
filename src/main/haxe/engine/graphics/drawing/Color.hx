@@ -1,6 +1,7 @@
 package engine.graphics.drawing;
 
 import lang.Debug;
+import engine.math.Vec3;
 
 class Color {
     public var r(default, null): Int;
@@ -29,6 +30,11 @@ class Color {
         this.r = correctColor(r);
         this.g = correctColor(g);
         this.b = correctColor(b);
+    }
+
+    public function toVec3()
+    {
+        return new Vec3(this.r, this.g, this.b);
     }
 
     private function correctColor(value: Int) {

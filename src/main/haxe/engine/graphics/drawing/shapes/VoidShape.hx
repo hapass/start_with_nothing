@@ -2,12 +2,10 @@ package engine.graphics.drawing.shapes;
 
 import engine.math.Vec2;
 import engine.graphics.drawing.Color;
-import engine.graphics.rendering.Texture;
-import lang.Promise;
 
 class VoidShape implements Shape {
     public var position(default, null):Vec2;
-    public var texture(default, null):Texture;
+    public var color(default, null):Color;
     public var height(default, null):Float;
     public var width(default, null):Float;
 
