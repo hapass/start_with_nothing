@@ -54,11 +54,11 @@ build.dependsOn embedShaders
 
 task startServer(type: Exec) {
     workingDir binPath
-    commandLine "screen", "-S", "flappy_bird_server", "-d", "-m", "python", "-m", "SimpleHTTPServer", "8000"
+    commandLine "screen", "-S", "glow_server", "-d", "-m", "python", "-m", "SimpleHTTPServer", "8000"
 }
 
 task killServer(type: Exec) {
-    commandLine "screen", "-S", "flappy_bird_server", "-X", "quit"
+    commandLine "screen", "-S", "glow_server", "-X", "quit"
 }
 
 //run
