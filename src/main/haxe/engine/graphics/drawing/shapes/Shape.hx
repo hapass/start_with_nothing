@@ -7,8 +7,7 @@ import lang.Promise;
 
 interface Shape {
     function move(vec:Vec2):Void;
-    
-    function setImageUrl(url:String):Promise<Shape>;
+
     function setColor(color:Color):Shape;
 
     var position(default, null):Vec2;

@@ -2,6 +2,7 @@ package engine.graphics.rendering;
 
 import lang.Debug;
 import engine.math.Vec2;
+import engine.math.Vec3;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;
@@ -11,8 +12,6 @@ import js.html.Float32Array;
 import js.Browser;
 
 using Lambda;
-
-typedef GlTexture = js.html.webgl.Texture;
 
 class Renderer {
     private var context:RenderingContext;
@@ -43,12 +42,8 @@ class Renderer {
         return canvas;
     }
 
-    public function loadTexture(texture:Texture) {
-        this.quadDrawingProgram.loadTexture(texture);
-    }
-
-    public function drawQuad(translation:Vec2, width:Int, height:Int, texture:Texture) {
-        this.quadDrawingProgram.drawQuad(translation, width, height, texture);
+    public function drawQuad(translation:Vec2, width:Int, height:Int, color:Vec3) {
+        this.quadDrawingProgram.drawQuad(translation, width, height, color);
     }
 
     public function clear() {
@@ -67,9 +62,9 @@ private class QuadDrawingProgram {
     private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "projection";
     private static inline var TRANSLATION_UNIFORM_NAME: String = "translation";
     private static inline var SCALE_UNIFORM_NAME: String = "scale";
-    private static inline var TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME: String = "texture_quad_position";
-    private static inline var TEXTURE_POSITION_ATTRIBUTE_NAME: String = "texture_position";
-    private static inline var PROGRAM_ID: String = "texture_drawing_program";
+    private static inline var COLOR_UNIFORM_NAME: String = "color";
+    private static inline var QUAD_POSITION_ATTRIBUTE_NAME: String = "quad_position";
+    private static inline var PROGRAM_ID: String = "quad_drawing_program";
     private static inline var VERTEX_SHADER_NAME: String = "VertexShader";
     private static inline var FRAGMENT_SHADER_NAME: String = "FragmentShader";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
@@ -81,11 +76,9 @@ private class QuadDrawingProgram {
     private var projection:UniformLocation;
     private var translation:UniformLocation;
     private var scale:UniformLocation;
-
-    private var textures:Map<Texture, GlTexture>;
+    private var color:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler) {
-        this.textures = new Map<Texture, GlTexture>();
         
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
@@ -96,53 +89,24 @@ private class QuadDrawingProgram {
         this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(getQuadVertices().flatten().array()), RenderingContext.STATIC_DRAW);
 
         setupQuadPositionAttribute();
-        setupQuadTexturePositionAttribute();
 
         this.projection = this.context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
         this.translation = this.context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
         this.scale = this.context.getUniformLocation(program, SCALE_UNIFORM_NAME);
+        this.color = this.context.getUniformLocation(program, COLOR_UNIFORM_NAME);
 
         this.context.useProgram(program);
-        this.context.activeTexture(RenderingContext.TEXTURE0);
     }
 
     private function setupQuadPositionAttribute() {
-        var positionAttributeLocation = context.getAttribLocation(program, TEXTURE_QUAD_POSITION_ATTRIBUTE_NAME);
+        var positionAttributeLocation = context.getAttribLocation(program, QUAD_POSITION_ATTRIBUTE_NAME);
         this.context.enableVertexAttribArray(positionAttributeLocation);
         this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
     }
 
-    private function setupQuadTexturePositionAttribute() {
-        var texturePositionAttributeLocation = context.getAttribLocation(program, TEXTURE_POSITION_ATTRIBUTE_NAME);
-        this.context.enableVertexAttribArray(texturePositionAttributeLocation);
-        this.context.vertexAttribPointer(texturePositionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
-    }
-
-    public function loadTexture(texture:Texture) {
-        if(!this.textures.exists(texture)) {
-            var glTexture = context.createTexture();
-
-            this.context.bindTexture(RenderingContext.TEXTURE_2D, glTexture);
-
-            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_S, RenderingContext.CLAMP_TO_EDGE);
-            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_WRAP_T, RenderingContext.CLAMP_TO_EDGE);
-            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MIN_FILTER, RenderingContext.NEAREST);
-            this.context.texParameteri(RenderingContext.TEXTURE_2D, RenderingContext.TEXTURE_MAG_FILTER, RenderingContext.NEAREST);
-
-            switch(texture.data) {
-                case TextureData.ImageElement(element):
-                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, element);
-                case TextureData.ColorArray(array):
-                    this.context.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, 2, 2, 0, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, array);
-            }
-            
-            this.textures.set(texture, glTexture);
-        }
-    }
-
-    public function drawQuad(position:Vec2, width:Int, height:Int, texture:Texture) {
+    public function drawQuad(position:Vec2, width:Int, height:Int, color:Vec3) {
         setProjection();
-        setTexture(texture);
+        setColor(color);
         setTranslation(position);
         setScale(width, height);
 
@@ -185,9 +149,8 @@ private class QuadDrawingProgram {
         ]);
     }
 
-    private function setTexture(texture:Texture) {
-        Debug.assert(this.textures.exists(texture), "You should load textures before using them.");
-        this.context.bindTexture(RenderingContext.TEXTURE_2D, this.textures.get(texture));
+    private function setColor(color:Vec3) {
+        this.context.uniform4fv(this.color, [color.x, color.y, color.z, 1]);
     }
 
     private function getQuadVertices() {
@@ -202,10 +165,6 @@ private class QuadDrawingProgram {
     public function dispose() {
         this.context.deleteProgram(this.program);
         this.context.deleteBuffer(this.quadVertexBuffer);
-
-        for(texture in this.textures) {
-            this.context.deleteTexture(texture);
-        }
     }
 }
 

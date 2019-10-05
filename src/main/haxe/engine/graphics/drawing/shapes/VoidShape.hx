@@ -17,6 +17,5 @@ class VoidShape implements Shape {
     public function new() { }
 
     public function move(vec:Vec2) {}
-    public function setImageUrl(url:String):Promise<Shape> return new Promise<Shape>().resolve(this);
     public function setColor(color:Color):Shape return this;
 }
