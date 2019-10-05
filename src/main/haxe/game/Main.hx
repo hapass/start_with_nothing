@@ -29,7 +29,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
     private var keyboard:Keyboard;
     private var board:DrawingBoard;
     private var gameObjects:Array<GameObject>;
-    private var spawner:ObstacleSpawner;
+    private var spawner:BrushSpawner;
     private var collisionResolver:CollisionResolver;
     private var gameResult:Promise<GameResult>;
 
@@ -38,7 +38,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
         this.board = new DrawingBoard(GamePlayParameters.GAME_WIDTH, GamePlayParameters.GAME_HEIGHT);
         this.gameObjects = new Array<GameObject>();
         this.loop = new GameLoop();
-        this.spawner = new ObstacleSpawner();
+        this.spawner = new BrushSpawner();
         this.collisionResolver = new CollisionResolver();
         this.gameResult = new Promise<GameResult>();
     }
@@ -62,7 +62,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
     public function update(timestamp:Float):Void {
         this.keyboard.checkInput();
 
-        spawnObstacleIfNecessary(timestamp);
+        spawnBrushIfNecessary(timestamp);
         this.collisionResolver.resolve();
 
 
@@ -91,7 +91,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
         this.keyboard.dispose();
     }
 
-    private function spawnObstacleIfNecessary(timestamp: Float) {
+    private function spawnBrushIfNecessary(timestamp: Float) {
         var spawnResult = spawner.spawn(timestamp);
 
         if(spawnResult.spawned) {

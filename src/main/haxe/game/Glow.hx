@@ -12,8 +12,6 @@ import engine.input.KeyboardObserver;
 
 import engine.collisions.Collider;
 
-import lang.Promise;
-
 class Glow extends GameObject implements KeyboardObserver {
     private static inline var GLOW_COLLISION_GROUP_NAME:String = "Glow";
 

@@ -1,28 +1,25 @@
 ext {
     binPath = "bin"
     layoutPath = "layout"
+    dataPath = "data"
     shadersPath = "src/main/glsl/engine/graphics/rendering"
     hxmlFile = "build.hxml"
     shaderToken = "<!-- INSERT_SHADERS -->"
+    levelToken = "<!-- INSERT_LEVELS -->"
     emptyString = ""
 }
 
-//------------------------------------------------
-//Build section.
-//------------------------------------------------
+//Build.
 
-//compile the game using haxe compiler
 task compile(type: Exec) {
     commandLine "haxe", hxmlFile
 }
 
-//copies html5 layout
 task copyLayout(type: Copy) {
     from layoutPath
     into binPath
 }
 
-//embed shaders into html5 layout
 task embedShaders << {
     FileTree tree = fileTree(dir: shadersPath)
     tree.include "**/*.glsl"
@@ -37,9 +34,23 @@ task embedShaders << {
     file.write file.text.replace(shaderToken, tags.join(emptyString))
 }
 
-embedShaders.mustRunAfter copyLayout
+task embedLevels << {
+    FileTree tree = fileTree(dir: dataPath)
+    tree.include "**/*.lvl"
 
-//build
+    def tags = []
+
+    tree.each { File file ->
+        tags << "<div" << " data-lvl-id=\"" << file.name.replace(".lvl", "") << "\"" << " data-lvl-description=\"" << file.text.replace(" ", "").replace("\n", " ") << "\"" << " />" << "\n"
+    }
+
+    def file = new File(binPath + "/index.html")
+    file.write file.text.replace(levelToken, tags.join(emptyString))
+}
+
+embedShaders.mustRunAfter copyLayout
+embedLevels.mustRunAfter copyLayout
+
 task build << {
     println "Building..."
 }
@@ -47,10 +58,9 @@ task build << {
 build.dependsOn compile
 build.dependsOn copyLayout
 build.dependsOn embedShaders
+build.dependsOn embedLevels
 
-//------------------------------------------------
-//Run section.
-//------------------------------------------------
+//Run.
 
 task startServer(type: Exec) {
     workingDir binPath
@@ -61,7 +71,6 @@ task killServer(type: Exec) {
     commandLine "screen", "-S", "glow_server", "-X", "quit"
 }
 
-//run
 task run << {
    java.awt.Desktop.desktop.browse "http://localhost:8000".toURI()
 }
