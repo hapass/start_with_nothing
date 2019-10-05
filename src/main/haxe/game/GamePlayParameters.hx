@@ -12,11 +12,11 @@ class GamePlayParameters {
     public static inline var WALL_HEIGHT_MIN: Int = 70;
     public static inline var WALL_SPAWN_INTERVAL: Int = 2500;
 
-    public static var BIRD_COLOR: Color = Color.YELLOW;
-    public static inline var BIRD_WIDTH: Int = 20;
-    public static inline var BIRD_HEIGHT: Int = 20;
-    public static inline var BIRD_UP_DISTANCE: Int = 150;
-    public static inline var BIRD_LEFT_DISTANCE: Int = 150;
-    public static inline var BIRD_FALL_ACCELERATION: Float = 0.2;
-    public static inline var BIRD_FLIGHT_ACCELERATION: Float = 4;
+    public static var GLOW_COLOR: Color = Color.YELLOW;
+    public static inline var GLOW_WIDTH: Int = 20;
+    public static inline var GLOW_HEIGHT: Int = 20;
+    public static inline var GLOW_UP_DISTANCE: Int = 150;
+    public static inline var GLOW_LEFT_DISTANCE: Int = 150;
+    public static inline var GLOW_FALL_ACCELERATION: Float = 0.2;
+    public static inline var GLOW_FLIGHT_ACCELERATION: Float = 4;
 }

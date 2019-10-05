@@ -4,6 +4,7 @@ import engine.math.Vec2;
 
 import engine.graphics.drawing.shapes.RectangleShape;
 import engine.graphics.drawing.shapes.Shape;
+import engine.graphics.drawing.Color;
 
 import engine.input.KeyboardState;
 import engine.input.Key;
@@ -13,8 +14,8 @@ import engine.collisions.Collider;
 
 import lang.Promise;
 
-class Bird extends GameObject implements KeyboardObserver {
-    private static inline var BIRD_COLLISION_GROUP_NAME:String = "Bird";
+class Glow extends GameObject implements KeyboardObserver {
+    private static inline var GLOW_COLLISION_GROUP_NAME:String = "Glow";
 
     private var shape:Shape;
     private var collider:Array<Collider>;
@@ -22,33 +23,27 @@ class Bird extends GameObject implements KeyboardObserver {
     private var acceleration:Vec2;
     private var position:Vec2;
 
-    private var lifetimeObservers:Array<BirdLifetimeObserver>;
+    private var lifetimeObservers:Array<GlowLifetimeObserver>;
 
-    public function subscribe(observer:BirdLifetimeObserver) {
+    public function subscribe(observer:GlowLifetimeObserver) {
         this.lifetimeObservers.push(observer);
     }
 
     private function new() {
         super();
         this.currentSpeed = new Vec2(0, 0);
-        this.acceleration = new Vec2(0, GamePlayParameters.BIRD_FALL_ACCELERATION);
-        this.lifetimeObservers = new Array<BirdLifetimeObserver>();
+        this.acceleration = new Vec2(0, GamePlayParameters.GLOW_FALL_ACCELERATION);
+        this.lifetimeObservers = new Array<GlowLifetimeObserver>();
     }
 
-    public static function create():Promise<Bird> {
-        var promise = new Promise<Bird>();
-        var bird = new Bird();
+    public static function create():Glow {
+        var glow = new Glow();
 
-        bird.position = new Vec2(GamePlayParameters.BIRD_LEFT_DISTANCE, GamePlayParameters.BIRD_UP_DISTANCE);
-        bird.collider = [new Collider(bird.position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)];
+        glow.position = new Vec2(GamePlayParameters.GLOW_LEFT_DISTANCE, GamePlayParameters.GLOW_UP_DISTANCE);
+        glow.collider = [new Collider(glow.position, GamePlayParameters.GLOW_WIDTH, GamePlayParameters.GLOW_HEIGHT)];
+        glow.shape = new RectangleShape(glow.position, GamePlayParameters.GLOW_WIDTH, GamePlayParameters.GLOW_HEIGHT).setColor(Color.BLUE);
 
-        new RectangleShape(bird.position, GamePlayParameters.BIRD_WIDTH, GamePlayParameters.BIRD_HEIGHT)
-            .setImageUrl("bird.jpg").then(function(shape:Shape) {
-                bird.shape = shape;
-                promise.resolve(bird);
-            });
-
-        return promise;
+        return glow;
     }
 
     override public function update(timestamp:Float) {
@@ -57,7 +52,7 @@ class Bird extends GameObject implements KeyboardObserver {
 
         if(isOutOfScreen()) {
             for(observer in lifetimeObservers) {
-                observer.onBirdDeath();
+                observer.onGlowDeath();
             }
         }
     }
@@ -79,7 +74,7 @@ class Bird extends GameObject implements KeyboardObserver {
     }
 
     override public function getCollisionGroupName():String {
-        return BIRD_COLLISION_GROUP_NAME;
+        return GLOW_COLLISION_GROUP_NAME;
     }
 
     public function onInput(state:KeyboardState):Void {
@@ -89,7 +84,7 @@ class Bird extends GameObject implements KeyboardObserver {
     }
 
     private function fly() {
-        this.currentSpeed = new Vec2(0, -GamePlayParameters.BIRD_FLIGHT_ACCELERATION);
+        this.currentSpeed = new Vec2(0, -GamePlayParameters.GLOW_FLIGHT_ACCELERATION);
     }
 
     private function applyGravity() {

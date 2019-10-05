@@ -24,7 +24,7 @@ class Main {
     }
 }
 
-class Game implements GameLoopObserver implements CollisionObserver implements BirdLifetimeObserver{
+class Game implements GameLoopObserver implements CollisionObserver implements GlowLifetimeObserver {
     private var loop:GameLoop;
     private var keyboard:Keyboard;
     private var board:DrawingBoard;
@@ -44,7 +44,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements B
     }
 
     public function run():Promise<GameResult> {
-        spawnBird();
+        spawnGlow();
 
         this.collisionResolver.subscribe(this);
         this.loop.subscribe(this);
@@ -53,11 +53,10 @@ class Game implements GameLoopObserver implements CollisionObserver implements B
         return this.gameResult;
     }
 
-    private function spawnBird():Void {
-        Bird.create().then(function(bird:Bird) {
-            bird.subscribe(this);
-            add(bird);
-        });
+    private function spawnGlow():Void {
+        var glow:Glow = Glow.create();
+        glow.subscribe(this);
+        add(glow);
     }
 
     public function update(timestamp:Float):Void {
@@ -73,7 +72,7 @@ class Game implements GameLoopObserver implements CollisionObserver implements B
         this.board.draw();
     }
 
-    public function onBirdDeath():Void {
+    public function onGlowDeath():Void {
         stop();
         this.gameResult.resolve(GameResult.Restart);
     }
