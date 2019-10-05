@@ -5,8 +5,6 @@ import engine.loop.GameLoop;
 import engine.loop.GameLoopObserver;
 import engine.input.Key;
 import engine.input.Keyboard;
-import engine.collisions.CollisionResolver;
-import engine.collisions.CollisionObserver;
 import lang.Promise;
 
 class Main {
@@ -24,13 +22,12 @@ class Main {
     }
 }
 
-class Game implements GameLoopObserver implements CollisionObserver implements GlowLifetimeObserver {
+class Game implements GameLoopObserver implements GlowLifetimeObserver {
     private var loop:GameLoop;
     private var keyboard:Keyboard;
     private var board:DrawingBoard;
     private var gameObjects:Array<GameObject>;
-    private var spawner:BrushSpawner;
-    private var collisionResolver:CollisionResolver;
+    private var spawner:LevelSpawner;
     private var gameResult:Promise<GameResult>;
 
     public function new() {
@@ -38,15 +35,14 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
         this.board = new DrawingBoard(GamePlayParameters.GAME_WIDTH, GamePlayParameters.GAME_HEIGHT);
         this.gameObjects = new Array<GameObject>();
         this.loop = new GameLoop();
-        this.spawner = new BrushSpawner();
-        this.collisionResolver = new CollisionResolver();
+        this.spawner = new LevelSpawner();
         this.gameResult = new Promise<GameResult>();
     }
 
     public function run():Promise<GameResult> {
         spawnGlow();
+        spawnBrush();
 
-        this.collisionResolver.subscribe(this);
         this.loop.subscribe(this);
         this.loop.start();
 
@@ -62,10 +58,6 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
     public function update(timestamp:Float):Void {
         this.keyboard.checkInput();
 
-        spawnBrushIfNecessary(timestamp);
-        this.collisionResolver.resolve();
-
-
         removeDisposedGameObjects();
         updateAllGameObjects(timestamp);
 
@@ -77,23 +69,16 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
         this.gameResult.resolve(GameResult.Restart);
     }
 
-    public function onCollision():Void {
-        stop();
-        this.gameResult.resolve(GameResult.Restart);
-    }
-
     private function stop() {
         this.loop.stop();
         this.loop.unsubscribe(this);
-        this.collisionResolver.unsubscribe(this);
         removeDisposedGameObjects(true);
         this.board.dispose();
         this.keyboard.dispose();
     }
 
-    private function spawnBrushIfNecessary(timestamp: Float) {
-        var spawnResult = spawner.spawn(timestamp);
-
+    private function spawnBrush() {
+        var spawnResult = spawner.spawn();
         if(spawnResult.spawned) {
             add(spawnResult.gameObject);
         }
@@ -113,11 +98,6 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
             this.board.add(shape);
         }
 
-        var compositeCollider = gameObject.getCollider();
-        for(collider in compositeCollider) {
-            this.collisionResolver.addToCollisionGroup(gameObject.getCollisionGroupName(), collider);
-        }
-
         this.gameObjects.push(gameObject);
     }
 
@@ -127,10 +107,6 @@ class Game implements GameLoopObserver implements CollisionObserver implements G
             if(gameObject.disposed || force) {
                 for(shape in gameObject.getShape()) {
                     this.board.remove(shape);
-                }
-                
-                for(collider in gameObject.getCollider()) {
-                    this.collisionResolver.removeFromCollisionGroup(gameObject.getCollisionGroupName(), collider);
                 }
             }
             else {

@@ -10,13 +10,10 @@ import engine.input.KeyboardState;
 import engine.input.Key;
 import engine.input.KeyboardObserver;
 
-import engine.collisions.Collider;
-
 class Glow extends GameObject implements KeyboardObserver {
     private static inline var GLOW_COLLISION_GROUP_NAME:String = "Glow";
 
     private var shape:Shape;
-    private var collider:Array<Collider>;
     private var currentSpeed:Vec2;
     private var acceleration:Vec2;
     private var position:Vec2;
@@ -38,7 +35,6 @@ class Glow extends GameObject implements KeyboardObserver {
         var glow = new Glow();
 
         glow.position = new Vec2(GamePlayParameters.GLOW_LEFT_DISTANCE, GamePlayParameters.GLOW_UP_DISTANCE);
-        glow.collider = [new Collider(glow.position, GamePlayParameters.GLOW_WIDTH, GamePlayParameters.GLOW_HEIGHT)];
         glow.shape = new RectangleShape(glow.position, GamePlayParameters.GLOW_WIDTH, GamePlayParameters.GLOW_HEIGHT).setColor(Color.BLUE);
 
         return glow;
@@ -59,20 +55,12 @@ class Glow extends GameObject implements KeyboardObserver {
         return this;
     }
 
-    override public function getCollider():Array<Collider> {
-        return this.collider;
-    }
-
     override public function getShape():Array<Shape> {
         var array:Array<Shape> = new Array<Shape>();
         if(this.shape != null) {
             array.push(this.shape);
         }
         return array;
-    }
-
-    override public function getCollisionGroupName():String {
-        return GLOW_COLLISION_GROUP_NAME;
     }
 
     public function onInput(state:KeyboardState):Void {
@@ -92,7 +80,6 @@ class Glow extends GameObject implements KeyboardObserver {
     private function move() {
         this.position = this.position.add(this.currentSpeed);
         this.shape.move(this.currentSpeed);
-        this.collider[0].move(this.currentSpeed);
     }
 
     private function isOutOfScreen() {
