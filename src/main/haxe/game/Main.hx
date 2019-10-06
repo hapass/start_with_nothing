@@ -38,7 +38,7 @@ class Game implements GameLoopObserver {
     private var gameResult: Promise<GameResult>;
 
     public function new() {
-        this.keyboard = new Keyboard([Key.SPACE]);
+        this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
 
         this.board = new DrawingBoard(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
@@ -79,6 +79,37 @@ class Game implements GameLoopObserver {
             jump();
         }
 
+        if (Key.RIGHT.currentState == Key.KEY_DOWN)
+        {
+            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x + 2, this.glow.currentSpeed.y);
+        }
+        else if (Key.LEFT.currentState == Key.KEY_DOWN)
+        {
+            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x - 2, this.glow.currentSpeed.y);
+        }
+        else
+        {
+            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
+        }
+
+        if (isLeftIntersectsLevel())
+        {
+            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
+            var brushPosition = new Vec2(Math.ceil(this.glow.position.x / Config.BRUSH_WIDTH) * Config.BRUSH_WIDTH + 1, this.glow.position.y);
+            var offset = brushPosition.subtract(this.glow.position);
+            this.glow.position = this.glow.position.add(offset);
+            this.glow.shape.move(offset);
+        }
+
+        if (isRightIntersectsLevel())
+        {
+            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
+            var brushPosition = new Vec2(Math.floor(this.glow.position.x / Config.BRUSH_WIDTH) * Config.BRUSH_WIDTH - 1, this.glow.position.y);
+            var offset = brushPosition.subtract(this.glow.position);
+            this.glow.position = this.glow.position.add(offset);
+            this.glow.shape.move(offset);
+        }
+
         move();
 
         if(isOutOfScreen()) {
@@ -111,12 +142,28 @@ class Game implements GameLoopObserver {
     private function isPointIntersectsLevel(point: Vec2) {
         var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
         var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
-        return level.data[rowIndex][columnIndex] != 0;
+
+        if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length)
+        {
+            return level.data[rowIndex][columnIndex] != 0;
+        }
+
+        return false;
     }
 
     private function isBottomIntersectsLevel() {
-        return isPointIntersectsLevel(this.glow.bottomLeftCorner) && 
+        return isPointIntersectsLevel(this.glow.bottomLeftCorner) ||
             isPointIntersectsLevel(this.glow.bottomRightCorner);
+    }
+
+    private function isRightIntersectsLevel() {
+        return isPointIntersectsLevel(this.glow.topRightCorner) &&
+            isPointIntersectsLevel(this.glow.bottomRightCorner);
+    }
+
+    private function isLeftIntersectsLevel() {
+        return isPointIntersectsLevel(this.glow.topLeftCorner) &&
+            isPointIntersectsLevel(this.glow.bottomLeftCorner);
     }
 
     private function stop() {

@@ -19,13 +19,13 @@ class Keyboard {
     }
 
     private function onKeyDown(event: KeyboardEvent) {
+        trace('Key down ${event.keyCode}');
         var key = trackedKeys[event.keyCode];
 
         //key is not being tracked
         if(key == null)
             return;
         
-        trace("key down");
         key.nextState = Key.KEY_DOWN;
     }
 
@@ -36,7 +36,6 @@ class Keyboard {
         if(key == null)
             return;
 
-        trace("key up");
         key.nextState = Key.KEY_UP;
     }
 
