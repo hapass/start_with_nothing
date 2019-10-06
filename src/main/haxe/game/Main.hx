@@ -69,6 +69,10 @@ class Game implements GameLoopObserver {
         if (isBottomIntersectsLevel())
         {
             this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
+            var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.position.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
+            var offset = brushPosition.subtract(this.glow.position);
+            this.glow.position = this.glow.position.add(offset);
+            this.glow.shape.move(offset);
         }
 
         if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
