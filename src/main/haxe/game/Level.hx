@@ -7,9 +7,10 @@ import engine.data.Data;
 import lang.Debug;
 
 class Level {
-    public var compositeShape:Array<Shape>;
-    public var position:Vec2;
+    public var compositeShape: Array<Shape>;
+    public var position: Vec2;
     public var data: Array<Array<Int>>;
+    public var glowPosition: Vec2;
 
     public function new() {
         this.compositeShape = new Array<Shape>();
@@ -38,13 +39,28 @@ class Level {
                 var positionX = this.position.x + columnIndex * Config.BRUSH_WIDTH;
                 var positionY = this.position.y + rowIndex * Config.BRUSH_HEIGHT;
 
-                if (this.data[rowIndex][columnIndex] == 1)
+                if (this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2)
                 {
                     trace('Spawned brush at: [$positionX, $positionY] in pixels; [$columnIndex, $rowIndex] in brushes.');
-                    this.compositeShape.push(
-                        new RectangleShape(new Vec2(positionX, positionY), Config.BRUSH_WIDTH, Config.BRUSH_HEIGHT)
-                        .setColor(Config.BRUSH_COLOR)
-                    );
+                    
+                    var rect = new RectangleShape(new Vec2(positionX, positionY), Config.BRUSH_WIDTH, Config.BRUSH_HEIGHT);
+                    
+                    if (this.data[rowIndex][columnIndex] == 1)
+                    {
+                        rect.setColor(Config.BRUSH_COLOR);
+                    }
+
+                    if (this.data[rowIndex][columnIndex] == 2)
+                    {
+                        rect.setColor(Config.EXIT_COLOR);
+                    }
+
+                    this.compositeShape.push(rect);
+                }
+
+                if (this.data[rowIndex][columnIndex] == 3)
+                {
+                    glowPosition = new Vec2(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
                 }
             }
         }

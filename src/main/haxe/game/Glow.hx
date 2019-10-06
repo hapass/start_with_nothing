@@ -17,11 +17,11 @@ class Glow {
     public var isLeftIntersecting:Bool;
     public var isRightIntersecting:Bool;
 
-    public function new() {
+    public function new(pos: Vec2) {
         this.currentSpeed = new Vec2(0, 0);
         this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
-        this.position = new Vec2(Config.GLOW_LEFT_DISTANCE, Config.GLOW_UP_DISTANCE);
-        this.shape = new RectangleShape(this.position, Config.GLOW_WIDTH, Config.GLOW_HEIGHT).setColor(Color.BLUE);
+        this.position = pos;
+        this.shape = new RectangleShape(this.position, Config.GLOW_WIDTH, Config.GLOW_HEIGHT).setColor(Config.GLOW_COLOR);
     }
 
     public function move(offset: Vec2)

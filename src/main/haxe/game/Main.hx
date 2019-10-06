@@ -7,6 +7,7 @@ import engine.math.Vec2;
 import engine.input.Keyboard;
 import lang.Promise;
 import engine.input.Key;
+import js.Browser;
 
 enum GameResult {
     Quit;
@@ -27,8 +28,11 @@ class Main {
     public static function launch() {
         new Game().run().then(function(result:GameResult){
             switch(result) {
-                case GameResult.Restart: launch();
+                case GameResult.Restart:
+                    Browser.alert("You've lost. Try again!");
+                    launch();
                 case GameResult.Quit:
+                    Browser.alert("You won!");
             }
         });
     }
@@ -52,14 +56,14 @@ class Game implements GameLoopObserver {
     }
 
     public function run():Promise<GameResult> {
-        this.glow = new Glow();
-        this.board.add(glow.shape);
-        
         this.level = new Level();
         for (shape in this.level.compositeShape)
         {
             this.board.add(shape);
         }
+
+        this.glow = new Glow(this.level.glowPosition);
+        this.board.add(glow.shape);
 
         this.loop.subscribe(this);
         this.loop.start();
@@ -68,61 +72,67 @@ class Game implements GameLoopObserver {
     }
 
     public function update(timestamp:Float):Void {
-        this.keyboard.update();
+        try {
+            this.keyboard.update();
 
-        //gravity
-        this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
+            //gravity
+            this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
 
-        //jump
-        checkIntersections();
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
-            this.glow.currentSpeed = new Vec2(0, -Config.GLOW_FLIGHT_ACCELERATION);
+            //jump
+            checkIntersections();
+            if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
+                this.glow.currentSpeed = new Vec2(0, -Config.GLOW_JUMP_ACCELERATION);
+            }
+
+            //movement
+            if (Key.RIGHT.currentState == Key.KEY_DOWN)
+            {
+                this.glow.currentSpeed = new Vec2(Config.GLOW_SPEED, this.glow.currentSpeed.y);
+            }
+            else if (Key.LEFT.currentState == Key.KEY_DOWN)
+            {
+                this.glow.currentSpeed = new Vec2(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
+            }
+            else
+            {
+                this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
+            }
+
+            this.glow.move(this.glow.currentSpeed);
+
+            //obstacles
+            checkIntersections();
+
+            if (this.glow.isLeftIntersecting)
+            {
+                this.glow.move(new Vec2(Config.GLOW_SPEED, 0));
+            }
+
+            if (this.glow.isRightIntersecting)
+            {
+                this.glow.move(new Vec2(-Config.GLOW_SPEED, 0));
+            }
+
+            checkIntersections();
+            if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
+            {
+                this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
+                var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.center.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
+                var offset = brushPosition.subtract(this.glow.position);
+                this.glow.move(offset);
+            }
+
+            //death
+            if(isOutOfScreen()) {
+                stop(GameResult.Restart);
+            }
+
+            this.board.draw();
         }
-
-        //movement
-        if (Key.RIGHT.currentState == Key.KEY_DOWN)
+        catch (e:Dynamic) 
         {
-            this.glow.currentSpeed = new Vec2(Config.GLOW_SPEED, this.glow.currentSpeed.y);
+            trace(e);
         }
-        else if (Key.LEFT.currentState == Key.KEY_DOWN)
-        {
-            this.glow.currentSpeed = new Vec2(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
-        }
-        else
-        {
-            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
-        }
-
-        this.glow.move(this.glow.currentSpeed);
-
-        //obstacles
-        checkIntersections();
-
-        if (this.glow.isLeftIntersecting)
-        {
-            this.glow.move(new Vec2(Config.GLOW_SPEED, 0));
-        }
-
-        if (this.glow.isRightIntersecting)
-        {
-            this.glow.move(new Vec2(-Config.GLOW_SPEED, 0));
-        }
-
-        checkIntersections();
-        if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
-        {
-            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
-            var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.center.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
-            var offset = brushPosition.subtract(this.glow.position);
-            this.glow.move(offset);
-        }
-
-        //death
-        if(isOutOfScreen()) {
-            stop();
-        }
-
-        this.board.draw();
     }
 
     private function isOutOfScreen() {
@@ -154,7 +164,7 @@ class Game implements GameLoopObserver {
 
         if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length)
         {
-            if(level.data[rowIndex][columnIndex] != 0)
+            if(level.data[rowIndex][columnIndex] == 1)
             {
                 if (rowIndex < centerRow)
                 {
@@ -176,14 +186,19 @@ class Game implements GameLoopObserver {
                     this.glow.isLeftIntersecting = true;
                 }
             }
+            else if (level.data[rowIndex][columnIndex] == 2)
+            {
+                stop(GameResult.Quit);
+            }
         }
     }
 
-    private function stop() {
+    private function stop(result:GameResult) {
         this.loop.stop();
         this.loop.unsubscribe(this);
         this.board.dispose();
         this.keyboard.dispose();
-        this.gameResult.resolve(GameResult.Restart);
+        this.gameResult.resolve(result);
+        throw "exit";
     }
 }

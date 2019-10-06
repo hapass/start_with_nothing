@@ -49,5 +49,10 @@ class Keyboard {
     public function dispose() {
         Browser.window.removeEventListener("keydown", onKeyDown);
         Browser.window.removeEventListener("keyup", onKeyUp);
+        for (code in this.trackedKeys.keys()) {
+            this.trackedKeys[code].previousState = Key.KEY_UP;
+            this.trackedKeys[code].currentState = Key.KEY_UP;
+            this.trackedKeys[code].nextState = Key.KEY_UP;
+        }
     }
 }
