@@ -6,86 +6,16 @@ import engine.graphics.drawing.shapes.RectangleShape;
 import engine.graphics.drawing.shapes.Shape;
 import engine.graphics.drawing.Color;
 
-import engine.input.KeyboardState;
-import engine.input.Key;
-import engine.input.KeyboardObserver;
+class Glow {
+    public var shape:Shape;
+    public var currentSpeed:Vec2;
+    public var acceleration:Vec2;
+    public var position:Vec2;
 
-class Glow extends GameObject implements KeyboardObserver {
-    private static inline var GLOW_COLLISION_GROUP_NAME:String = "Glow";
-
-    private var shape:Shape;
-    private var currentSpeed:Vec2;
-    private var acceleration:Vec2;
-    private var position:Vec2;
-
-    private var lifetimeObservers:Array<GlowLifetimeObserver>;
-
-    public function subscribe(observer:GlowLifetimeObserver) {
-        this.lifetimeObservers.push(observer);
-    }
-
-    private function new() {
-        super();
+    public function new() {
         this.currentSpeed = new Vec2(0, 0);
-        this.acceleration = new Vec2(0, GamePlayParameters.GLOW_FALL_ACCELERATION);
-        this.lifetimeObservers = new Array<GlowLifetimeObserver>();
-    }
-
-    public static function create():Glow {
-        var glow = new Glow();
-
-        glow.position = new Vec2(GamePlayParameters.GLOW_LEFT_DISTANCE, GamePlayParameters.GLOW_UP_DISTANCE);
-        glow.shape = new RectangleShape(glow.position, GamePlayParameters.GLOW_WIDTH, GamePlayParameters.GLOW_HEIGHT).setColor(Color.BLUE);
-
-        return glow;
-    }
-
-    override public function update(timestamp:Float) {
-        applyGravity();
-        move();
-
-        if(isOutOfScreen()) {
-            for(observer in lifetimeObservers) {
-                observer.onGlowDeath();
-            }
-        }
-    }
-
-    override public function getKeyboardObserver() {
-        return this;
-    }
-
-    override public function getShape():Array<Shape> {
-        var array:Array<Shape> = new Array<Shape>();
-        if(this.shape != null) {
-            array.push(this.shape);
-        }
-        return array;
-    }
-
-    public function onInput(state:KeyboardState):Void {
-        if(state.hasBeenPressed(Key.SPACE)) {
-            fly();
-        }
-    }
-
-    private function fly() {
-        this.currentSpeed = new Vec2(0, -GamePlayParameters.GLOW_FLIGHT_ACCELERATION);
-    }
-
-    private function applyGravity() {
-        this.currentSpeed = this.currentSpeed.add(this.acceleration);
-    }
-
-    private function move() {
-        this.position = this.position.add(this.currentSpeed);
-        this.shape.move(this.currentSpeed);
-    }
-
-    private function isOutOfScreen() {
-        return this.position.x > GamePlayParameters.GAME_WIDTH ||
-            this.position.x < 0 ||
-            this.position.y > GamePlayParameters.GAME_HEIGHT ||
-            this.position.y < 0;
+        this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
+        this.position = new Vec2(Config.GLOW_LEFT_DISTANCE, Config.GLOW_UP_DISTANCE);
+        this.shape = new RectangleShape(this.position, Config.GLOW_WIDTH, Config.GLOW_HEIGHT).setColor(Color.BLUE);
     }
 }

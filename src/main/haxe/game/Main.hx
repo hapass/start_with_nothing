@@ -3,9 +3,15 @@ package game;
 import engine.graphics.drawing.DrawingBoard;
 import engine.loop.GameLoop;
 import engine.loop.GameLoopObserver;
-import engine.input.Key;
+import engine.math.Vec2;
 import engine.input.Keyboard;
 import lang.Promise;
+import engine.input.Key;
+
+enum GameResult {
+    Quit;
+    Restart;
+}
 
 class Main {
     static function main() {
@@ -22,26 +28,32 @@ class Main {
     }
 }
 
-class Game implements GameLoopObserver implements GlowLifetimeObserver {
-    private var loop:GameLoop;
-    private var keyboard:Keyboard;
-    private var board:DrawingBoard;
-    private var gameObjects:Array<GameObject>;
-    private var spawner:LevelSpawner;
-    private var gameResult:Promise<GameResult>;
+class Game implements GameLoopObserver {
+    private var loop: GameLoop;
+    private var keyboard: Keyboard;
+    private var board: DrawingBoard;
+
+    private var glow: Glow;
+    private var level: Level;
+    private var gameResult: Promise<GameResult>;
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE]);
-        this.board = new DrawingBoard(GamePlayParameters.GAME_WIDTH, GamePlayParameters.GAME_HEIGHT);
-        this.gameObjects = new Array<GameObject>();
+
+        this.board = new DrawingBoard(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
-        this.spawner = new LevelSpawner();
         this.gameResult = new Promise<GameResult>();
     }
 
     public function run():Promise<GameResult> {
-        spawnGlow();
-        spawnBrush();
+        this.glow = new Glow();
+        this.board.add(glow.shape);
+        
+        this.level = new Level();
+        for (shape in this.level.compositeShape)
+        {
+            this.board.add(shape);
+        }
 
         this.loop.subscribe(this);
         this.loop.start();
@@ -49,70 +61,48 @@ class Game implements GameLoopObserver implements GlowLifetimeObserver {
         return this.gameResult;
     }
 
-    private function spawnGlow():Void {
-        var glow:Glow = Glow.create();
-        glow.subscribe(this);
-        add(glow);
-    }
-
     public function update(timestamp:Float):Void {
-        this.keyboard.checkInput();
+        this.keyboard.update();
 
-        removeDisposedGameObjects();
-        updateAllGameObjects(timestamp);
+        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+            fly();
+        }
+
+        applyGravity();
+        move();
+
+        if(isOutOfScreen()) {
+            stop();
+        }
 
         this.board.draw();
     }
 
-    public function onGlowDeath():Void {
-        stop();
-        this.gameResult.resolve(GameResult.Restart);
+    private function fly() {
+        this.glow.currentSpeed = new Vec2(0, -Config.GLOW_FLIGHT_ACCELERATION);
+    }
+
+    private function applyGravity() {
+        this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
+    }
+
+    private function move() {
+        this.glow.position = this.glow.position.add(this.glow.currentSpeed);
+        this.glow.shape.move(this.glow.currentSpeed);
+    }
+
+    private function isOutOfScreen() {
+        return this.glow.position.x > Config.GAME_WIDTH ||
+            this.glow.position.x < 0 ||
+            this.glow.position.y > Config.GAME_HEIGHT ||
+            this.glow.position.y < 0;
     }
 
     private function stop() {
         this.loop.stop();
         this.loop.unsubscribe(this);
-        removeDisposedGameObjects(true);
         this.board.dispose();
         this.keyboard.dispose();
-    }
-
-    private function spawnBrush() {
-        var spawnResult = spawner.spawn();
-        if(spawnResult.spawned) {
-            add(spawnResult.gameObject);
-        }
-    }
-
-    private function updateAllGameObjects(timestamp: Float) {
-        for(gameObject in this.gameObjects) {
-            gameObject.update(timestamp);
-        }
-    }
-
-    private function add(gameObject:GameObject):Void {
-        this.keyboard.subscribe(gameObject.getKeyboardObserver());
-
-        var compositeShape = gameObject.getShape();
-        for(shape in compositeShape) {
-            this.board.add(shape);
-        }
-
-        this.gameObjects.push(gameObject);
-    }
-
-    private function removeDisposedGameObjects(force:Bool = false) {
-        var activeObjects = [];
-        for(gameObject in this.gameObjects) {
-            if(gameObject.disposed || force) {
-                for(shape in gameObject.getShape()) {
-                    this.board.remove(shape);
-                }
-            }
-            else {
-                activeObjects.push(gameObject);
-            }
-        }
-        this.gameObjects = activeObjects;
+        this.gameResult.resolve(GameResult.Restart);
     }
 }

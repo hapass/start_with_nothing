@@ -31,5 +31,6 @@ class DrawingBoard {
 
     public function dispose() {
         this.renderer.dispose();
+        this.shapes.splice(0, this.shapes.length);
     }
 }

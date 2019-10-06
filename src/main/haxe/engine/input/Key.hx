@@ -1,7 +1,9 @@
 package engine.input;
 
-@:allow(engine.input.Keyboard)
 class Key {
+    public static inline var KEY_DOWN = "KEY_DOWN";
+    public static inline var KEY_UP = "KEY_UP";
+
     public static var SPACE(get, never): Key;
 
     private static var spaceKey: Key;
@@ -11,16 +13,16 @@ class Key {
         return spaceKey;
     }
         
-    private var code: Int;
-    private var currentState: String;
-    private var previousState: String;
+    public var code: Int;
+
+    public var nextState: String;
+    public var currentState: String;
+    public var previousState: String;
 
     private function new(code: Int) {
         this.code = code;
-    }
-
-    private function setState(state: String) {
-        this.previousState = currentState;
-        this.currentState = state;
+        this.currentState = KEY_UP;
+        this.previousState = KEY_UP;
+        this.nextState = KEY_UP;
     }
 }

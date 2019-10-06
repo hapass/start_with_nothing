@@ -6,21 +6,14 @@ import engine.input.Key;
 import lang.Debug;
 
 class Keyboard {
-    private static inline var KEY_DOWN = "KEY_DOWN";
-    private static inline var KEY_UP = "KEY_UP";
-    private static inline var KEY_PRESSED = "KEY_PRESSED";
+    private var trackedKeys: Map<Int, Key>;
 
-    private var trackedKeys: Array<Key>;
-    private var observers: Array<KeyboardObserver>;    
-
-    public function new (trackedKeys: Array<Key>) {
+    public function new (keys: Array<Key>) {
         Browser.window.addEventListener("keydown", onKeyDown);
         Browser.window.addEventListener("keyup", onKeyUp);
-        this.trackedKeys = new Array<Key>();
-        this.observers = new Array<KeyboardObserver>();
-        for(key in trackedKeys) {
+        this.trackedKeys = new Map<Int, Key>();
+        for(key in keys) {
             Debug.assert(this.trackedKeys[key.code] == null, "Tracked keys cannot repeat in keyboard."); 
-            key.setState(KEY_UP);      
             this.trackedKeys[key.code] = key;
         }
     }
@@ -32,7 +25,8 @@ class Keyboard {
         if(key == null)
             return;
         
-        key.setState(KEY_DOWN);
+        trace("key down");
+        key.nextState = Key.KEY_DOWN;
     }
 
     private function onKeyUp(event: KeyboardEvent) {
@@ -41,35 +35,16 @@ class Keyboard {
         //key is not being tracked
         if(key == null)
             return;
-        
-        key.setState(KEY_UP);
+
+        trace("key up");
+        key.nextState = Key.KEY_UP;
     }
 
-    public function subscribe(observer: KeyboardObserver) {
-        this.observers.push(observer);
-    }
-
-    public function unsubscribe(observer: KeyboardObserver) {
-        this.observers.remove(observer);
-    }
-
-    public function checkInput() {
-        for(observer in this.observers)
-            observer.onInput({
-                isKeyDown: this.isKeyDown,
-                hasBeenPressed: this.hasBeenPressed
-            });
-    }
-
-    private function isKeyDown(key: Key) {
-        return key.currentState == KEY_DOWN;
-    }
-
-    private function hasBeenPressed(key: Key) {
-        var pressed = key.currentState == KEY_DOWN && key.previousState == KEY_UP;
-        if(pressed)
-            key.setState(KEY_PRESSED);
-        return pressed;
+    public function update() {
+        for (code in this.trackedKeys.keys()) {
+            this.trackedKeys[code].previousState = this.trackedKeys[code].currentState;
+            this.trackedKeys[code].currentState = this.trackedKeys[code].nextState;
+        }
     }
 
     public function dispose() {

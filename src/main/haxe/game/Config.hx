@@ -2,7 +2,7 @@ package game;
 
 import engine.graphics.drawing.Color;
 
-class GamePlayParameters {
+class Config {
     public static var BRUSH_COLOR: Color = Color.RED;
     public static inline var BRUSH_WIDTH: Int = 20;
     public static inline var BRUSH_HEIGHT: Int = 20;
