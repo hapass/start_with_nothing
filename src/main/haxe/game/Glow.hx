@@ -12,11 +12,22 @@ class Glow {
     public var acceleration:Vec2;
     public var position:Vec2;
 
+    public var isTopIntersecting:Bool;
+    public var isBottomIntersecting:Bool;
+    public var isLeftIntersecting:Bool;
+    public var isRightIntersecting:Bool;
+
     public function new() {
         this.currentSpeed = new Vec2(0, 0);
         this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
         this.position = new Vec2(Config.GLOW_LEFT_DISTANCE, Config.GLOW_UP_DISTANCE);
         this.shape = new RectangleShape(this.position, Config.GLOW_WIDTH, Config.GLOW_HEIGHT).setColor(Color.BLUE);
+    }
+
+    public function move(offset: Vec2)
+    {
+        this.position = this.position.add(offset);
+        this.shape.move(offset);
     }
 
     public var topLeftCorner(get, never):Vec2;
@@ -28,7 +39,7 @@ class Glow {
     public var topRightCorner(get, never):Vec2;
     private function get_topRightCorner():Vec2
     {
-        return new Vec2(position.x + Config.GLOW_WIDTH, position.y);
+        return new Vec2(position.x + Config.GLOW_WIDTH - 1, position.y);
     }
 
     public var bottomLeftCorner(get, never):Vec2;
@@ -40,6 +51,12 @@ class Glow {
     public var bottomRightCorner(get, never):Vec2;
     private function get_bottomRightCorner():Vec2
     {
-        return new Vec2(position.x + Config.GLOW_WIDTH, position.y + Config.GLOW_HEIGHT);
+        return new Vec2(position.x + Config.GLOW_WIDTH - 1, position.y + Config.GLOW_HEIGHT);
+    }
+
+    public var center(get, never):Vec2;
+    private function get_center():Vec2
+    {
+        return new Vec2(position.x + Std.int(Config.GLOW_WIDTH / 2), position.y + Std.int(Config.GLOW_HEIGHT / 2));
     }
 }

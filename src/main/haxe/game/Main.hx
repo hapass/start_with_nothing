@@ -13,6 +13,12 @@ enum GameResult {
     Restart;
 }
 
+enum PointIntersection
+{
+    Intersects(row:Int, column:Int);
+    NoIntersection;
+}
+
 class Main {
     static function main() {
         launch();
@@ -64,72 +70,59 @@ class Game implements GameLoopObserver {
     public function update(timestamp:Float):Void {
         this.keyboard.update();
 
-        applyGravity();
+        //gravity
+        this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
 
-        if (isBottomIntersectsLevel())
-        {
-            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
-            var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.position.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
-            var offset = brushPosition.subtract(this.glow.position);
-            this.glow.position = this.glow.position.add(offset);
-            this.glow.shape.move(offset);
+        //jump
+        checkIntersections();
+        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
+            this.glow.currentSpeed = new Vec2(0, -Config.GLOW_FLIGHT_ACCELERATION);
         }
 
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
-            jump();
-        }
-
+        //movement
         if (Key.RIGHT.currentState == Key.KEY_DOWN)
         {
-            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x + 2, this.glow.currentSpeed.y);
+            this.glow.currentSpeed = new Vec2(Config.GLOW_SPEED, this.glow.currentSpeed.y);
         }
         else if (Key.LEFT.currentState == Key.KEY_DOWN)
         {
-            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x - 2, this.glow.currentSpeed.y);
+            this.glow.currentSpeed = new Vec2(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
         }
         else
         {
             this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
         }
 
-        if (isLeftIntersectsLevel())
+        this.glow.move(this.glow.currentSpeed);
+
+        //obstacles
+        checkIntersections();
+
+        if (this.glow.isLeftIntersecting)
         {
-            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
-            var brushPosition = new Vec2(Math.ceil(this.glow.position.x / Config.BRUSH_WIDTH) * Config.BRUSH_WIDTH + 1, this.glow.position.y);
-            var offset = brushPosition.subtract(this.glow.position);
-            this.glow.position = this.glow.position.add(offset);
-            this.glow.shape.move(offset);
+            this.glow.move(new Vec2(Config.GLOW_SPEED, 0));
         }
 
-        if (isRightIntersectsLevel())
+        if (this.glow.isRightIntersecting)
         {
-            this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
-            var brushPosition = new Vec2(Math.floor(this.glow.position.x / Config.BRUSH_WIDTH) * Config.BRUSH_WIDTH - 1, this.glow.position.y);
-            var offset = brushPosition.subtract(this.glow.position);
-            this.glow.position = this.glow.position.add(offset);
-            this.glow.shape.move(offset);
+            this.glow.move(new Vec2(-Config.GLOW_SPEED, 0));
         }
 
-        move();
+        checkIntersections();
+        if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
+        {
+            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
+            var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.center.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
+            var offset = brushPosition.subtract(this.glow.position);
+            this.glow.move(offset);
+        }
 
+        //death
         if(isOutOfScreen()) {
             stop();
         }
 
         this.board.draw();
-    }
-
-    private function jump() {
-        this.glow.currentSpeed = new Vec2(0, -Config.GLOW_FLIGHT_ACCELERATION);
-    }
-
-    private function applyGravity() {
-        this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
-    }
-
-    private function move() {
-        this.glow.position = this.glow.position.add(this.glow.currentSpeed);
-        this.glow.shape.move(this.glow.currentSpeed);
     }
 
     private function isOutOfScreen() {
@@ -139,31 +132,51 @@ class Game implements GameLoopObserver {
             this.glow.position.y < 0;
     }
 
-    private function isPointIntersectsLevel(point: Vec2) {
+    private function checkIntersections()
+    {
+        this.glow.isBottomIntersecting = false;
+        this.glow.isLeftIntersecting = false;
+        this.glow.isRightIntersecting = false;
+        this.glow.isTopIntersecting = false;
+
+        var centerColumn = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
+        var centerRow = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
+
+        setGlowIntersections(this.glow.topLeftCorner, centerRow, centerColumn);
+        setGlowIntersections(this.glow.topRightCorner, centerRow, centerColumn);
+        setGlowIntersections(this.glow.bottomRightCorner, centerRow, centerColumn);
+        setGlowIntersections(this.glow.bottomLeftCorner, centerRow, centerColumn);
+    }
+
+    private function setGlowIntersections(point: Vec2, centerRow:Int, centerColumn:Int) {
         var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
         var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
 
         if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length)
         {
-            return level.data[rowIndex][columnIndex] != 0;
+            if(level.data[rowIndex][columnIndex] != 0)
+            {
+                if (rowIndex < centerRow)
+                {
+                    this.glow.isTopIntersecting = true;
+                }
+
+                if (rowIndex > centerRow)
+                {
+                    this.glow.isBottomIntersecting = true;
+                }
+
+                if (columnIndex > centerColumn && rowIndex == centerRow)
+                {
+                    this.glow.isRightIntersecting = true;
+                }
+
+                if (columnIndex < centerColumn && rowIndex == centerRow)
+                {
+                    this.glow.isLeftIntersecting = true;
+                }
+            }
         }
-
-        return false;
-    }
-
-    private function isBottomIntersectsLevel() {
-        return isPointIntersectsLevel(this.glow.bottomLeftCorner) ||
-            isPointIntersectsLevel(this.glow.bottomRightCorner);
-    }
-
-    private function isRightIntersectsLevel() {
-        return isPointIntersectsLevel(this.glow.topRightCorner) &&
-            isPointIntersectsLevel(this.glow.bottomRightCorner);
-    }
-
-    private function isLeftIntersectsLevel() {
-        return isPointIntersectsLevel(this.glow.topLeftCorner) &&
-            isPointIntersectsLevel(this.glow.bottomLeftCorner);
     }
 
     private function stop() {
