@@ -18,4 +18,28 @@ class Glow {
         this.position = new Vec2(Config.GLOW_LEFT_DISTANCE, Config.GLOW_UP_DISTANCE);
         this.shape = new RectangleShape(this.position, Config.GLOW_WIDTH, Config.GLOW_HEIGHT).setColor(Color.BLUE);
     }
+
+    public var topLeftCorner(get, never):Vec2;
+    private function get_topLeftCorner():Vec2
+    {
+        return position;
+    }
+
+    public var topRightCorner(get, never):Vec2;
+    private function get_topRightCorner():Vec2
+    {
+        return new Vec2(position.x + Config.GLOW_WIDTH, position.y);
+    }
+
+    public var bottomLeftCorner(get, never):Vec2;
+    private function get_bottomLeftCorner():Vec2
+    {
+        return new Vec2(position.x, position.y + Config.GLOW_HEIGHT);
+    }
+
+    public var bottomRightCorner(get, never):Vec2;
+    private function get_bottomRightCorner():Vec2
+    {
+        return new Vec2(position.x + Config.GLOW_WIDTH, position.y + Config.GLOW_HEIGHT);
+    }
 }

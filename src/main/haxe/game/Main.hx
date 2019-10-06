@@ -64,11 +64,17 @@ class Game implements GameLoopObserver {
     public function update(timestamp:Float):Void {
         this.keyboard.update();
 
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
-            fly();
+        applyGravity();
+
+        if (isBottomIntersectsLevel())
+        {
+            this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
         }
 
-        applyGravity();
+        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+            jump();
+        }
+
         move();
 
         if(isOutOfScreen()) {
@@ -78,7 +84,7 @@ class Game implements GameLoopObserver {
         this.board.draw();
     }
 
-    private function fly() {
+    private function jump() {
         this.glow.currentSpeed = new Vec2(0, -Config.GLOW_FLIGHT_ACCELERATION);
     }
 
@@ -96,6 +102,17 @@ class Game implements GameLoopObserver {
             this.glow.position.x < 0 ||
             this.glow.position.y > Config.GAME_HEIGHT ||
             this.glow.position.y < 0;
+    }
+
+    private function isPointIntersectsLevel(point: Vec2) {
+        var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
+        var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
+        return level.data[rowIndex][columnIndex] != 0;
+    }
+
+    private function isBottomIntersectsLevel() {
+        return isPointIntersectsLevel(this.glow.bottomLeftCorner) && 
+            isPointIntersectsLevel(this.glow.bottomRightCorner);
     }
 
     private function stop() {
