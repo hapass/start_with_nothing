@@ -105,19 +105,22 @@ class Game implements GameLoopObserver {
 
             if (this.glow.isLeftIntersecting)
             {
-                this.glow.move(new Vec2(Config.GLOW_SPEED, 0));
+                var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
+                this.glow.move(new Vec2(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0));
             }
 
             if (this.glow.isRightIntersecting)
             {
-                this.glow.move(new Vec2(-Config.GLOW_SPEED, 0));
+                var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
+                this.glow.move(new Vec2(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0));
             }
 
             checkIntersections();
             if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
             {
                 this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
-                var brushPosition = new Vec2(this.glow.position.x, Std.int(this.glow.center.y / Config.BRUSH_HEIGHT) * Config.BRUSH_HEIGHT);
+                var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
+                var brushPosition = new Vec2(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
                 var offset = brushPosition.subtract(this.glow.position);
                 this.glow.move(offset);
             }
