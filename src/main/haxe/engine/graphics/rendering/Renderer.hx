@@ -8,7 +8,7 @@ import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;
 import js.html.webgl.UniformLocation;
 import js.html.CanvasElement;
-import js.html.Float32Array;
+import js.lib.Float32Array;
 import js.Browser;
 
 using Lambda;
