@@ -14,12 +14,6 @@ enum GameResult {
     Restart;
 }
 
-enum PointIntersection
-{
-    Intersects(row:Int, column:Int);
-    NoIntersection;
-}
-
 class Main {
     static function main() {
         launch();
