@@ -51,13 +51,10 @@ class Game implements GameLoopObserver {
 
     public function run():Promise<GameResult> {
         this.level = new Level();
-        for (shape in this.level.compositeShape)
-        {
-            this.board.add(shape);
-        }
+        this.board.add(this.level.compositeShape);
 
         this.glow = new Glow(this.level.glowPosition);
-        this.board.add(glow.shape);
+        this.board.add([glow.shape]);
 
         this.loop.subscribe(this);
         this.loop.start();

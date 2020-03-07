@@ -12,12 +12,16 @@ class DrawingBoard {
         this.shapes = new Array<Shape>();
     }
 
-    public function add(shape:Shape) {
-        this.shapes.push(shape);
+    public function add(shapeArray:Array<Shape>) {
+        for (shape in shapeArray) {
+            this.shapes.push(shape);
+        }
     }
 
-    public function remove(shape:Shape) {
-        this.shapes.remove(shape);
+    public function remove(shapeArray:Array<Shape>) {
+        for (shape in shapeArray) {
+            this.shapes.remove(shape);
+        }
     }
 
     public function draw() {
