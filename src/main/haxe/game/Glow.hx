@@ -32,11 +32,16 @@ class Glow {
         this.shape.width = Config.GLOW_WIDTH;
         this.shape.height = Config.GLOW_HEIGHT;
         this.shape.color = Config.GLOW_COLOR;
-        move(new Vec2(0, 0));
+        setPosition(this.position.x, this.position.y);
     }
 
     public function move(offset:Vec2) {
         this.position.add(offset);
+        setPosition(this.position.x, this.position.y);
+    }
+
+    public function setPosition(x:Float, y:Float) {
+        this.position.set(x, y);
         this.shape.position = this.position;
         this.topLeftCorner.set(this.position.x, this.position.y);
         this.topRightCorner.set(this.position.x + Config.GLOW_WIDTH - 1, this.position.y);

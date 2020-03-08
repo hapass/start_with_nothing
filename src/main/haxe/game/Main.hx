@@ -93,20 +93,16 @@ class Game implements GameLoopObserver {
 
         //correct movement
         if (this.glow.isLeftIntersecting) {
-            var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
-            this.leftIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
-            this.glow.move(this.leftIntersectionOffset);
+            this.glow.setPosition(getColumn(this.glow.center) * Config.BRUSH_WIDTH, this.glow.position.y);
         }
 
         if (this.glow.isRightIntersecting) {
-            var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
-            this.rightIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
-            this.glow.move(this.rightIntersectionOffset);
+            this.glow.setPosition(getColumn(this.glow.center) * Config.BRUSH_WIDTH, this.glow.position.y);
         }
 
         if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting) {
             this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-            var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
+            var rowIndex = getRow(this.glow.center);
             this.bottomIntersectionOffset.set(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
             this.bottomIntersectionOffset.subtract(this.glow.position);
             this.glow.move(bottomIntersectionOffset);
@@ -127,6 +123,14 @@ class Game implements GameLoopObserver {
         this.renderer.draw();
     }
 
+    private function getColumn(point:Vec2):Int {
+        return Std.int(point.x / Config.BRUSH_WIDTH);
+    }
+
+    private function getRow(point:Vec2):Int {
+        return Std.int(point.y / Config.BRUSH_HEIGHT);
+    }
+
     private function isOutOfScreen() {
         return this.glow.position.x > Config.GAME_WIDTH ||
             this.glow.position.x < 0 ||
@@ -141,8 +145,8 @@ class Game implements GameLoopObserver {
         this.glow.isTopIntersecting = false;
         this.glow.isYellowSquareIntersecting = false;
 
-        var centerColumn = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
-        var centerRow = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
+        var centerColumn = getColumn(this.glow.center);
+        var centerRow = getRow(this.glow.center);
 
         setGlowIntersections(this.glow.topLeftCorner, centerRow, centerColumn);
         setGlowIntersections(this.glow.topRightCorner, centerRow, centerColumn);
@@ -151,8 +155,8 @@ class Game implements GameLoopObserver {
     }
 
     private function setGlowIntersections(point:Vec2, centerRow:Int, centerColumn:Int) {
-        var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
-        var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
+        var columnIndex = getColumn(point);
+        var rowIndex = getRow(point);
 
         if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length) {
             if(level.data[rowIndex][columnIndex] == 1) {
