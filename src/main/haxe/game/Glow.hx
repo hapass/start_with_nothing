@@ -25,8 +25,8 @@ class Glow {
         this.shape.color = Config.GLOW_COLOR;
     }
 
-    public function move(offset: Vec2) {
-        this.position = this.position.add(offset);
+    public function move(offset:Vec2) {
+        this.position.add(offset);
         this.shape.position = this.position;
     }
 

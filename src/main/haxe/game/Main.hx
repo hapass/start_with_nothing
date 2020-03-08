@@ -43,7 +43,6 @@ class Game implements GameLoopObserver {
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
-
         this.renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
         this.gameResult = new Promise<GameResult>();
@@ -65,7 +64,7 @@ class Game implements GameLoopObserver {
             this.keyboard.update();
 
             //gravity
-            this.glow.currentSpeed = this.glow.currentSpeed.add(this.glow.acceleration);
+            this.glow.currentSpeed.add(this.glow.acceleration);
 
             //jump
             checkIntersections();
@@ -111,8 +110,8 @@ class Game implements GameLoopObserver {
             {
                 this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
                 var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
-                var brushPosition = new Vec2(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
-                var offset = brushPosition.subtract(this.glow.position);
+                var offset = new Vec2(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
+                offset.subtract(this.glow.position);
                 this.glow.move(offset);
             }
 
