@@ -1,10 +1,10 @@
 package engine.math;
 
 class Vec2 {
-    public var x(default, null): Float;
-    public var y(default, null): Float;
+    public var x:Float;
+    public var y:Float;
 
-    public function new(x: Float, y: Float) {
+    public function new(x:Float, y:Float) {
         this.x = x;
         this.y = y;
     }
@@ -17,5 +17,10 @@ class Vec2 {
     public function subtract(vec:Vec2):Void {
         this.x -= vec.x;
         this.y -= vec.y;
+    }
+
+    public function set(x:Float, y:Float):Void {
+        this.x = x;
+        this.y = y;
     }
 }

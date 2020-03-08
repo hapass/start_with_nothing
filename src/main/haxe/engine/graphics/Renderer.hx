@@ -11,8 +11,6 @@ import js.html.CanvasElement;
 import js.lib.Float32Array;
 import js.Browser;
 
-using Lambda;
-
 class Color {
     public var r(default, null):Float;
     public var g(default, null):Float;
@@ -36,7 +34,7 @@ class Color {
     public static var BLACK(get, never): Color;
     static function get_BLACK(): Color return new Color(0, 0, 0);
 
-    public function new(r: Float, g: Float, b: Float) {
+    private function new(r: Float, g: Float, b: Float) {
         this.r = correctColor(r);
         this.g = correctColor(g);
         this.b = correctColor(b);
@@ -61,7 +59,9 @@ class Quad {
     public var width:Float;
     public var position:Vec2;
 
-    public function new() {}
+    public function new() {
+        position = new Vec2(0, 0);
+    }
 }
 
 class Renderer {
@@ -204,7 +204,7 @@ private class QuadDrawingProgram {
             array[index+28] = quadArray[i].color.g;
             array[index+29] = quadArray[i].color.b;
         }
-        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(array), RenderingContext.DYNAMIC_DRAW);
+        this.context.bufferData(RenderingContext.ARRAY_BUFFER, array, RenderingContext.DYNAMIC_DRAW);
         this.context.drawArrays(RenderingContext.TRIANGLES, 0, vertexCount);
     }
 

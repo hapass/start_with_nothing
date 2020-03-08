@@ -9,6 +9,12 @@ class Glow {
     public var acceleration:Vec2;
     public var position:Vec2;
 
+    public var topLeftCorner:Vec2;
+    public var topRightCorner:Vec2;
+    public var bottomLeftCorner:Vec2;
+    public var bottomRightCorner:Vec2;
+    public var center:Vec2;
+
     public var isTopIntersecting:Bool;
     public var isBottomIntersecting:Bool;
     public var isLeftIntersecting:Bool;
@@ -16,6 +22,11 @@ class Glow {
 
     public function new(pos: Vec2) {
         this.currentSpeed = new Vec2(0, 0);
+        this.topLeftCorner = new Vec2(0, 0);
+        this.topRightCorner = new Vec2(0, 0);
+        this.bottomLeftCorner = new Vec2(0, 0);
+        this.bottomRightCorner = new Vec2(0, 0);
+        this.center = new Vec2(0, 0);
         this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
         this.position = pos;
         this.shape = new Quad();
@@ -28,30 +39,10 @@ class Glow {
     public function move(offset:Vec2) {
         this.position.add(offset);
         this.shape.position = this.position;
-    }
-
-    public var topLeftCorner(get, never):Vec2;
-    private function get_topLeftCorner():Vec2 {
-        return position;
-    }
-
-    public var topRightCorner(get, never):Vec2;
-    private function get_topRightCorner():Vec2 {
-        return new Vec2(position.x + Config.GLOW_WIDTH - 1, position.y);
-    }
-
-    public var bottomLeftCorner(get, never):Vec2;
-    private function get_bottomLeftCorner():Vec2 {
-        return new Vec2(position.x, position.y + Config.GLOW_HEIGHT);
-    }
-
-    public var bottomRightCorner(get, never):Vec2;
-    private function get_bottomRightCorner():Vec2 {
-        return new Vec2(position.x + Config.GLOW_WIDTH - 1, position.y + Config.GLOW_HEIGHT);
-    }
-
-    public var center(get, never):Vec2;
-    private function get_center():Vec2 {
-        return new Vec2(position.x + Std.int(Config.GLOW_WIDTH / 2), position.y + Std.int(Config.GLOW_HEIGHT / 2));
+        this.topLeftCorner.set(this.position.x, this.position.y);
+        this.topRightCorner.set(this.position.x + Config.GLOW_WIDTH - 1, this.position.y);
+        this.bottomLeftCorner.set(this.position.x, this.position.y + Config.GLOW_HEIGHT);
+        this.bottomRightCorner.set(this.position.x + Config.GLOW_WIDTH - 1, this.position.y + Config.GLOW_HEIGHT);
+        this.center.set(this.position.x + Std.int(Config.GLOW_WIDTH / 2), this.position.y + Std.int(Config.GLOW_HEIGHT / 2));
     }
 }

@@ -41,11 +41,18 @@ class Game implements GameLoopObserver {
     private var level: Level;
     private var gameResult: Promise<GameResult>;
 
+    private var bottomIntersectionOffset:Vec2;
+    private var leftIntersectionOffset:Vec2;
+    private var rightIntersectionOffset:Vec2;
+
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
         this.renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
         this.gameResult = new Promise<GameResult>();
+        this.bottomIntersectionOffset = new Vec2(0, 0);
+        this.leftIntersectionOffset = new Vec2(0, 0);
+        this.rightIntersectionOffset = new Vec2(0, 0);
     }
 
     public function run():Promise<GameResult> {
@@ -71,21 +78,21 @@ class Game implements GameLoopObserver {
             if (Key.SPACE.currentState == Key.KEY_DOWN && 
                 Key.SPACE.previousState == Key.KEY_UP && 
                 this.glow.isBottomIntersecting) {
-                this.glow.currentSpeed = new Vec2(0, -Config.GLOW_JUMP_ACCELERATION);
+                this.glow.currentSpeed.set(0, -Config.GLOW_JUMP_ACCELERATION);
             }
 
             //movement
             if (Key.RIGHT.currentState == Key.KEY_DOWN)
             {
-                this.glow.currentSpeed = new Vec2(Config.GLOW_SPEED, this.glow.currentSpeed.y);
+                this.glow.currentSpeed.set(Config.GLOW_SPEED, this.glow.currentSpeed.y);
             }
             else if (Key.LEFT.currentState == Key.KEY_DOWN)
             {
-                this.glow.currentSpeed = new Vec2(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
+                this.glow.currentSpeed.set(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
             }
             else
             {
-                this.glow.currentSpeed = new Vec2(0, this.glow.currentSpeed.y);
+                this.glow.currentSpeed.set(0, this.glow.currentSpeed.y);
             }
 
             this.glow.move(this.glow.currentSpeed);
@@ -96,23 +103,25 @@ class Game implements GameLoopObserver {
             if (this.glow.isLeftIntersecting)
             {
                 var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
-                this.glow.move(new Vec2(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0));
+                this.leftIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
+                this.glow.move(this.leftIntersectionOffset);
             }
 
             if (this.glow.isRightIntersecting)
             {
                 var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
-                this.glow.move(new Vec2(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0));
+                this.rightIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
+                this.glow.move(this.rightIntersectionOffset);
             }
 
             checkIntersections();
             if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
             {
-                this.glow.currentSpeed = new Vec2(this.glow.currentSpeed.x, 0);
+                this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
                 var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
-                var offset = new Vec2(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
-                offset.subtract(this.glow.position);
-                this.glow.move(offset);
+                this.bottomIntersectionOffset.set(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
+                this.bottomIntersectionOffset.subtract(this.glow.position);
+                this.glow.move(bottomIntersectionOffset);
             }
 
             //death

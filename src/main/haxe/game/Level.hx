@@ -9,11 +9,12 @@ class Level {
     public var compositeShape: Array<Quad>;
     public var position: Vec2;
     public var data: Array<Array<Int>>;
-    public var glowPosition: Vec2;
+    public var glowPosition:Vec2;
 
     public function new() {
         this.compositeShape = new Array<Quad>();
         this.position = new Vec2(0, 0);
+        this.glowPosition = new Vec2(0, 0);
 
         var stringData = new Data("BlindLuck").stringData;
 
@@ -41,7 +42,7 @@ class Level {
                 if (this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2)
                 {                    
                     var rect = new Quad();
-                    rect.position = new Vec2(positionX, positionY);
+                    rect.position.set(positionX, positionY);
                     rect.width = Config.BRUSH_WIDTH;
                     rect.height = Config.BRUSH_HEIGHT;
 
@@ -60,7 +61,7 @@ class Level {
 
                 if (this.data[rowIndex][columnIndex] == 3)
                 {
-                    glowPosition = new Vec2(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
+                    this.glowPosition.set(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
                 }
             }
         }
