@@ -53,14 +53,12 @@ class Color {
 }
 
 class Quad {
-    public var color:Color;
-    public var height:Float;
-    public var width:Float;
-    public var position:Vec2;
+    public var color:Color = Color.WHITE;
+    public var height:Float = 0;
+    public var width:Float = 0;
+    public var position:Vec2 = new Vec2();
 
-    public function new() {
-        position = new Vec2();
-    }
+    public function new() {}
 }
 
 class Renderer {
@@ -233,12 +231,11 @@ private class QuadDrawingProgram {
 
 private class ProgramCompiler {
 
-    private var programs:Map<String, Program>;
-    private var context:RenderingContext;
+    private var programs:Map<String, Program> = new Map<String, Program>();
+    private var context:RenderingContext = null;
 
     public function new(context:RenderingContext) {
         this.context = context;
-        this.programs = new Map<String, Program>();
     }
 
     public function compileProgram(name:String, vertexShaderName:String, fragmentShaderName:String):Void {

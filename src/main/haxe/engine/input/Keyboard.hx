@@ -6,14 +6,12 @@ import engine.input.Key;
 import lang.Debug;
 
 class Keyboard {
-    private var trackedKeys:Map<Int, Key>;
-    private var trackedKeyCodes:Array<Int>;
+    private var trackedKeys:Map<Int, Key> = new Map<Int, Key>();
+    private var trackedKeyCodes:Array<Int> = new Array<Int>();
 
     public function new (keys:Array<Key>) {
         Browser.window.addEventListener("keydown", onKeyDown);
         Browser.window.addEventListener("keyup", onKeyUp);
-        this.trackedKeys = new Map<Int, Key>();
-        this.trackedKeyCodes = new Array<Int>();
         for(key in keys) {
             Debug.assert(this.trackedKeys[key.code] == null, "Tracked keys cannot repeat in keyboard."); 
             this.trackedKeys[key.code] = key;

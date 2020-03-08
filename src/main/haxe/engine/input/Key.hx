@@ -28,16 +28,13 @@ class Key {
         return leftKey;
     }
 
-    public var code:Int;
+    public var code:Int = 0;
 
-    public var nextState:String;
-    public var currentState:String;
-    public var previousState:String;
+    public var nextState:String = KEY_UP;
+    public var currentState:String = KEY_UP;
+    public var previousState:String = KEY_UP;
 
     private function new(code:Int) {
         this.code = code;
-        this.currentState = KEY_UP;
-        this.previousState = KEY_UP;
-        this.nextState = KEY_UP;
     }
 }

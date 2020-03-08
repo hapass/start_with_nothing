@@ -5,8 +5,8 @@ import js.Browser;
 import engine.loop.GameLoopObserver;
 
 class GameLoop {
-    private var shouldExitLoop:Bool;
-    private var observer:GameLoopObserver;
+    private var shouldExitLoop:Bool = false;
+    private var observer:GameLoopObserver = null;
 
     public function new() {}
 

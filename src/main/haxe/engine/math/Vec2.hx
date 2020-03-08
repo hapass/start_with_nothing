@@ -1,13 +1,10 @@
 package engine.math;
 
 class Vec2 {
-    public var x:Float;
-    public var y:Float;
+    public var x:Float = 0;
+    public var y:Float = 0;
 
-    public function new() {
-        this.x = 0;
-        this.y = 0;
-    }
+    public function new() {}
 
     public function add(x:Float, y:Float):Void {
         this.x += x;
