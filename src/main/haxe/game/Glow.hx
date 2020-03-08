@@ -20,7 +20,7 @@ class Glow {
     public var isLeftIntersecting:Bool;
     public var isRightIntersecting:Bool;
 
-    public function new(pos: Vec2) {
+    public function new(pos:Vec2) {
         this.currentSpeed = new Vec2(0, 0);
         this.topLeftCorner = new Vec2(0, 0);
         this.topRightCorner = new Vec2(0, 0);

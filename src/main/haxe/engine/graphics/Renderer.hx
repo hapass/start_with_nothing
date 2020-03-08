@@ -1,6 +1,5 @@
 package engine.graphics;
 
-import haxe.io.ArrayBufferView;
 import lang.Debug;
 import engine.math.Vec2;
 import js.html.webgl.Program;
@@ -16,25 +15,25 @@ class Color {
     public var g(default, null):Float;
     public var b(default, null):Float;
 
-    public static var RED(get, never): Color;
-    static function get_RED(): Color return new Color(1, 0, 0);
+    public static var RED(get, never):Color;
+    static function get_RED():Color return new Color(1, 0, 0);
 
-    public static var GREEN(get, never): Color;
-    static function get_GREEN(): Color return new Color(0, 1, 0);
+    public static var GREEN(get, never):Color;
+    static function get_GREEN():Color return new Color(0, 1, 0);
 
-    public static var BLUE(get, never): Color;
-    static function get_BLUE(): Color return new Color(0, 0, 1);
+    public static var BLUE(get, never):Color;
+    static function get_BLUE():Color return new Color(0, 0, 1);
 
-    public static var YELLOW(get, never): Color;
-    static function get_YELLOW(): Color return new Color(1, 1, 0);
+    public static var YELLOW(get, never):Color;
+    static function get_YELLOW():Color return new Color(1, 1, 0);
 
-    public static var WHITE(get, never): Color;
-    static function get_WHITE(): Color return new Color(1, 1, 1);
+    public static var WHITE(get, never):Color;
+    static function get_WHITE():Color return new Color(1, 1, 1);
 
-    public static var BLACK(get, never): Color;
-    static function get_BLACK(): Color return new Color(0, 0, 0);
+    public static var BLACK(get, never):Color;
+    static function get_BLACK():Color return new Color(0, 0, 0);
 
-    private function new(r: Float, g: Float, b: Float) {
+    private function new(r:Float, g:Float, b:Float) {
         this.r = correctColor(r);
         this.g = correctColor(g);
         this.b = correctColor(b);
@@ -119,12 +118,12 @@ class Renderer {
 }
 
 private class QuadDrawingProgram {
-    private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "projection";
-    private static inline var QUAD_POSITION_ATTRIBUTE_NAME: String = "quad_position";
-    private static inline var QUAD_COLOR_ATTRIBUTE_NAME: String = "quad_color";
-    private static inline var PROGRAM_ID: String = "quad_drawing_program";
-    private static inline var VERTEX_SHADER_NAME: String = "VertexShader";
-    private static inline var FRAGMENT_SHADER_NAME: String = "FragmentShader";
+    private static inline var SCREEN_SIZE_UNIFORM_NAME:String = "projection";
+    private static inline var QUAD_POSITION_ATTRIBUTE_NAME:String = "quad_position";
+    private static inline var QUAD_COLOR_ATTRIBUTE_NAME:String = "quad_color";
+    private static inline var PROGRAM_ID:String = "quad_drawing_program";
+    private static inline var VERTEX_SHADER_NAME:String = "VertexShader";
+    private static inline var FRAGMENT_SHADER_NAME:String = "FragmentShader";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
     private static inline var VEC3_DIMENSIONS_NUMBER = 3;
 
@@ -276,7 +275,7 @@ private class ProgramCompiler {
         return shader;
     }
 
-    public function getProgram(name: String): Program {
+    public function getProgram(name:String):Program {
         if(!programs.exists(name))
             throw "The program hasn't been compiled yet. " + "Program name: " + name;
 

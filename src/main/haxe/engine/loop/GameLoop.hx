@@ -5,12 +5,12 @@ import js.Browser;
 import engine.loop.GameLoopObserver;
 
 class GameLoop {
-    private var shouldExitLoop: Bool;
-    private var observer: GameLoopObserver;
+    private var shouldExitLoop:Bool;
+    private var observer:GameLoopObserver;
 
     public function new() {}
 
-    private function tick(timestamp: Float) {
+    private function tick(timestamp:Float) {
         if(shouldExitLoop)
             return;
 
@@ -20,7 +20,7 @@ class GameLoop {
         Browser.window.requestAnimationFrame(tick);
     }
 
-    public function start(observer: GameLoopObserver) {
+    public function start(observer:GameLoopObserver) {
         this.shouldExitLoop = false;
         this.observer = observer;
         tick(0);

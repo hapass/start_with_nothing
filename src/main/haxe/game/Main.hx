@@ -33,13 +33,13 @@ class Main {
 }
 
 class Game implements GameLoopObserver {
-    private var loop: GameLoop;
-    private var keyboard: Keyboard;
-    private var renderer: Renderer;
+    private var loop:GameLoop;
+    private var keyboard:Keyboard;
+    private var renderer:Renderer;
 
-    private var glow: Glow;
-    private var level: Level;
-    private var gameResult: Promise<GameResult>;
+    private var glow:Glow;
+    private var level:Level;
+    private var gameResult:Promise<GameResult>;
 
     private var bottomIntersectionOffset:Vec2;
     private var leftIntersectionOffset:Vec2;
@@ -160,7 +160,7 @@ class Game implements GameLoopObserver {
         setGlowIntersections(this.glow.bottomLeftCorner, centerRow, centerColumn);
     }
 
-    private function setGlowIntersections(point: Vec2, centerRow:Int, centerColumn:Int) {
+    private function setGlowIntersections(point:Vec2, centerRow:Int, centerColumn:Int) {
         var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
         var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
 

@@ -6,9 +6,9 @@ import engine.data.Data;
 import lang.Debug;
 
 class Level {
-    public var compositeShape: Array<Quad>;
-    public var position: Vec2;
-    public var data: Array<Array<Int>>;
+    public var compositeShape:Array<Quad>;
+    public var position:Vec2;
+    public var data:Array<Array<Int>>;
     public var glowPosition:Vec2;
 
     public function new() {

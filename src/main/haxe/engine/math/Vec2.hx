@@ -9,7 +9,7 @@ class Vec2 {
         this.y = y;
     }
 
-    public function add(vec: Vec2):Void {
+    public function add(vec:Vec2):Void {
         this.x += vec.x;
         this.y += vec.y;
     }
