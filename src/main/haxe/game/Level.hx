@@ -12,7 +12,7 @@ class Level {
 
     public function new() {
         this.compositeShape = new Array<Quad>();
-        this.glowPosition = new Vec2(0, 0);
+        this.glowPosition = new Vec2();
 
         var stringData = Data.getString("BlindLuck");
 

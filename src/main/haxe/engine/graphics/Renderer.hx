@@ -59,7 +59,7 @@ class Quad {
     public var position:Vec2;
 
     public function new() {
-        position = new Vec2(0, 0);
+        position = new Vec2();
     }
 }
 

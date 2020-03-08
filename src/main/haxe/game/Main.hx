@@ -42,17 +42,13 @@ class Game implements GameLoopObserver {
     private var gameResult:Promise<GameResult>;
 
     private var bottomIntersectionOffset:Vec2;
-    private var leftIntersectionOffset:Vec2;
-    private var rightIntersectionOffset:Vec2;
 
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
         this.renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
         this.gameResult = new Promise<GameResult>();
-        this.bottomIntersectionOffset = new Vec2(0, 0);
-        this.leftIntersectionOffset = new Vec2(0, 0);
-        this.rightIntersectionOffset = new Vec2(0, 0);
+        this.bottomIntersectionOffset = new Vec2();
     }
 
     public function run():Promise<GameResult> {
@@ -70,7 +66,7 @@ class Game implements GameLoopObserver {
         this.keyboard.update();
 
         //move
-        this.glow.currentSpeed.addFloat(0, Config.GLOW_FALL_ACCELERATION);
+        this.glow.currentSpeed.add(0, Config.GLOW_FALL_ACCELERATION);
 
         if (Key.RIGHT.currentState == Key.KEY_DOWN) {
             this.glow.currentSpeed.set(Config.GLOW_SPEED, this.glow.currentSpeed.y);
@@ -83,10 +79,10 @@ class Game implements GameLoopObserver {
         }
 
         if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
-            this.glow.currentSpeed.addFloat(0, Config.GLOW_JUMP_ACCELERATION);
+            this.glow.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
         }
 
-        this.glow.move(this.glow.currentSpeed);
+        this.glow.move();
 
         //intersect
         checkIntersections();
@@ -102,10 +98,7 @@ class Game implements GameLoopObserver {
 
         if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting) {
             this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-            var rowIndex = getRow(this.glow.center);
-            this.bottomIntersectionOffset.set(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
-            this.bottomIntersectionOffset.subtract(this.glow.position);
-            this.glow.move(bottomIntersectionOffset);
+            this.glow.setPosition(this.glow.position.x, getRow(this.glow.center) * Config.BRUSH_HEIGHT);
         }
 
         //death
@@ -145,16 +138,16 @@ class Game implements GameLoopObserver {
         this.glow.isTopIntersecting = false;
         this.glow.isYellowSquareIntersecting = false;
 
+        setGlowIntersections(this.glow.topLeftCorner);
+        setGlowIntersections(this.glow.topRightCorner);
+        setGlowIntersections(this.glow.bottomRightCorner);
+        setGlowIntersections(this.glow.bottomLeftCorner);
+    }
+
+    private function setGlowIntersections(point:Vec2) {
         var centerColumn = getColumn(this.glow.center);
         var centerRow = getRow(this.glow.center);
 
-        setGlowIntersections(this.glow.topLeftCorner, centerRow, centerColumn);
-        setGlowIntersections(this.glow.topRightCorner, centerRow, centerColumn);
-        setGlowIntersections(this.glow.bottomRightCorner, centerRow, centerColumn);
-        setGlowIntersections(this.glow.bottomLeftCorner, centerRow, centerColumn);
-    }
-
-    private function setGlowIntersections(point:Vec2, centerRow:Int, centerColumn:Int) {
         var columnIndex = getColumn(point);
         var rowIndex = getRow(point);
 

@@ -21,23 +21,22 @@ class Glow {
     public var isYellowSquareIntersecting:Bool;
 
     public function new(pos:Vec2) {
-        this.currentSpeed = new Vec2(0, 0);
-        this.topLeftCorner = new Vec2(0, 0);
-        this.topRightCorner = new Vec2(0, 0);
-        this.bottomLeftCorner = new Vec2(0, 0);
-        this.bottomRightCorner = new Vec2(0, 0);
-        this.center = new Vec2(0, 0);
-        this.position = pos;
+        this.currentSpeed = new Vec2();
+        this.topLeftCorner = new Vec2();
+        this.topRightCorner = new Vec2();
+        this.bottomLeftCorner = new Vec2();
+        this.bottomRightCorner = new Vec2();
+        this.center = new Vec2();
+        this.position = new Vec2();
         this.shape = new Quad();
         this.shape.width = Config.GLOW_WIDTH;
         this.shape.height = Config.GLOW_HEIGHT;
         this.shape.color = Config.GLOW_COLOR;
-        setPosition(this.position.x, this.position.y);
+        setPosition(pos.x, pos.y);
     }
 
-    public function move(offset:Vec2) {
-        this.position.add(offset);
-        setPosition(this.position.x, this.position.y);
+    public function move() {
+        setPosition(this.position.x + this.currentSpeed.x, this.position.y + this.currentSpeed.y);
     }
 
     public function setPosition(x:Float, y:Float) {
