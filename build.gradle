@@ -41,7 +41,7 @@ task embedLevels << {
     def tags = []
 
     tree.each { File file ->
-        tags << "<div" << " id=\"" << file.name.replace(".lvl", "") << "\"" << " data-lvl-description=\"" << file.text.replace(" ", "").replace("\n", "") << "\"" << " />" << "\n"
+        tags << "<div" << " id=\"" << file.name.replace(".lvl", "") << "\"" << " data-string=\"" << file.text.replace(" ", "").replace("\n", "") << "\"" << " />" << "\n"
     }
 
     def file = new File(binPath + "/index.html")

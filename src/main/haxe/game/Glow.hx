@@ -19,6 +19,7 @@ class Glow {
     public var isBottomIntersecting:Bool;
     public var isLeftIntersecting:Bool;
     public var isRightIntersecting:Bool;
+    public var isYellowSquareIntersecting:Bool;
 
     public function new(pos:Vec2) {
         this.currentSpeed = new Vec2(0, 0);
@@ -30,10 +31,10 @@ class Glow {
         this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
         this.position = pos;
         this.shape = new Quad();
-        this.shape.position = this.position;
         this.shape.width = Config.GLOW_WIDTH;
         this.shape.height = Config.GLOW_HEIGHT;
         this.shape.color = Config.GLOW_COLOR;
+        move(new Vec2(0, 0));
     }
 
     public function move(offset:Vec2) {

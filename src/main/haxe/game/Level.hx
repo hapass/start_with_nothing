@@ -7,16 +7,14 @@ import lang.Debug;
 
 class Level {
     public var compositeShape:Array<Quad>;
-    public var position:Vec2;
     public var data:Array<Array<Int>>;
     public var glowPosition:Vec2;
 
     public function new() {
         this.compositeShape = new Array<Quad>();
-        this.position = new Vec2(0, 0);
         this.glowPosition = new Vec2(0, 0);
 
-        var stringData = new Data("BlindLuck").stringData;
+        var stringData = Data.getString("BlindLuck");
 
         this.data = new Array<Array<Int>>();
         for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
@@ -32,8 +30,8 @@ class Level {
 
         for (rowIndex in 0...this.data.length) {
             for (columnIndex in 0...this.data[rowIndex].length) {
-                var positionX = this.position.x + columnIndex * Config.BRUSH_WIDTH;
-                var positionY = this.position.y + rowIndex * Config.BRUSH_HEIGHT;
+                var positionX = columnIndex * Config.BRUSH_WIDTH;
+                var positionY = rowIndex * Config.BRUSH_HEIGHT;
 
                 if (this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2) {
                     var rect = new Quad();
