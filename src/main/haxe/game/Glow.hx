@@ -4,35 +4,26 @@ import engine.math.Vec2;
 import engine.graphics.Renderer;
 
 class Glow {
-    public var shape:Quad;
-    public var currentSpeed:Vec2;
-    public var position:Vec2;
+    public var shape:Quad = new Quad();
+    public var currentSpeed:Vec2 = new Vec2();
+    public var position:Vec2 = new Vec2();
 
-    public var topLeftCorner:Vec2;
-    public var topRightCorner:Vec2;
-    public var bottomLeftCorner:Vec2;
-    public var bottomRightCorner:Vec2;
-    public var center:Vec2;
+    public var topLeftCorner:Vec2 = new Vec2();
+    public var topRightCorner:Vec2 = new Vec2();
+    public var bottomLeftCorner:Vec2 = new Vec2();
+    public var bottomRightCorner:Vec2 = new Vec2();
+    public var center:Vec2 = new Vec2();
 
-    public var isTopIntersecting:Bool;
-    public var isBottomIntersecting:Bool;
-    public var isLeftIntersecting:Bool;
-    public var isRightIntersecting:Bool;
-    public var isYellowSquareIntersecting:Bool;
+    public var isTopIntersecting:Bool = false;
+    public var isBottomIntersecting:Bool = false;
+    public var isLeftIntersecting:Bool = false;
+    public var isRightIntersecting:Bool = false;
+    public var isYellowSquareIntersecting:Bool = false;
 
-    public function new(pos:Vec2) {
-        this.currentSpeed = new Vec2();
-        this.topLeftCorner = new Vec2();
-        this.topRightCorner = new Vec2();
-        this.bottomLeftCorner = new Vec2();
-        this.bottomRightCorner = new Vec2();
-        this.center = new Vec2();
-        this.position = new Vec2();
-        this.shape = new Quad();
+    public function new() {
         this.shape.width = Config.GLOW_WIDTH;
         this.shape.height = Config.GLOW_HEIGHT;
         this.shape.color = Config.GLOW_COLOR;
-        setPosition(pos.x, pos.y);
     }
 
     public function move() {

@@ -6,17 +6,13 @@ import engine.data.Data;
 import lang.Debug;
 
 class Level {
-    public var compositeShape:Array<Quad>;
-    public var data:Array<Array<Int>>;
-    public var glowPosition:Vec2;
+    public var compositeShape:Array<Quad> = new Array<Quad>();
+    public var data:Array<Array<Int>> = new Array<Array<Int>>();
+    public var glowPosition:Vec2 = new Vec2();
 
     public function new() {
-        this.compositeShape = new Array<Quad>();
-        this.glowPosition = new Vec2();
-
         var stringData = Data.getString("BlindLuck");
 
-        this.data = new Array<Array<Int>>();
         for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
             this.data.push(new Array<Int>());
             for (column in 0...Config.GAME_WIDTH_BRUSHES) {

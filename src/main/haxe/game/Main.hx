@@ -33,31 +33,22 @@ class Main {
 }
 
 class Game implements GameLoopObserver {
-    private var loop:GameLoop;
-    private var keyboard:Keyboard;
-    private var renderer:Renderer;
+    private var loop:GameLoop = new GameLoop();
+    private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
+    private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
-    private var glow:Glow;
-    private var level:Level;
-    private var gameResult:Promise<GameResult>;
+    private var glow:Glow = new Glow();
+    private var level:Level = new Level();
+    private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
-    private var bottomIntersectionOffset:Vec2;
+    private var bottomIntersectionOffset:Vec2 = new Vec2();
 
-    public function new() {
-        this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
-        this.renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
-        this.loop = new GameLoop();
-        this.gameResult = new Promise<GameResult>();
-        this.bottomIntersectionOffset = new Vec2();
-    }
+    public function new() {}
 
     public function run():Promise<GameResult> {
-        this.level = new Level();
-        this.renderer.add(this.level.compositeShape);
-
-        this.glow = new Glow(this.level.glowPosition);
+        this.glow.setPosition(this.level.glowPosition.x, this.level.glowPosition.y);
         this.renderer.add([glow.shape]);
-
+        this.renderer.add(this.level.compositeShape);
         this.loop.start(this);
         return this.gameResult;
     }
