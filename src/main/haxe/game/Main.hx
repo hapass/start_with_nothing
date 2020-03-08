@@ -69,10 +69,9 @@ class Game implements GameLoopObserver {
     public function update(timestamp:Float):Void {
         this.keyboard.update();
 
-        //gravity
-        this.glow.currentSpeed.add(this.glow.acceleration);
+        //move
+        this.glow.currentSpeed.addFloat(0, Config.GLOW_FALL_ACCELERATION);
 
-        //movement
         if (Key.RIGHT.currentState == Key.KEY_DOWN) {
             this.glow.currentSpeed.set(Config.GLOW_SPEED, this.glow.currentSpeed.y);
         }
@@ -84,13 +83,15 @@ class Game implements GameLoopObserver {
         }
 
         if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
-            this.glow.currentSpeed.set(0, -Config.GLOW_JUMP_ACCELERATION);
+            this.glow.currentSpeed.addFloat(0, Config.GLOW_JUMP_ACCELERATION);
         }
 
         this.glow.move(this.glow.currentSpeed);
 
-        //obstacles
+        //intersect
         checkIntersections();
+
+        //correct movement
         if (this.glow.isLeftIntersecting) {
             var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
             this.leftIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
@@ -103,7 +104,6 @@ class Game implements GameLoopObserver {
             this.glow.move(this.rightIntersectionOffset);
         }
 
-        checkIntersections();
         if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting) {
             this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
             var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);

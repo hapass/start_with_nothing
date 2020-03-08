@@ -14,6 +14,11 @@ class Vec2 {
         this.y += vec.y;
     }
 
+    public function addFloat(x:Float, y:Float):Void {
+        this.x += x;
+        this.y += y;
+    }
+
     public function subtract(vec:Vec2):Void {
         this.x -= vec.x;
         this.y -= vec.y;

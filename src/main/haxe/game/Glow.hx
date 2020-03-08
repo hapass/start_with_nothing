@@ -6,7 +6,6 @@ import engine.graphics.Renderer;
 class Glow {
     public var shape:Quad;
     public var currentSpeed:Vec2;
-    public var acceleration:Vec2;
     public var position:Vec2;
 
     public var topLeftCorner:Vec2;
@@ -28,7 +27,6 @@ class Glow {
         this.bottomLeftCorner = new Vec2(0, 0);
         this.bottomRightCorner = new Vec2(0, 0);
         this.center = new Vec2(0, 0);
-        this.acceleration = new Vec2(0, Config.GLOW_FALL_ACCELERATION);
         this.position = pos;
         this.shape = new Quad();
         this.shape.width = Config.GLOW_WIDTH;
