@@ -2,8 +2,7 @@ package engine.data;
 
 import js.Browser;
 
-class Data
-{
+class Data {
     public var stringData(default, null):String;
 
     public function new (id:String) {

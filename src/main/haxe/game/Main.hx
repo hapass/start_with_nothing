@@ -82,16 +82,13 @@ class Game implements GameLoopObserver {
             }
 
             //movement
-            if (Key.RIGHT.currentState == Key.KEY_DOWN)
-            {
+            if (Key.RIGHT.currentState == Key.KEY_DOWN) {
                 this.glow.currentSpeed.set(Config.GLOW_SPEED, this.glow.currentSpeed.y);
             }
-            else if (Key.LEFT.currentState == Key.KEY_DOWN)
-            {
+            else if (Key.LEFT.currentState == Key.KEY_DOWN) {
                 this.glow.currentSpeed.set(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
             }
-            else
-            {
+            else {
                 this.glow.currentSpeed.set(0, this.glow.currentSpeed.y);
             }
 
@@ -100,23 +97,20 @@ class Game implements GameLoopObserver {
             //obstacles
             checkIntersections();
 
-            if (this.glow.isLeftIntersecting)
-            {
+            if (this.glow.isLeftIntersecting) {
                 var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
                 this.leftIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
                 this.glow.move(this.leftIntersectionOffset);
             }
 
-            if (this.glow.isRightIntersecting)
-            {
+            if (this.glow.isRightIntersecting) {
                 var columnIndex = Std.int(this.glow.center.x / Config.BRUSH_WIDTH);
                 this.rightIntersectionOffset.set(columnIndex * Config.BRUSH_WIDTH - this.glow.position.x, 0);
                 this.glow.move(this.rightIntersectionOffset);
             }
 
             checkIntersections();
-            if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting)
-            {
+            if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting) {
                 this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
                 var rowIndex = Std.int(this.glow.center.y / Config.BRUSH_HEIGHT);
                 this.bottomIntersectionOffset.set(this.glow.position.x, rowIndex * Config.BRUSH_HEIGHT);
@@ -131,8 +125,7 @@ class Game implements GameLoopObserver {
 
             this.renderer.draw();
         }
-        catch (e:Dynamic) 
-        {
+        catch (e:Dynamic) {
             trace(e);
         }
     }
@@ -144,8 +137,7 @@ class Game implements GameLoopObserver {
             this.glow.position.y < 0;
     }
 
-    private function checkIntersections()
-    {
+    private function checkIntersections() {
         this.glow.isBottomIntersecting = false;
         this.glow.isLeftIntersecting = false;
         this.glow.isRightIntersecting = false;
@@ -164,32 +156,25 @@ class Game implements GameLoopObserver {
         var columnIndex = Std.int(point.x / Config.BRUSH_WIDTH);
         var rowIndex = Std.int(point.y / Config.BRUSH_HEIGHT);
 
-        if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length)
-        {
-            if(level.data[rowIndex][columnIndex] == 1)
-            {
-                if (rowIndex < centerRow)
-                {
+        if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length) {
+            if(level.data[rowIndex][columnIndex] == 1) {
+                if (rowIndex < centerRow) {
                     this.glow.isTopIntersecting = true;
                 }
 
-                if (rowIndex > centerRow)
-                {
+                if (rowIndex > centerRow) {
                     this.glow.isBottomIntersecting = true;
                 }
 
-                if (columnIndex > centerColumn && rowIndex == centerRow)
-                {
+                if (columnIndex > centerColumn && rowIndex == centerRow) {
                     this.glow.isRightIntersecting = true;
                 }
 
-                if (columnIndex < centerColumn && rowIndex == centerRow)
-                {
+                if (columnIndex < centerColumn && rowIndex == centerRow) {
                     this.glow.isLeftIntersecting = true;
                 }
             }
-            else if (level.data[rowIndex][columnIndex] == 2)
-            {
+            else if (level.data[rowIndex][columnIndex] == 2) {
                 stop(GameResult.Quit);
             }
         }
