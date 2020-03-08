@@ -131,10 +131,12 @@ private class QuadDrawingProgram {
     private var program:Program;
     private var context:RenderingContext;
     private var quadVertexBuffer:Buffer;
+    private var vertexArray:Float32Array;
 
     private var projection:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler) {
+        this.vertexArray = new Float32Array(0);
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
 
@@ -165,46 +167,50 @@ private class QuadDrawingProgram {
     public function drawQuads(quadArray:Array<Quad>) {
         var vertexCount = 6 * quadArray.length;
         var attributeCount = 5 * vertexCount;
-        var array:Float32Array = new Float32Array(attributeCount);
+
+        if (this.vertexArray.length != attributeCount) {
+            this.vertexArray = new Float32Array(attributeCount);
+        }
+
         for (i in 0...quadArray.length) {
             var index = i * 30;
-            array[index] = quadArray[i].position.x;
-            array[index+1] = quadArray[i].position.y;
-            array[index+2] = quadArray[i].color.r;
-            array[index+3] = quadArray[i].color.g;
-            array[index+4] = quadArray[i].color.b;
+            this.vertexArray[index] = quadArray[i].position.x;
+            this.vertexArray[index+1] = quadArray[i].position.y;
+            this.vertexArray[index+2] = quadArray[i].color.r;
+            this.vertexArray[index+3] = quadArray[i].color.g;
+            this.vertexArray[index+4] = quadArray[i].color.b;
 
-            array[index+5] = quadArray[i].width + quadArray[i].position.x;
-            array[index+6] = quadArray[i].position.y;
-            array[index+7] = quadArray[i].color.r;
-            array[index+8] = quadArray[i].color.g;
-            array[index+9] = quadArray[i].color.b;
+            this.vertexArray[index+5] = quadArray[i].width + quadArray[i].position.x;
+            this.vertexArray[index+6] = quadArray[i].position.y;
+            this.vertexArray[index+7] = quadArray[i].color.r;
+            this.vertexArray[index+8] = quadArray[i].color.g;
+            this.vertexArray[index+9] = quadArray[i].color.b;
 
-            array[index+10] = quadArray[i].position.x;
-            array[index+11] = quadArray[i].height + quadArray[i].position.y;
-            array[index+12] = quadArray[i].color.r;
-            array[index+13] = quadArray[i].color.g;
-            array[index+14] = quadArray[i].color.b;
+            this.vertexArray[index+10] = quadArray[i].position.x;
+            this.vertexArray[index+11] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+12] = quadArray[i].color.r;
+            this.vertexArray[index+13] = quadArray[i].color.g;
+            this.vertexArray[index+14] = quadArray[i].color.b;
 
-            array[index+15] = quadArray[i].position.x;
-            array[index+16] = quadArray[i].height + quadArray[i].position.y;
-            array[index+17] = quadArray[i].color.r;
-            array[index+18] = quadArray[i].color.g;
-            array[index+19] = quadArray[i].color.b;
+            this.vertexArray[index+15] = quadArray[i].position.x;
+            this.vertexArray[index+16] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+17] = quadArray[i].color.r;
+            this.vertexArray[index+18] = quadArray[i].color.g;
+            this.vertexArray[index+19] = quadArray[i].color.b;
 
-            array[index+20] = quadArray[i].width + quadArray[i].position.x;
-            array[index+21] = quadArray[i].position.y;
-            array[index+22] = quadArray[i].color.r;
-            array[index+23] = quadArray[i].color.g;
-            array[index+24] = quadArray[i].color.b;
+            this.vertexArray[index+20] = quadArray[i].width + quadArray[i].position.x;
+            this.vertexArray[index+21] = quadArray[i].position.y;
+            this.vertexArray[index+22] = quadArray[i].color.r;
+            this.vertexArray[index+23] = quadArray[i].color.g;
+            this.vertexArray[index+24] = quadArray[i].color.b;
 
-            array[index+25] = quadArray[i].width + quadArray[i].position.x;
-            array[index+26] = quadArray[i].height + quadArray[i].position.y;
-            array[index+27] = quadArray[i].color.r;
-            array[index+28] = quadArray[i].color.g;
-            array[index+29] = quadArray[i].color.b;
+            this.vertexArray[index+25] = quadArray[i].width + quadArray[i].position.x;
+            this.vertexArray[index+26] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+27] = quadArray[i].color.r;
+            this.vertexArray[index+28] = quadArray[i].color.g;
+            this.vertexArray[index+29] = quadArray[i].color.b;
         }
-        this.context.bufferData(RenderingContext.ARRAY_BUFFER, array, RenderingContext.DYNAMIC_DRAW);
+        this.context.bufferData(RenderingContext.ARRAY_BUFFER, this.vertexArray, RenderingContext.DYNAMIC_DRAW);
         this.context.drawArrays(RenderingContext.TRIANGLES, 0, vertexCount);
     }
 
