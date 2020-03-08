@@ -1,19 +1,18 @@
 package game;
 
-import engine.graphics.drawing.shapes.Shape;
-import engine.graphics.drawing.shapes.RectangleShape;
+import engine.graphics.Renderer;
 import engine.math.Vec2;
 import engine.data.Data;
 import lang.Debug;
 
 class Level {
-    public var compositeShape: Array<Shape>;
+    public var compositeShape: Array<Quad>;
     public var position: Vec2;
     public var data: Array<Array<Int>>;
     public var glowPosition: Vec2;
 
     public function new() {
-        this.compositeShape = new Array<Shape>();
+        this.compositeShape = new Array<Quad>();
         this.position = new Vec2(0, 0);
 
         var stringData = new Data("BlindLuck").stringData;
@@ -40,19 +39,20 @@ class Level {
                 var positionY = this.position.y + rowIndex * Config.BRUSH_HEIGHT;
 
                 if (this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2)
-                {
-                    trace('Spawned brush at: [$positionX, $positionY] in pixels; [$columnIndex, $rowIndex] in brushes.');
-                    
-                    var rect = new RectangleShape(new Vec2(positionX, positionY), Config.BRUSH_WIDTH, Config.BRUSH_HEIGHT);
-                    
+                {                    
+                    var rect = new Quad();
+                    rect.position = new Vec2(positionX, positionY);
+                    rect.width = Config.BRUSH_WIDTH;
+                    rect.height = Config.BRUSH_HEIGHT;
+
                     if (this.data[rowIndex][columnIndex] == 1)
                     {
-                        rect.setColor(Config.BRUSH_COLOR);
+                        rect.color = Config.BRUSH_COLOR;
                     }
 
                     if (this.data[rowIndex][columnIndex] == 2)
                     {
-                        rect.setColor(Config.EXIT_COLOR);
+                        rect.color = Config.EXIT_COLOR;
                     }
 
                     this.compositeShape.push(rect);

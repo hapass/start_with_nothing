@@ -1,6 +1,6 @@
 package game;
 
-import engine.graphics.drawing.DrawingBoard;
+import engine.graphics.Renderer;
 import engine.loop.GameLoop;
 import engine.loop.GameLoopObserver;
 import engine.math.Vec2;
@@ -20,7 +20,7 @@ class Main {
     }
 
     public static function launch() {
-        new Game().run().then(function(result:GameResult){
+        new Game().run().then(function(result:GameResult) {
             switch(result) {
                 case GameResult.Restart:
                     Browser.alert("You've lost. Try again!");
@@ -35,7 +35,7 @@ class Main {
 class Game implements GameLoopObserver {
     private var loop: GameLoop;
     private var keyboard: Keyboard;
-    private var board: DrawingBoard;
+    private var renderer: Renderer;
 
     private var glow: Glow;
     private var level: Level;
@@ -44,21 +44,19 @@ class Game implements GameLoopObserver {
     public function new() {
         this.keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
 
-        this.board = new DrawingBoard(Config.GAME_WIDTH, Config.GAME_HEIGHT);
+        this.renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
         this.loop = new GameLoop();
         this.gameResult = new Promise<GameResult>();
     }
 
     public function run():Promise<GameResult> {
         this.level = new Level();
-        this.board.add(this.level.compositeShape);
+        this.renderer.add(this.level.compositeShape);
 
         this.glow = new Glow(this.level.glowPosition);
-        this.board.add([glow.shape]);
+        this.renderer.add([glow.shape]);
 
-        this.loop.subscribe(this);
-        this.loop.start();
-
+        this.loop.start(this);
         return this.gameResult;
     }
 
@@ -71,7 +69,9 @@ class Game implements GameLoopObserver {
 
             //jump
             checkIntersections();
-            if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
+            if (Key.SPACE.currentState == Key.KEY_DOWN && 
+                Key.SPACE.previousState == Key.KEY_UP && 
+                this.glow.isBottomIntersecting) {
                 this.glow.currentSpeed = new Vec2(0, -Config.GLOW_JUMP_ACCELERATION);
             }
 
@@ -121,7 +121,7 @@ class Game implements GameLoopObserver {
                 stop(GameResult.Restart);
             }
 
-            this.board.draw();
+            this.renderer.draw();
         }
         catch (e:Dynamic) 
         {
@@ -189,8 +189,7 @@ class Game implements GameLoopObserver {
 
     private function stop(result:GameResult) {
         this.loop.stop();
-        this.loop.unsubscribe(this);
-        this.board.dispose();
+        this.renderer.dispose();
         this.keyboard.dispose();
         this.gameResult.resolve(result);
         throw "exit";

@@ -19,7 +19,6 @@ class Keyboard {
     }
 
     private function onKeyDown(event: KeyboardEvent) {
-        trace('Key down ${event.keyCode}');
         var key = trackedKeys[event.keyCode];
 
         //key is not being tracked

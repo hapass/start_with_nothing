@@ -1,5 +1,6 @@
-package engine.graphics.rendering;
+package engine.graphics;
 
+import haxe.io.ArrayBufferView;
 import lang.Debug;
 import engine.math.Vec2;
 import engine.math.Vec3;
@@ -13,9 +14,61 @@ import js.Browser;
 
 using Lambda;
 
+class Color {
+    public var r(default, null): Int;
+    public var g(default, null): Int;
+    public var b(default, null): Int;
+
+    public static var RED(get, never): Color;
+    static function get_RED(): Color return new Color(255, 0, 0);
+
+    public static var GREEN(get, never): Color;
+    static function get_GREEN(): Color return new Color(0, 255, 0);
+
+    public static var BLUE(get, never): Color;
+    static function get_BLUE(): Color return new Color(0, 0, 255);
+
+    public static var YELLOW(get, never): Color;
+    static function get_YELLOW(): Color return new Color(255, 255, 0);
+
+    public static var WHITE(get, never): Color;
+    static function get_WHITE(): Color return new Color(255, 255, 255);
+
+    public static var BLACK(get, never): Color;
+    static function get_BLACK(): Color return new Color(0, 0, 0);
+
+    public function new(r: Int, g: Int, b: Int) {
+        this.r = correctColor(r);
+        this.g = correctColor(g);
+        this.b = correctColor(b);
+    }
+
+    private function correctColor(value: Int) {
+        Debug.assert(value >= 0 && value <= 255, "Each color value should be between 0 and 255.");
+
+        if(value < 0)
+            return 0;
+        
+        if(value > 255)
+            return 255;
+
+        return value;
+    }
+}
+
+class Quad {
+    public var color:Color;
+    public var height:Float;
+    public var width:Float;
+    public var position:Vec2;
+
+    public function new() {}
+}
+
 class Renderer {
     private var context:RenderingContext;
     private var canvas:CanvasElement;
+    private var quads:Array<Quad>;
 
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
@@ -23,6 +76,7 @@ class Renderer {
     private var quadDrawingProgram:QuadDrawingProgram;
 
     public function new(canvasWidth:Int, canvasHeight:Int) {
+        this.quads = new Array<Quad>();
         this.canvas = createCanvas(canvasWidth, canvasHeight);
         this.context = canvas.getContextWebGL();
         this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
@@ -42,11 +96,18 @@ class Renderer {
         return canvas;
     }
 
-    public function drawQuad(translation:Vec2, width:Int, height:Int, color:Vec3) {
-        this.quadDrawingProgram.drawQuad(translation, width, height, color);
+    public function add(quadArray:Array<Quad>) {
+        for (quad in quadArray) {
+            this.quads.push(quad);
+        }
     }
 
-    public function clear() {
+    public function draw() {
+        clear();
+        this.quadDrawingProgram.drawQuads(this.quads);
+    }
+
+    private function clear() {
         context.clearColor(0, 0, 0, 1);
         context.clear(RenderingContext.COLOR_BUFFER_BIT);
     }
@@ -60,81 +121,92 @@ class Renderer {
 
 private class QuadDrawingProgram {
     private static inline var SCREEN_SIZE_UNIFORM_NAME: String = "projection";
-    private static inline var TRANSLATION_UNIFORM_NAME: String = "translation";
-    private static inline var SCALE_UNIFORM_NAME: String = "scale";
-    private static inline var COLOR_UNIFORM_NAME: String = "color";
     private static inline var QUAD_POSITION_ATTRIBUTE_NAME: String = "quad_position";
+    private static inline var QUAD_COLOR_ATTRIBUTE_NAME: String = "quad_color";
     private static inline var PROGRAM_ID: String = "quad_drawing_program";
     private static inline var VERTEX_SHADER_NAME: String = "VertexShader";
     private static inline var FRAGMENT_SHADER_NAME: String = "FragmentShader";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
+    private static inline var VEC3_DIMENSIONS_NUMBER = 3;
 
     private var program:Program;
     private var context:RenderingContext;
     private var quadVertexBuffer:Buffer;
 
     private var projection:UniformLocation;
-    private var translation:UniformLocation;
-    private var scale:UniformLocation;
-    private var color:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler) {
-        
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
 
         this.context = context;
         this.quadVertexBuffer = this.context.createBuffer();
         this.context.bindBuffer(RenderingContext.ARRAY_BUFFER, this.quadVertexBuffer);
-        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(getQuadVertices().flatten().array()), RenderingContext.STATIC_DRAW);
 
         setupQuadPositionAttribute();
+        setupQuadColorAttribute();
 
         this.projection = this.context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
-        this.translation = this.context.getUniformLocation(program, TRANSLATION_UNIFORM_NAME);
-        this.scale = this.context.getUniformLocation(program, SCALE_UNIFORM_NAME);
-        this.color = this.context.getUniformLocation(program, COLOR_UNIFORM_NAME);
-
         this.context.useProgram(program);
+        setProjection();
     }
 
     private function setupQuadPositionAttribute() {
         var positionAttributeLocation = context.getAttribLocation(program, QUAD_POSITION_ATTRIBUTE_NAME);
         this.context.enableVertexAttribArray(positionAttributeLocation);
-        this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, 0, 0);
+        this.context.vertexAttribPointer(positionAttributeLocation, VEC2_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, VEC2_DIMENSIONS_NUMBER * 4 + VEC3_DIMENSIONS_NUMBER * 4, 0);
     }
 
-    public function drawQuad(position:Vec2, width:Int, height:Int, color:Vec3) {
-        setProjection();
-        setColor(color);
-        setTranslation(position);
-        setScale(width, height);
-
-        this.context.drawArrays(RenderingContext.TRIANGLE_STRIP, 0, 4);
+    private function setupQuadColorAttribute() {
+        var colorAttributeLocation = context.getAttribLocation(program, QUAD_COLOR_ATTRIBUTE_NAME);
+        this.context.enableVertexAttribArray(colorAttributeLocation);
+        this.context.vertexAttribPointer(colorAttributeLocation, VEC3_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, VEC2_DIMENSIONS_NUMBER * 4 + VEC3_DIMENSIONS_NUMBER * 4, VEC2_DIMENSIONS_NUMBER * 4);
     }
 
-    private function setTranslation(position:Vec2) {
-        var x = position.x;
-        var y = position.y;
+    public function drawQuads(quadArray:Array<Quad>) {
+        var vertexCount = 6 * quadArray.length;
+        var attributeCount = 5 * vertexCount;
+        var array:Float32Array = new Float32Array(attributeCount);
+        for (i in 0...quadArray.length) {
+            var index = i * 30;
+            array[index] = quadArray[i].position.x;
+            array[index+1] = quadArray[i].position.y;
+            array[index+2] = quadArray[i].color.r;
+            array[index+3] = quadArray[i].color.g;
+            array[index+4] = quadArray[i].color.b;
 
-        this.context.uniformMatrix4fv(this.translation, false, [
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            x, y, 0, 1,
-        ]);
-    }
+            array[index+5] = quadArray[i].width + quadArray[i].position.x;
+            array[index+6] = quadArray[i].position.y;
+            array[index+7] = quadArray[i].color.r;
+            array[index+8] = quadArray[i].color.g;
+            array[index+9] = quadArray[i].color.b;
 
-    private function setScale(width:Int, height:Int) {
-        var w = width;
-        var h = height;
+            array[index+10] = quadArray[i].position.x;
+            array[index+11] = quadArray[i].height + quadArray[i].position.y;
+            array[index+12] = quadArray[i].color.r;
+            array[index+13] = quadArray[i].color.g;
+            array[index+14] = quadArray[i].color.b;
 
-        this.context.uniformMatrix4fv(this.scale, false, [
-            w, 0, 0, 0,
-            0, h, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1
-        ]);
+            array[index+15] = quadArray[i].position.x;
+            array[index+16] = quadArray[i].height + quadArray[i].position.y;
+            array[index+17] = quadArray[i].color.r;
+            array[index+18] = quadArray[i].color.g;
+            array[index+19] = quadArray[i].color.b;
+
+            array[index+20] = quadArray[i].width + quadArray[i].position.x;
+            array[index+21] = quadArray[i].position.y;
+            array[index+22] = quadArray[i].color.r;
+            array[index+23] = quadArray[i].color.g;
+            array[index+24] = quadArray[i].color.b;
+
+            array[index+25] = quadArray[i].width + quadArray[i].position.x;
+            array[index+26] = quadArray[i].height + quadArray[i].position.y;
+            array[index+27] = quadArray[i].color.r;
+            array[index+28] = quadArray[i].color.g;
+            array[index+29] = quadArray[i].color.b;
+        }
+        this.context.bufferData(RenderingContext.ARRAY_BUFFER, new Float32Array(array), RenderingContext.DYNAMIC_DRAW);
+        this.context.drawArrays(RenderingContext.TRIANGLES, 0, vertexCount);
     }
 
     private function setProjection() {
@@ -147,19 +219,6 @@ private class QuadDrawingProgram {
               0,    0, 1, 0,
              -1,    1, 0, 1
         ]);
-    }
-
-    private function setColor(color:Vec3) {
-        this.context.uniform4fv(this.color, [color.x, color.y, color.z, 1]);
-    }
-
-    private function getQuadVertices() {
-        return [
-            new Vec2(0, 1),
-            new Vec2(0, 0),
-            new Vec2(1, 1),
-            new Vec2(1, 0),
-        ];
     }
 
     public function dispose() {

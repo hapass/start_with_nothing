@@ -1,9 +1,10 @@
 attribute vec2 quad_position;
+attribute vec3 quad_color;
 
 uniform mat4 projection;
-uniform mat4 translation;
-uniform mat4 scale;
+varying vec4 color;
 
 void main() {
-    gl_Position =  projection * translation * scale * vec4(quad_position, 0, 1);
+    gl_Position =  projection * vec4(quad_position, 0, 1);
+    color = vec4(quad_color, 1);
 }

@@ -20,15 +20,4 @@ class Vec2 {
     public function copy(): Vec2 {
         return new Vec2(this.x, this.y);
     }
-
-    public function toArray(): Array<Float> {
-        return [
-            this.x,
-            this.y
-        ];
-    }
-
-    public function iterator():Iterator<Float> {
-        return this.toArray().iterator();
-    }
 }

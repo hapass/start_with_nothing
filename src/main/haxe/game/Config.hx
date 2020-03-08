@@ -1,6 +1,6 @@
 package game;
 
-import engine.graphics.drawing.Color;
+import engine.graphics.Renderer;
 
 class Config {
     public static var BRUSH_COLOR: Color = Color.RED;
@@ -13,7 +13,7 @@ class Config {
     public static inline var GAME_HEIGHT: Int = GAME_HEIGHT_BRUSHES * BRUSH_HEIGHT;
 
     public static var GLOW_COLOR: Color = Color.WHITE;
-    public static inline var GLOW_SPEED: Int = 3;
+    public static inline var GLOW_SPEED: Int = 1;
     public static inline var GLOW_WIDTH_BRUSHES: Int = 1;
     public static inline var GLOW_HEIGHT_BRUSHES: Int = 1;
     public static inline var GLOW_WIDTH: Int = GLOW_WIDTH_BRUSHES * BRUSH_WIDTH;

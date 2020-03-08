@@ -22,16 +22,4 @@ class Vec3 {
     public function copy(): Vec3 {
         return new Vec3(this.x, this.y, this.z);
     }
-
-    public function toArray(): Array<Float> {
-        return [
-            this.x,
-            this.y,
-            this.z
-        ];
-    }
-
-    public function iterator():Iterator<Float> {
-        return this.toArray().iterator();
-    }
 }
