@@ -1,5 +1,6 @@
 package game;
 
+import lang.Debug;
 import engine.math.Vec2;
 import engine.graphics.Renderer;
 
@@ -18,10 +19,6 @@ class Glow {
     public var bottomLeftCornerPreviousCell:Vec2<Int> = new Vec2Int();
     public var bottomRightCornerPreviousCell:Vec2<Int> = new Vec2Int();
 
-    public var isTopIntersecting:Bool = false;
-    public var isBottomIntersecting:Bool = false;
-    public var isLeftIntersecting:Bool = false;
-    public var isRightIntersecting:Bool = false;
     public var isExitIntersecting:Bool = false;
     public var isOutOfScreen:Bool = false;
 
@@ -31,21 +28,55 @@ class Glow {
         this.shape.color = Config.GLOW_COLOR;
     }
 
-    public function move() {
-        setPosition(this.position.x + this.currentSpeed.x, this.position.y + this.currentSpeed.y);
+    public function moveHorizontally() {
+        setPosition(this.position.x + this.currentSpeed.x, this.position.y);
+    }
+
+    public function moveVertically() {
+        setPosition(this.position.x, this.position.y + this.currentSpeed.y);
     }
 
     public function setPosition(x:Float, y:Float) {
-        this.topLeftCornerPreviousCell.set(this.topLeftCornerCell.x, this.topLeftCornerCell.y);
-        this.topRightCornerPreviousCell.set(this.topRightCornerCell.x, this.topRightCornerCell.y);
-        this.bottomLeftCornerPreviousCell.set(this.bottomLeftCornerCell.x, this.bottomLeftCornerCell.y);
-        this.bottomRightCornerPreviousCell.set(this.bottomRightCornerCell.x, this.bottomRightCornerCell.y);
+        var topLeftCornerCellx = this.topLeftCornerCell.x;
+        var topLeftCornerCelly = this.topLeftCornerCell.y;
+        var topRightCornerCelly = this.topRightCornerCell.y;
+        var topRightCornerCellx = this.topRightCornerCell.x;
+        var bottomLeftCornerCellx = this.bottomLeftCornerCell.x;
+        var bottomLeftCornerCelly = this.bottomLeftCornerCell.y;
+        var bottomRightCornerCellx = this.bottomRightCornerCell.x;
+        var bottomRightCornerCelly = this.bottomRightCornerCell.y;
+
         this.position.set(x, y);
         this.shape.position = this.position;
+
         this.topLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y));
         this.topRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y));
-        this.bottomLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y + Config.GLOW_HEIGHT));
-        this.bottomRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y + Config.GLOW_HEIGHT));
+        this.bottomLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y + Config.GLOW_HEIGHT - 1));
+        this.bottomRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y + Config.GLOW_HEIGHT - 1));
+        
+        if (topLeftCornerCellx != this.topLeftCornerCell.x ||
+            topLeftCornerCelly != this.topLeftCornerCell.y) {
+            this.topLeftCornerPreviousCell.set(topLeftCornerCellx, topLeftCornerCelly);
+        }
+
+        if (topRightCornerCelly != this.topRightCornerCell.y ||
+            topRightCornerCellx != this.topRightCornerCell.x) {
+            this.topRightCornerPreviousCell.set(topRightCornerCellx, topRightCornerCelly);
+        }
+
+        if (bottomLeftCornerCellx != this.bottomLeftCornerCell.x ||
+            bottomLeftCornerCelly != this.bottomLeftCornerCell.y) {
+            this.bottomLeftCornerPreviousCell.set(bottomLeftCornerCellx, bottomLeftCornerCelly);
+        }
+
+        if (bottomRightCornerCellx != this.bottomRightCornerCell.x ||
+            bottomRightCornerCelly != this.bottomRightCornerCell.y) {
+            this.bottomRightCornerPreviousCell.set(bottomRightCornerCellx, bottomRightCornerCelly);
+        }
+
+        trace('Cell previous ${this.bottomLeftCornerPreviousCell.y}');
+        trace('Cell current ${this.bottomLeftCornerCell.y}');
+        trace('Position ${this.position.y}');
     }
 
     public function isTop(cell:Vec2<Int>):Bool {
@@ -65,10 +96,10 @@ class Glow {
     }
 
     private function getColumn(x:Float):Int {
-        return Std.int(x / Config.BRUSH_WIDTH);
+        return Math.floor(x / Config.BRUSH_WIDTH);
     }
 
     private function getRow(y:Float):Int {
-        return Std.int(y / Config.BRUSH_HEIGHT);
+        return Math.floor(y / Config.BRUSH_HEIGHT);
     }
 }

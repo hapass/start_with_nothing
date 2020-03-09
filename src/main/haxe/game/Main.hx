@@ -69,37 +69,19 @@ class Game implements GameLoopObserver {
             this.glow.currentSpeed.set(0, this.glow.currentSpeed.y);
         }
 
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP && this.glow.isBottomIntersecting) {
+        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
             this.glow.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
         }
 
-        this.glow.move();
-
         //intersect
-        checkIntersections();
+        this.glow.isExitIntersecting = false;
+        this.glow.isOutOfScreen = false;
 
-        //correct movement
-        if (this.glow.isLeftIntersecting) {
-            this.glow.setPosition(this.glow.topLeftCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
-            this.glow.setPosition(this.glow.topLeftCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
-        }
+        this.glow.moveHorizontally();
+        checkIntersections(true);
 
-        if (this.glow.isRightIntersecting) {
-            this.glow.setPosition(this.glow.topRightCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
-            this.glow.setPosition(this.glow.topRightCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
-        }
-
-        if (this.glow.isBottomIntersecting) {
-            this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-            this.glow.setPosition(this.glow.position.x, this.glow.bottomRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
-            this.glow.setPosition(this.glow.position.x, this.glow.bottomRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
-        }
-
-        if (this.glow.isTopIntersecting) {
-            this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-            this.glow.setPosition(this.glow.position.x, this.glow.topRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
-            this.glow.setPosition(this.glow.position.x, this.glow.topRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
-        }
+        this.glow.moveVertically();
+        checkIntersections(false);
 
         //death
         if (this.glow.isOutOfScreen) {
@@ -116,37 +98,30 @@ class Game implements GameLoopObserver {
         this.renderer.draw();
     }
 
-    private function checkIntersections() {
-        this.glow.isBottomIntersecting = false;
-        this.glow.isLeftIntersecting = false;
-        this.glow.isRightIntersecting = false;
-        this.glow.isTopIntersecting = false;
-        this.glow.isExitIntersecting = false;
-        this.glow.isOutOfScreen = false;
-
-        setGlowIntersections(this.glow.topLeftCornerCell, this.glow.topLeftCornerPreviousCell);
-        setGlowIntersections(this.glow.topRightCornerCell, this.glow.topRightCornerPreviousCell);
-        setGlowIntersections(this.glow.bottomRightCornerCell, this.glow.bottomRightCornerPreviousCell);
-        setGlowIntersections(this.glow.bottomLeftCornerCell, this.glow.bottomLeftCornerPreviousCell);
+    private function checkIntersections(isHorizontal:Bool) {
+        setGlowIntersections(this.glow.topLeftCornerCell, this.glow.topLeftCornerPreviousCell, isHorizontal);
+        setGlowIntersections(this.glow.topRightCornerCell, this.glow.topRightCornerPreviousCell, isHorizontal);
+        setGlowIntersections(this.glow.bottomRightCornerCell, this.glow.bottomRightCornerPreviousCell, isHorizontal);
+        setGlowIntersections(this.glow.bottomLeftCornerCell, this.glow.bottomLeftCornerPreviousCell, isHorizontal);
     }
 
-    private function setGlowIntersections(cell:Vec2<Int>, previousCell:Vec2<Int>) {
+    private function setGlowIntersections(cell:Vec2<Int>, previousCell:Vec2<Int>, isHorizontal:Bool) {
         if (level.isCellValid(cell)) {
             if(level.getCellType(cell) == 1) {
-                if (cell.y < previousCell.y && this.glow.isTop(cell)) {
-                    this.glow.isTopIntersecting = true;
+                if (isHorizontal)
+                {
+                    if ((cell.x > previousCell.x && this.glow.isRight(cell)) || 
+                        (cell.x < previousCell.x && this.glow.isLeft(cell))) {
+                        this.glow.setPosition(previousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
+                    }
                 }
-
-                if (cell.y > previousCell.y && this.glow.isBottom(cell)) {
-                    this.glow.isBottomIntersecting = true;
-                }
-
-                if (cell.x > previousCell.x && this.glow.isRight(cell)) {
-                    this.glow.isRightIntersecting = true;
-                }
-
-                if (cell.x < previousCell.x && this.glow.isLeft(cell)) {
-                    this.glow.isLeftIntersecting = true;
+                else
+                {
+                    if ((cell.y < previousCell.y && this.glow.isTop(cell)) || 
+                        (cell.y > previousCell.y && this.glow.isBottom(cell))) {
+                        this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
+                        this.glow.setPosition(this.glow.position.x, previousCell.y * Config.BRUSH_HEIGHT);
+                    }
                 }
             }
             else if (level.getCellType(cell) == 2) {
