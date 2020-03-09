@@ -5,20 +5,25 @@ import engine.graphics.Renderer;
 
 class Glow {
     public var shape:Quad = new Quad();
-    public var currentSpeed:Vec2 = new Vec2();
-    public var position:Vec2 = new Vec2();
+    public var currentSpeed:Vec2<Float> = new Vec2<Float>();
+    public var position:Vec2<Float> = new Vec2<Float>();
 
-    public var topLeftCorner:Vec2 = new Vec2();
-    public var topRightCorner:Vec2 = new Vec2();
-    public var bottomLeftCorner:Vec2 = new Vec2();
-    public var bottomRightCorner:Vec2 = new Vec2();
-    public var center:Vec2 = new Vec2();
+    public var topLeftCornerCell:Vec2<Int> = new Vec2<Int>();
+    public var topRightCornerCell:Vec2<Int> = new Vec2<Int>();
+    public var bottomLeftCornerCell:Vec2<Int> = new Vec2<Int>();
+    public var bottomRightCornerCell:Vec2<Int> = new Vec2<Int>();
+
+    public var topLeftCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
+    public var topRightCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
+    public var bottomLeftCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
+    public var bottomRightCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
 
     public var isTopIntersecting:Bool = false;
     public var isBottomIntersecting:Bool = false;
     public var isLeftIntersecting:Bool = false;
     public var isRightIntersecting:Bool = false;
-    public var isYellowSquareIntersecting:Bool = false;
+    public var isExitIntersecting:Bool = false;
+    public var isOutOfScreen:Bool = false;
 
     public function new() {
         this.shape.width = Config.GLOW_WIDTH;
@@ -31,12 +36,39 @@ class Glow {
     }
 
     public function setPosition(x:Float, y:Float) {
+        this.topLeftCornerPreviousCell.set(this.topLeftCornerCell.x, this.topLeftCornerCell.y);
+        this.topRightCornerPreviousCell.set(this.topRightCornerCell.x, this.topRightCornerCell.y);
+        this.bottomLeftCornerPreviousCell.set(this.bottomLeftCornerCell.x, this.bottomLeftCornerCell.y);
+        this.bottomRightCornerPreviousCell.set(this.bottomRightCornerCell.x, this.bottomRightCornerCell.y);
         this.position.set(x, y);
         this.shape.position = this.position;
-        this.topLeftCorner.set(this.position.x, this.position.y);
-        this.topRightCorner.set(this.position.x + Config.GLOW_WIDTH - 1, this.position.y);
-        this.bottomLeftCorner.set(this.position.x, this.position.y + Config.GLOW_HEIGHT);
-        this.bottomRightCorner.set(this.position.x + Config.GLOW_WIDTH - 1, this.position.y + Config.GLOW_HEIGHT);
-        this.center.set(this.position.x + Std.int(Config.GLOW_WIDTH / 2), this.position.y + Std.int(Config.GLOW_HEIGHT / 2));
+        this.topLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y));
+        this.topRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y));
+        this.bottomLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y + Config.GLOW_HEIGHT));
+        this.bottomRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y + Config.GLOW_HEIGHT));
+    }
+
+    public function isTop(cell:Vec2<Int>):Bool {
+        return cell == this.topLeftCornerCell || cell == this.topRightCornerCell;
+    }
+
+    public function isBottom(cell:Vec2<Int>):Bool {
+        return cell == this.bottomLeftCornerCell || cell == this.bottomRightCornerCell;
+    }
+
+    public function isRight(cell:Vec2<Int>):Bool {
+        return cell == this.bottomRightCornerCell || cell == this.topRightCornerCell;
+    }
+
+    public function isLeft(cell:Vec2<Int>):Bool {
+        return cell == this.bottomLeftCornerCell || cell == this.topLeftCornerCell;
+    }
+
+    private function getColumn(x:Float):Int {
+        return Std.int(x / Config.BRUSH_WIDTH);
+    }
+
+    private function getRow(y:Float):Int {
+        return Std.int(y / Config.BRUSH_HEIGHT);
     }
 }

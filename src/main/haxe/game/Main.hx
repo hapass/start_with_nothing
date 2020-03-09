@@ -41,7 +41,7 @@ class Game implements GameLoopObserver {
     private var level:Level = new Level();
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
-    private var bottomIntersectionOffset:Vec2 = new Vec2();
+    private var bottomIntersectionOffset:Vec2<Float> = new Vec2<Float>();
 
     public function new() {}
 
@@ -80,26 +80,35 @@ class Game implements GameLoopObserver {
 
         //correct movement
         if (this.glow.isLeftIntersecting) {
-            this.glow.setPosition(getColumn(this.glow.center) * Config.BRUSH_WIDTH, this.glow.position.y);
+            this.glow.setPosition(this.glow.topLeftCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
+            this.glow.setPosition(this.glow.topLeftCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
         }
 
         if (this.glow.isRightIntersecting) {
-            this.glow.setPosition(getColumn(this.glow.center) * Config.BRUSH_WIDTH, this.glow.position.y);
+            this.glow.setPosition(this.glow.topRightCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
+            this.glow.setPosition(this.glow.topRightCornerPreviousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
         }
 
-        if (this.glow.isBottomIntersecting || this.glow.isTopIntersecting) {
+        if (this.glow.isBottomIntersecting) {
             this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-            this.glow.setPosition(this.glow.position.x, getRow(this.glow.center) * Config.BRUSH_HEIGHT);
+            this.glow.setPosition(this.glow.position.x, this.glow.bottomRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
+            this.glow.setPosition(this.glow.position.x, this.glow.bottomRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
+        }
+
+        if (this.glow.isTopIntersecting) {
+            this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
+            this.glow.setPosition(this.glow.position.x, this.glow.topRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
+            this.glow.setPosition(this.glow.position.x, this.glow.topRightCornerPreviousCell.y * Config.BRUSH_HEIGHT);
         }
 
         //death
-        if (isOutOfScreen()) {
+        if (this.glow.isOutOfScreen) {
             stop(GameResult.Restart);
             return;
         }
 
         //win
-        if (this.glow.isYellowSquareIntersecting) {
+        if (this.glow.isExitIntersecting) {
             stop(GameResult.Quit);
             return;
         }
@@ -107,62 +116,45 @@ class Game implements GameLoopObserver {
         this.renderer.draw();
     }
 
-    private function getColumn(point:Vec2):Int {
-        return Std.int(point.x / Config.BRUSH_WIDTH);
-    }
-
-    private function getRow(point:Vec2):Int {
-        return Std.int(point.y / Config.BRUSH_HEIGHT);
-    }
-
-    private function isOutOfScreen() {
-        return this.glow.position.x > Config.GAME_WIDTH ||
-            this.glow.position.x < 0 ||
-            this.glow.position.y > Config.GAME_HEIGHT ||
-            this.glow.position.y < 0;
-    }
-
     private function checkIntersections() {
         this.glow.isBottomIntersecting = false;
         this.glow.isLeftIntersecting = false;
         this.glow.isRightIntersecting = false;
         this.glow.isTopIntersecting = false;
-        this.glow.isYellowSquareIntersecting = false;
+        this.glow.isExitIntersecting = false;
+        this.glow.isOutOfScreen = false;
 
-        setGlowIntersections(this.glow.topLeftCorner);
-        setGlowIntersections(this.glow.topRightCorner);
-        setGlowIntersections(this.glow.bottomRightCorner);
-        setGlowIntersections(this.glow.bottomLeftCorner);
+        setGlowIntersections(this.glow.topLeftCornerCell, this.glow.topLeftCornerPreviousCell);
+        setGlowIntersections(this.glow.topRightCornerCell, this.glow.topRightCornerPreviousCell);
+        setGlowIntersections(this.glow.bottomRightCornerCell, this.glow.bottomRightCornerPreviousCell);
+        setGlowIntersections(this.glow.bottomLeftCornerCell, this.glow.bottomLeftCornerPreviousCell);
     }
 
-    private function setGlowIntersections(point:Vec2) {
-        var centerColumn = getColumn(this.glow.center);
-        var centerRow = getRow(this.glow.center);
-
-        var columnIndex = getColumn(point);
-        var rowIndex = getRow(point);
-
-        if (rowIndex < level.data.length && columnIndex < level.data[rowIndex].length) {
-            if(level.data[rowIndex][columnIndex] == 1) {
-                if (rowIndex < centerRow) {
+    private function setGlowIntersections(cell:Vec2<Int>, previousCell:Vec2<Int>) {
+        if (level.isCellValid(cell)) {
+            if(level.getCellType(cell) == 1) {
+                if (cell.y < previousCell.y && this.glow.isTop(cell)) {
                     this.glow.isTopIntersecting = true;
                 }
 
-                if (rowIndex > centerRow) {
+                if (cell.y > previousCell.y && this.glow.isBottom(cell)) {
                     this.glow.isBottomIntersecting = true;
                 }
 
-                if (columnIndex > centerColumn && rowIndex == centerRow) {
+                if (cell.x > previousCell.x && this.glow.isRight(cell)) {
                     this.glow.isRightIntersecting = true;
                 }
 
-                if (columnIndex < centerColumn && rowIndex == centerRow) {
+                if (cell.x < previousCell.x && this.glow.isLeft(cell)) {
                     this.glow.isLeftIntersecting = true;
                 }
             }
-            else if (level.data[rowIndex][columnIndex] == 2) {
-                this.glow.isYellowSquareIntersecting = true;
+            else if (level.getCellType(cell) == 2) {
+                this.glow.isExitIntersecting = true;
             }
+        }
+        else {
+            this.glow.isOutOfScreen = true;
         }
     }
 

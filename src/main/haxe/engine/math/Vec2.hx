@@ -1,17 +1,18 @@
 package engine.math;
 
-class Vec2 {
-    public var x:Float = 0;
-    public var y:Float = 0;
+@:generic
+class Vec2<T> {
+    public var x:Dynamic = 0;
+    public var y:Dynamic = 0;
 
     public function new() {}
 
-    public function add(x:Float, y:Float):Void {
+    public function add(x:T, y:T):Void {
         this.x += x;
         this.y += y;
     }
 
-    public function set(x:Float, y:Float):Void {
+    public function set(x:T, y:T):Void {
         this.x = x;
         this.y = y;
     }

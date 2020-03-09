@@ -8,7 +8,7 @@ import lang.Debug;
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
     public var data:Array<Array<Int>> = new Array<Array<Int>>();
-    public var glowPosition:Vec2 = new Vec2();
+    public var glowPosition:Vec2<Float> = new Vec2<Float>();
 
     public function new() {
         var stringData = Data.getString("BlindLuck");
@@ -51,5 +51,15 @@ class Level {
                 }
             }
         }
+    }
+
+    public function isCellValid(cell:Vec2<Int>):Bool {
+        return 
+            0 <= cell.y && cell.y < this.data.length && 
+            0 <= cell.x && cell.x < this.data[cell.x].length;
+    }
+
+    public function getCellType(cell:Vec2<Int>):Int {
+        return data[cell.y][cell.x];
     }
 }
