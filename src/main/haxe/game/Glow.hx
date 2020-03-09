@@ -5,18 +5,18 @@ import engine.graphics.Renderer;
 
 class Glow {
     public var shape:Quad = new Quad();
-    public var currentSpeed:Vec2<Float> = new Vec2<Float>();
-    public var position:Vec2<Float> = new Vec2<Float>();
+    public var currentSpeed:Vec2<Float> = new Vec2Float();
+    public var position:Vec2<Float> = new Vec2Float();
 
-    public var topLeftCornerCell:Vec2<Int> = new Vec2<Int>();
-    public var topRightCornerCell:Vec2<Int> = new Vec2<Int>();
-    public var bottomLeftCornerCell:Vec2<Int> = new Vec2<Int>();
-    public var bottomRightCornerCell:Vec2<Int> = new Vec2<Int>();
+    public var topLeftCornerCell:Vec2<Int> = new Vec2Int();
+    public var topRightCornerCell:Vec2<Int> = new Vec2Int();
+    public var bottomLeftCornerCell:Vec2<Int> = new Vec2Int();
+    public var bottomRightCornerCell:Vec2<Int> = new Vec2Int();
 
-    public var topLeftCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
-    public var topRightCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
-    public var bottomLeftCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
-    public var bottomRightCornerPreviousCell:Vec2<Int> = new Vec2<Int>();
+    public var topLeftCornerPreviousCell:Vec2<Int> = new Vec2Int();
+    public var topRightCornerPreviousCell:Vec2<Int> = new Vec2Int();
+    public var bottomLeftCornerPreviousCell:Vec2<Int> = new Vec2Int();
+    public var bottomRightCornerPreviousCell:Vec2<Int> = new Vec2Int();
 
     public var isTopIntersecting:Bool = false;
     public var isBottomIntersecting:Bool = false;

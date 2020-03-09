@@ -8,7 +8,7 @@ import lang.Debug;
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
     public var data:Array<Array<Int>> = new Array<Array<Int>>();
-    public var glowPosition:Vec2<Float> = new Vec2<Float>();
+    public var glowPosition:Vec2<Float> = new Vec2Float();
 
     public function new() {
         var stringData = Data.getString("BlindLuck");

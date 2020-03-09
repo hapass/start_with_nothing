@@ -41,7 +41,7 @@ class Game implements GameLoopObserver {
     private var level:Level = new Level();
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
-    private var bottomIntersectionOffset:Vec2<Float> = new Vec2<Float>();
+    private var bottomIntersectionOffset:Vec2<Float> = new Vec2Float();
 
     public function new() {}
 
