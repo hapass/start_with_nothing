@@ -54,6 +54,18 @@ class Game implements GameLoopObserver {
     }
 
     public function update(timestamp:Float):Void {
+        //death
+        if (this.glow.isOutOfScreen) {
+            stop(GameResult.Restart);
+            return;
+        }
+
+        //win
+        if (this.glow.isExitIntersecting) {
+            stop(GameResult.Quit);
+            return;
+        }
+
         this.keyboard.update();
 
         //move
@@ -74,26 +86,11 @@ class Game implements GameLoopObserver {
         }
 
         //intersect
-        this.glow.isExitIntersecting = false;
-        this.glow.isOutOfScreen = false;
-
         this.glow.moveHorizontally();
         checkIntersections(true);
 
         this.glow.moveVertically();
         checkIntersections(false);
-
-        //death
-        if (this.glow.isOutOfScreen) {
-            stop(GameResult.Restart);
-            return;
-        }
-
-        //win
-        if (this.glow.isExitIntersecting) {
-            stop(GameResult.Quit);
-            return;
-        }
 
         this.renderer.draw();
     }

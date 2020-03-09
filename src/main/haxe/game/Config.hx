@@ -21,6 +21,6 @@ class Config {
     
     public static var EXIT_COLOR:Color = Color.YELLOW;
 
-    public static inline var GLOW_FALL_ACCELERATION:Float = 0.2;
-    public static inline var GLOW_JUMP_ACCELERATION:Float = -7;
+    public static inline var GLOW_FALL_ACCELERATION:Float = 1;
+    public static inline var GLOW_JUMP_ACCELERATION:Float = -15;
 }
