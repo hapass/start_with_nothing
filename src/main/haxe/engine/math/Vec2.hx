@@ -7,9 +7,7 @@ class Vec2<T> {
     public var x:T;
     public var y:T;
 
-    @:abstract
-    public function add(x:T, y:T){}
-
+    public function add(x:T, y:T) {}
     public function set(x:T, y:T):Void {
         this.x = x;
         this.y = y;
