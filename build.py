@@ -21,7 +21,7 @@ shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>
 
 level_data_path = "data"
 level_token = "INSERT_LEVELS"
-level_template = "<div id=\"<id_string>\" data-string=\"<data_string>\"/>\n"
+level_template = "<div id=\"<id_string>\" data-string=\"<data_string>\"></div>\n"
 
 js_hash_token = "INSERT_VERSION"
 
