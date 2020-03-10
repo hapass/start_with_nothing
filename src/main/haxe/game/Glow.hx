@@ -74,9 +74,9 @@ class Glow {
             this.bottomRightCornerPreviousCell.set(bottomRightCornerCellx, bottomRightCornerCelly);
         }
 
-        trace('Cell previous ${this.bottomLeftCornerPreviousCell.y}');
-        trace('Cell current ${this.bottomLeftCornerCell.y}');
-        trace('Position ${this.position.y}');
+        Debug.log('Cell previous ${this.bottomLeftCornerPreviousCell.y}');
+        Debug.log('Cell current ${this.bottomLeftCornerCell.y}');
+        Debug.log('Position ${this.position.y}');
     }
 
     public function isTop(cell:Vec2<Int>):Bool {

@@ -246,7 +246,7 @@ private class ProgramCompiler {
         context.linkProgram(program);
 
         if(!context.getProgramParameter(program, RenderingContext.LINK_STATUS)) {
-            trace(context.getProgramInfoLog(program));
+            Debug.log(context.getProgramInfoLog(program));
             context.deleteProgram(program);
             throw "Program linking error. " + "Program name: " + name;
         }
@@ -264,7 +264,7 @@ private class ProgramCompiler {
         context.compileShader(shader);
 
         if(!context.getShaderParameter(shader, RenderingContext.COMPILE_STATUS)) {
-            trace(context.getShaderInfoLog(shader));
+            Debug.log(context.getShaderInfoLog(shader));
             context.deleteShader(shader);
             throw "Shader compilation error. " + "Shader file name: " + name;
         }

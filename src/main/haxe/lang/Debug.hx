@@ -12,4 +12,10 @@ class Debug {
             }
         };
     }
+
+    public static inline function log(message:String) {
+        #if debug
+            trace(message);
+        #end
+    }
 }

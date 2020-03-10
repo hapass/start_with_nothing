@@ -203,7 +203,7 @@ engine_graphics__$Renderer_ProgramCompiler.prototype = {
 		this.context.attachShader(program,this.compileShader(fragmentShaderName,35632));
 		this.context.linkProgram(program);
 		if(!this.context.getProgramParameter(program,35714)) {
-			console.log("src/main/haxe/engine/graphics/Renderer.hx:249:",this.context.getProgramInfoLog(program));
+			var message = this.context.getProgramInfoLog(program);
 			this.context.deleteProgram(program);
 			throw new js__$Boot_HaxeError("Program linking error. " + "Program name: " + name);
 		}
@@ -220,7 +220,7 @@ engine_graphics__$Renderer_ProgramCompiler.prototype = {
 		this.context.shaderSource(shader,shaderSource);
 		this.context.compileShader(shader);
 		if(!this.context.getShaderParameter(shader,35713)) {
-			console.log("src/main/haxe/engine/graphics/Renderer.hx:267:",this.context.getShaderInfoLog(shader));
+			var message = this.context.getShaderInfoLog(shader);
 			this.context.deleteShader(shader);
 			throw new js__$Boot_HaxeError("Shader compilation error. " + "Shader file name: " + name);
 		}
@@ -416,9 +416,6 @@ game_Glow.prototype = {
 		if(bottomRightCornerCellx != this.bottomRightCornerCell.x || bottomRightCornerCelly != this.bottomRightCornerCell.y) {
 			this.bottomRightCornerPreviousCell.set(bottomRightCornerCellx,bottomRightCornerCelly);
 		}
-		console.log("src/main/haxe/game/Glow.hx:77:","Cell previous " + this.bottomLeftCornerPreviousCell.y);
-		console.log("src/main/haxe/game/Glow.hx:78:","Cell current " + this.bottomLeftCornerCell.y);
-		console.log("src/main/haxe/game/Glow.hx:79:","Position " + this.position.y);
 	}
 	,isTop: function(cell) {
 		if(cell != this.topLeftCornerCell) {
