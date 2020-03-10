@@ -1,7 +1,0 @@
--cp src/main/haxe
-
--main game.Main
-
--debug
-
--js bin/glow.js
