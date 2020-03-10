@@ -8,10 +8,13 @@ new_line_string = "\n"
 
 is_debug = True
 bin_path = "bin"
-layout_path = "layout"
-index_page = "index.html"
 
-shader_data_path = "src/main/glsl/engine/graphics/rendering"
+layout_path = "layout"
+layout_file_name = "index.html"
+
+source_code_path = os.path.join("src", "main", "haxe")
+
+shader_data_path = os.path.join("src", "main", "glsl", "engine", "graphics", "rendering")
 shader_token = "<!-- INSERT_SHADERS -->"
 shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>\n</script>\n"
 
@@ -19,35 +22,44 @@ level_data_path = "data"
 level_token = "<!-- INSERT_LEVELS -->"
 level_template = "<div id=\"<id_string>\" data-string=\"<data_string>\"/>\n"
 
-def embed_files_into_index_page(files_to_embed_path, replace_token, template, should_flatten_data):
-  tags = empty_string
+def embed_files_into_layout(files_to_embed_path, replace_token, template, should_flatten_data):
+  file_data_to_embed = empty_string
   for file_to_embed_name in os.listdir(files_to_embed_path):
     with open(os.path.join(files_to_embed_path, file_to_embed_name), "r") as file_to_embed:
       file_data = file_to_embed.read()
       if should_flatten_data:
         file_data = file_data.replace(space_string, empty_string).replace(new_line_string, empty_string)
-      tags += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
+      file_data_to_embed += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
 
-  with open(os.path.join(bin_path, index_page), "r") as file_index_read:
-    index_data = file_index_read.read()
-    with open(os.path.join(bin_path, index_page), "w") as file_index_write:
-      file_index_write.write(index_data.replace(replace_token, tags))
+  with open(os.path.join(bin_path, layout_file_name), "r") as layout_file_read:
+    file_data = layout_file_read.read()
+    with open(os.path.join(bin_path, layout_file_name), "w") as layout_file_write:
+      layout_file_write.write(file_data.replace(replace_token, file_data_to_embed))
+
+def add_option(command, option, value):
+  result = command + space_string + option
+  if value != empty_string:
+    result += space_string + value
+  return result
 
 def compile():
-  command = "haxe -cp src/main/haxe -main game.Main"
+  command = add_option("haxe", "-cp", source_code_path)
+  command = add_option(command, "-main", "game.Main")
+  command = add_option(command, "-js", os.path.join(bin_path, "glow.js"))
+
   if is_debug:
-    command += space_string + "-debug"
-  command += space_string + "-js" + space_string + os.path.join(bin_path, "glow.js")
+    command = add_option(command, "-debug", empty_string)
+
   os.system(command)
 
 def copy_layout():
-  shutil.copyfile(os.path.join(layout_path, index_page), os.path.join(bin_path, index_page))
+  shutil.copyfile(os.path.join(layout_path, layout_file_name), os.path.join(bin_path, layout_file_name))
 
 def build():
   compile()
   copy_layout()
-  embed_files_into_index_page(shader_data_path, shader_token, shader_template, False)
-  embed_files_into_index_page(level_data_path, level_token, level_template, True)
+  embed_files_into_layout(shader_data_path, shader_token, shader_template, False)
+  embed_files_into_layout(level_data_path, level_token, level_template, True)
 
 if len(sys.argv) == 1 or sys.argv[1] == "debug":
   build()
