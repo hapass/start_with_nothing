@@ -73,6 +73,7 @@ var engine_graphics_Quad = function() {
 engine_graphics_Quad.__name__ = true;
 var engine_graphics_Renderer = function(gameWidth,gameHeight) {
 	this.quads = [];
+	this.glowIndex = 0;
 	this.canvas = this.createCanvas(gameWidth,gameHeight);
 	this.context = js_html__$CanvasElement_CanvasUtil.getContextWebGL(this.canvas,null);
 	this.context.viewport(0,0,this.context.canvas.width,this.context.canvas.height);
@@ -100,11 +101,14 @@ engine_graphics_Renderer.prototype = {
 			var quad = quadArray[_g];
 			++_g;
 			this.quads.push(quad);
+			if(quad.color == engine_graphics_Color.get_WHITE()) {
+				this.glowIndex = this.quads.length - 1;
+			}
 		}
 	}
 	,draw: function() {
 		this.clear();
-		this.quadDrawingProgram.drawQuads(this.quads);
+		this.quadDrawingProgram.drawQuads(this.quads,this.glowIndex);
 	}
 	,clear: function() {
 		this.context.clearColor(0,0,0,1);
@@ -117,6 +121,8 @@ engine_graphics_Renderer.prototype = {
 	}
 };
 var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,gameWidth,gameHeight) {
+	this.glowRadius = 15.0;
+	this.animatingGlow = false;
 	this.gameWidth = gameWidth;
 	this.gameHeight = gameHeight;
 	this.vertexArray = new Float32Array(0);
@@ -128,6 +134,7 @@ var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,ga
 	this.setupQuadPositionAttribute();
 	this.setupQuadColorAttribute();
 	this.projection = this.context.getUniformLocation(this.program,"projection");
+	this.glowPosition = this.context.getUniformLocation(this.program,"glow_position");
 	this.context.useProgram(this.program);
 	this.setProjection();
 };
@@ -143,7 +150,19 @@ engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
 		this.context.enableVertexAttribArray(colorAttributeLocation);
 		this.context.vertexAttribPointer(colorAttributeLocation,3,5126,false,20,8);
 	}
-	,drawQuads: function(quadArray) {
+	,drawQuads: function(quadArray,glowIndex) {
+		if(engine_input_Key.SPACE.currentState == engine_input_Key.KEY_DOWN && engine_input_Key.SPACE.previousState == engine_input_Key.KEY_UP) {
+			this.animatingGlow = true;
+			this.glowRadius = 15.0;
+		}
+		if(this.animatingGlow) {
+			this.glowRadius -= 0.5;
+			if(this.glowRadius < 0.0) {
+				this.glowRadius = 15.0;
+				this.animatingGlow = false;
+			}
+		}
+		this.context.uniform3f(this.glowPosition,quadArray[glowIndex].position.x + quadArray[glowIndex].width / 2,quadArray[glowIndex].position.y + quadArray[glowIndex].height / 2,this.glowRadius);
 		var vertexCount = 6 * quadArray.length;
 		var attributeCount = 5 * vertexCount;
 		if(this.vertexArray.length != attributeCount) {
