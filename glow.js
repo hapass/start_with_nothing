@@ -1060,7 +1060,7 @@ engine_graphics_Renderer.prototype = {
 };
 var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler) {
 	this.vertexArray = new Float32Array(0);
-	compiler.compileProgram("quad_drawing_program","VertexShader","FragmentShader");
+	compiler.compileProgram("quad_drawing_program","VertexShader.glsl","FragmentShader.glsl");
 	this.program = compiler.getProgram("quad_drawing_program");
 	this.context = context;
 	this.quadVertexBuffer = this.context.createBuffer();
@@ -1486,7 +1486,7 @@ var game_Level = function() {
 	this.glowPosition = new engine_math_Vec2Float();
 	this.data = [];
 	this.compositeShape = [];
-	var stringData = engine_data_Data.getString("BlindLuck");
+	var stringData = engine_data_Data.getString("BlindLuck.lvl");
 	var _g = 0;
 	while(_g < 30) {
 		var row = _g++;
@@ -3265,8 +3265,8 @@ engine_graphics__$Renderer_QuadDrawingProgram.SCREEN_SIZE_UNIFORM_NAME = "projec
 engine_graphics__$Renderer_QuadDrawingProgram.QUAD_POSITION_ATTRIBUTE_NAME = "quad_position";
 engine_graphics__$Renderer_QuadDrawingProgram.QUAD_COLOR_ATTRIBUTE_NAME = "quad_color";
 engine_graphics__$Renderer_QuadDrawingProgram.PROGRAM_ID = "quad_drawing_program";
-engine_graphics__$Renderer_QuadDrawingProgram.VERTEX_SHADER_NAME = "VertexShader";
-engine_graphics__$Renderer_QuadDrawingProgram.FRAGMENT_SHADER_NAME = "FragmentShader";
+engine_graphics__$Renderer_QuadDrawingProgram.VERTEX_SHADER_NAME = "VertexShader.glsl";
+engine_graphics__$Renderer_QuadDrawingProgram.FRAGMENT_SHADER_NAME = "FragmentShader.glsl";
 engine_graphics__$Renderer_QuadDrawingProgram.VEC2_DIMENSIONS_NUMBER = 2;
 engine_graphics__$Renderer_QuadDrawingProgram.VEC3_DIMENSIONS_NUMBER = 3;
 engine_input_Key.KEY_DOWN = "KEY_DOWN";

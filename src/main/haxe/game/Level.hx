@@ -11,7 +11,7 @@ class Level {
     public var glowPosition:Vec2<Float> = new Vec2Float();
 
     public function new() {
-        var stringData = Data.getString("BlindLuck");
+        var stringData = Data.getString("BlindLuck.lvl");
 
         for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
             this.data.push(new Array<Int>());

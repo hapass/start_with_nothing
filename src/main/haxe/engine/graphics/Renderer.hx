@@ -120,8 +120,8 @@ private class QuadDrawingProgram {
     private static inline var QUAD_POSITION_ATTRIBUTE_NAME:String = "quad_position";
     private static inline var QUAD_COLOR_ATTRIBUTE_NAME:String = "quad_color";
     private static inline var PROGRAM_ID:String = "quad_drawing_program";
-    private static inline var VERTEX_SHADER_NAME:String = "VertexShader";
-    private static inline var FRAGMENT_SHADER_NAME:String = "FragmentShader";
+    private static inline var VERTEX_SHADER_NAME:String = "VertexShader.glsl";
+    private static inline var FRAGMENT_SHADER_NAME:String = "FragmentShader.glsl";
     private static inline var VEC2_DIMENSIONS_NUMBER = 2;
     private static inline var VEC3_DIMENSIONS_NUMBER = 3;
 

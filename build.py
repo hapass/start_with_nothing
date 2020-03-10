@@ -32,7 +32,7 @@ def embed_files_into_index_page(files_to_embed_path, replace_token, template, sh
       file_data = file_to_embed.read()
       if should_flatten_data:
         file_data = file_data.replace(" ", empty_string).replace(new_line_string, empty_string)
-      tags += template.replace("<id_string>", file_to_embed_name.rstrip(".")).replace("<data_string>", file_data)
+      tags += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
 
   with open(get_bin_path(index_page), "r") as file_index_read:
     index_data = file_index_read.read()
