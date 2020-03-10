@@ -71,9 +71,9 @@ class Renderer {
 
     private var quadDrawingProgram:QuadDrawingProgram;
 
-    public function new(canvasWidth:Int, canvasHeight:Int) {
+    public function new(gameWidth:Int, gameHeight:Int) {
         this.quads = new Array<Quad>();
-        this.canvas = createCanvas(canvasWidth, canvasHeight);
+        this.canvas = createCanvas(gameWidth, gameHeight);
         this.context = canvas.getContextWebGL();
         this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
 
@@ -81,13 +81,16 @@ class Renderer {
             throw "Your browser doesn't support webgl. Please update your browser.";
 
         var compiler = new ProgramCompiler(context);
-        this.quadDrawingProgram = new QuadDrawingProgram(context, compiler);
+        this.quadDrawingProgram = new QuadDrawingProgram(context, compiler, gameWidth, gameHeight);
     }
 
-    private function createCanvas(width:Int, height:Int) { 
+    private function createCanvas(gameWidth:Int, gameHeight:Int) { 
         var canvas = Browser.document.createCanvasElement();
-        canvas.setAttribute(CANVAS_WIDTH_PROPERTY, Std.string(width));
-        canvas.setAttribute(CANVAS_HEIGHT_PROPERTY, Std.string(height));
+        var canvasHeight = Browser.document.body.clientHeight;
+        var canvasWidth = Browser.document.body.clientHeight * (gameWidth / gameHeight);
+        canvas.setAttribute(CANVAS_WIDTH_PROPERTY, Std.string(canvasWidth));
+        canvas.setAttribute(CANVAS_HEIGHT_PROPERTY, Std.string(canvasHeight));
+        canvas.style.marginLeft = Std.string((Browser.document.body.clientWidth - canvasWidth) / 2) + "px";
         Browser.document.body.appendChild(canvas);
         return canvas;
     }
@@ -129,10 +132,14 @@ private class QuadDrawingProgram {
     private var context:RenderingContext;
     private var quadVertexBuffer:Buffer;
     private var vertexArray:Float32Array;
+    private var gameWidth:Int;
+    private var gameHeight:Int;
 
     private var projection:UniformLocation;
 
-    public function new(context:RenderingContext, compiler:ProgramCompiler) {
+    public function new(context:RenderingContext, compiler:ProgramCompiler, gameWidth:Int, gameHeight:Int) {
+        this.gameWidth = gameWidth;
+        this.gameHeight = gameHeight;
         this.vertexArray = new Float32Array(0);
         compiler.compileProgram(PROGRAM_ID, VERTEX_SHADER_NAME, FRAGMENT_SHADER_NAME);
         this.program = compiler.getProgram(PROGRAM_ID);
@@ -212,8 +219,8 @@ private class QuadDrawingProgram {
     }
 
     private function setProjection() {
-        var w = this.context.canvas.width;
-        var h = this.context.canvas.height;
+        var w = this.gameWidth;
+        var h = this.gameHeight;
 
         this.context.uniformMatrix4fv(this.projection, false, [
             2/w,    0, 0, 0,

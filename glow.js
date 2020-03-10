@@ -10,6 +10,9 @@ function $extend(from, fields) {
 Math.__name__ = true;
 var Std = function() { };
 Std.__name__ = true;
+Std.string = function(s) {
+	return js_Boot.__string_rec(s,"");
+};
 Std.parseInt = function(x) {
 	if(x != null) {
 		var _g = 0;
@@ -68,23 +71,26 @@ var engine_graphics_Quad = function() {
 	this.color = engine_graphics_Color.get_WHITE();
 };
 engine_graphics_Quad.__name__ = true;
-var engine_graphics_Renderer = function(canvasWidth,canvasHeight) {
+var engine_graphics_Renderer = function(gameWidth,gameHeight) {
 	this.quads = [];
-	this.canvas = this.createCanvas(canvasWidth,canvasHeight);
+	this.canvas = this.createCanvas(gameWidth,gameHeight);
 	this.context = js_html__$CanvasElement_CanvasUtil.getContextWebGL(this.canvas,null);
 	this.context.viewport(0,0,this.context.canvas.width,this.context.canvas.height);
 	if(this.context == null) {
 		throw new js__$Boot_HaxeError("Your browser doesn't support webgl. Please update your browser.");
 	}
 	var compiler = new engine_graphics__$Renderer_ProgramCompiler(this.context);
-	this.quadDrawingProgram = new engine_graphics__$Renderer_QuadDrawingProgram(this.context,compiler);
+	this.quadDrawingProgram = new engine_graphics__$Renderer_QuadDrawingProgram(this.context,compiler,gameWidth,gameHeight);
 };
 engine_graphics_Renderer.__name__ = true;
 engine_graphics_Renderer.prototype = {
-	createCanvas: function(width,height) {
+	createCanvas: function(gameWidth,gameHeight) {
 		var canvas = window.document.createElement("canvas");
-		canvas.setAttribute("width",width == null ? "null" : "" + width);
-		canvas.setAttribute("height",height == null ? "null" : "" + height);
+		var canvasHeight = window.document.body.clientHeight;
+		var canvasWidth = window.document.body.clientHeight * (gameWidth / gameHeight);
+		canvas.setAttribute("width",canvasWidth == null ? "null" : "" + canvasWidth);
+		canvas.setAttribute("height",canvasHeight == null ? "null" : "" + canvasHeight);
+		canvas.style.marginLeft = Std.string((window.document.body.clientWidth - canvasWidth) / 2) + "px";
 		window.document.body.appendChild(canvas);
 		return canvas;
 	}
@@ -110,7 +116,9 @@ engine_graphics_Renderer.prototype = {
 		window.document.body.removeChild(this.canvas);
 	}
 };
-var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler) {
+var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,gameWidth,gameHeight) {
+	this.gameWidth = gameWidth;
+	this.gameHeight = gameHeight;
 	this.vertexArray = new Float32Array(0);
 	compiler.compileProgram("quad_drawing_program","VertexShader.glsl","FragmentShader.glsl");
 	this.program = compiler.getProgram("quad_drawing_program");
@@ -181,8 +189,8 @@ engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
 		this.context.drawArrays(4,0,vertexCount);
 	}
 	,setProjection: function() {
-		var w = this.context.canvas.width;
-		var h = this.context.canvas.height;
+		var w = this.gameWidth;
+		var h = this.gameHeight;
 		this.context.uniformMatrix4fv(this.projection,false,[2 / w,0,0,0,0,-2 / h,0,0,0,0,1,0,-1,1,0,1]);
 	}
 	,dispose: function() {
