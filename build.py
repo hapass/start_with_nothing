@@ -8,6 +8,7 @@ new_line_string = "\n"
 
 is_debug = True
 bin_path = "bin"
+js_file_name = "glow.js"
 
 layout_path = "layout"
 layout_file_name = "index.html"
@@ -15,12 +16,20 @@ layout_file_name = "index.html"
 source_code_path = os.path.join("src", "main", "haxe")
 
 shader_data_path = os.path.join("src", "main", "glsl", "engine", "graphics", "rendering")
-shader_token = "<!-- INSERT_SHADERS -->"
+shader_token = "INSERT_SHADERS"
 shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>\n</script>\n"
 
 level_data_path = "data"
-level_token = "<!-- INSERT_LEVELS -->"
+level_token = "INSERT_LEVELS"
 level_template = "<div id=\"<id_string>\" data-string=\"<data_string>\"/>\n"
+
+js_hash_token = "INSERT_VERSION"
+
+def embed_token_into_layout(replace_token, data_to_embed):
+  with open(os.path.join(bin_path, layout_file_name), "r") as layout_file_read:
+    file_data = layout_file_read.read()
+    with open(os.path.join(bin_path, layout_file_name), "w") as layout_file_write:
+      layout_file_write.write(file_data.replace(replace_token, data_to_embed))
 
 def embed_files_into_layout(files_to_embed_path, replace_token, template, should_flatten_data):
   file_data_to_embed = empty_string
@@ -30,11 +39,12 @@ def embed_files_into_layout(files_to_embed_path, replace_token, template, should
       if should_flatten_data:
         file_data = file_data.replace(space_string, empty_string).replace(new_line_string, empty_string)
       file_data_to_embed += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
+  embed_token_into_layout(replace_token, file_data_to_embed)
 
-  with open(os.path.join(bin_path, layout_file_name), "r") as layout_file_read:
-    file_data = layout_file_read.read()
-    with open(os.path.join(bin_path, layout_file_name), "w") as layout_file_write:
-      layout_file_write.write(file_data.replace(replace_token, file_data_to_embed))
+def embed_version_into_layout():
+  md5_hash = os.popen("md5 " + os.path.join(bin_path, js_file_name)).read()
+  js_file_hash = "?" + md5_hash.replace("MD5 (" + os.path.join(bin_path, js_file_name) + ") = ", empty_string).replace(new_line_string, empty_string)
+  embed_token_into_layout(js_hash_token, js_file_hash)
 
 def add_option(command, option, value):
   result = command + space_string + option
@@ -45,11 +55,12 @@ def add_option(command, option, value):
 def compile():
   command = add_option("haxe", "-cp", source_code_path)
   command = add_option(command, "-main", "game.Main")
-  command = add_option(command, "-js", os.path.join(bin_path, "glow.js"))
+  command = add_option(command, "-js", os.path.join(bin_path, js_file_name))
 
   if is_debug:
     command = add_option(command, "-debug", empty_string)
 
+  command = add_option(command, "-dce", "full")
   os.system(command)
 
 def copy_layout():
@@ -60,6 +71,7 @@ def build():
   copy_layout()
   embed_files_into_layout(shader_data_path, shader_token, shader_template, False)
   embed_files_into_layout(level_data_path, level_token, level_template, True)
+  embed_version_into_layout()
 
 if len(sys.argv) == 1 or sys.argv[1] == "debug":
   build()
