@@ -34,7 +34,7 @@ class Main {
 
 class Game implements GameLoopObserver {
     private var loop:GameLoop = new GameLoop();
-    private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT]);
+    private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
     private var glow:Glow = new Glow();

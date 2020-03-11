@@ -127,6 +127,7 @@ class Renderer {
 private class QuadDrawingProgram {
     private static inline var PROJECTION_UNIFORM_NAME:String = "projection";
     private static inline var GLOW_POSITION_UNIFORM_NAME:String = "glow_position";
+    private static inline var TIME_UNIFORM_NAME:String = "rand";
     private static inline var QUAD_POSITION_ATTRIBUTE_NAME:String = "quad_position";
     private static inline var QUAD_COLOR_ATTRIBUTE_NAME:String = "quad_color";
     private static inline var PROGRAM_ID:String = "quad_drawing_program";
@@ -147,6 +148,7 @@ private class QuadDrawingProgram {
 
     private var projection:UniformLocation;
     private var glowPosition:UniformLocation;
+    private var rand:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler, gameWidth:Int, gameHeight:Int) {
         this.gameWidth = gameWidth;
@@ -164,6 +166,7 @@ private class QuadDrawingProgram {
 
         this.projection = this.context.getUniformLocation(program, PROJECTION_UNIFORM_NAME);
         this.glowPosition = this.context.getUniformLocation(program, GLOW_POSITION_UNIFORM_NAME);
+        this.rand = this.context.getUniformLocation(program, TIME_UNIFORM_NAME);
         this.context.useProgram(program);
         setProjection();
     }
@@ -180,10 +183,18 @@ private class QuadDrawingProgram {
         this.context.vertexAttribPointer(colorAttributeLocation, VEC3_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, VEC2_DIMENSIONS_NUMBER * 4 + VEC3_DIMENSIONS_NUMBER * 4, VEC2_DIMENSIONS_NUMBER * 4);
     }
 
+    private var randFloat1:Float = 0;
+    private var randFloat2:Float = 0;
+    private var randFloat3:Float = 0;
+
     public function drawQuads(quadArray:Array<Quad>, glowIndex:Int) {
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+        if (Key.SHIFT.currentState == Key.KEY_DOWN && 
+            Key.SHIFT.previousState == Key.KEY_UP) {
             this.animatingGlow = true;
             this.glowRadius = 15.0;
+            randFloat1 = Math.random();
+            randFloat2 = Math.random();
+            randFloat3 = Math.random();
         }
 
         if (this.animatingGlow) {
@@ -194,6 +205,7 @@ private class QuadDrawingProgram {
             }
         }
 
+        this.context.uniform3f(this.rand, randFloat1, randFloat2, randFloat3);
         this.context.uniform3f(this.glowPosition, quadArray[glowIndex].position.x + (quadArray[glowIndex].width / 2), quadArray[glowIndex].position.y + (quadArray[glowIndex].height / 2), this.glowRadius);
 
         var vertexCount = 6 * quadArray.length;

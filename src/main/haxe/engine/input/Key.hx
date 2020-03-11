@@ -7,6 +7,7 @@ class Key {
     public static var SPACE:Key = new Key(32);
     public static var RIGHT:Key = new Key(39);
     public static var LEFT:Key = new Key(37);
+    public static var SHIFT:Key = new Key(16);
 
     public var code:Int = 0;
 
