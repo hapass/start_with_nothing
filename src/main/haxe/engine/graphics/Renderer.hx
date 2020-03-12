@@ -1,5 +1,6 @@
 package engine.graphics;
 
+import game.Config;
 import engine.input.Key;
 import lang.Debug;
 import engine.math.Vec2;
@@ -144,8 +145,8 @@ private class QuadDrawingProgram {
     private var gameHeight:Int;
 
     private var animatingGlow:Bool = false;
-    private var glowRadius:Float = 0;
-    private var glowRadiusSpeed:Float = 0.001;
+    private var glowRadius:Float = 0.0;
+    private var glowRadiusSpeed:Float = 0.0;
 
     private var projection:UniformLocation;
     private var glowPosition:UniformLocation;
@@ -184,31 +185,25 @@ private class QuadDrawingProgram {
         this.context.vertexAttribPointer(colorAttributeLocation, VEC3_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, VEC2_DIMENSIONS_NUMBER * 4 + VEC3_DIMENSIONS_NUMBER * 4, VEC2_DIMENSIONS_NUMBER * 4);
     }
 
-    private var randFloat1:Float = 0;
-    private var randFloat2:Float = 0;
-    private var randFloat3:Float = 0;
-
     public function drawQuads(quadArray:Array<Quad>, glowIndex:Int) {
         if (Key.SHIFT.currentState == Key.KEY_DOWN && 
             Key.SHIFT.previousState == Key.KEY_UP) {
-            this.glowRadius = 0;
-            this.glowRadiusSpeed = 0.001;
+            this.glowRadius = Config.GLOW_LIGHT_MIN_RADIUS;
+            this.glowRadiusSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
             this.animatingGlow = true;
-            randFloat1 = Math.random();
-            randFloat2 = Math.random();
-            randFloat3 = Math.random();
+            this.context.uniform3f(this.rand, Math.random(), Math.random(), Math.random());
         }
 
         if (this.animatingGlow) {
-            this.glowRadiusSpeed += 0.0003;
+            this.glowRadiusSpeed += Config.GLOW_LIGHT_ACCELERATION;
             this.glowRadius += glowRadiusSpeed;
-            if (this.glowRadius > 1) {
-                this.glowRadius = 0;
+            
+            if (this.glowRadius > Config.GLOW_LIGHT_MAX_RADIUS) {
+                this.glowRadius = 0.0;
                 this.animatingGlow = false;
             }
         }
 
-        this.context.uniform3f(this.rand, randFloat1, randFloat2, randFloat3);
         this.context.uniform3f(this.glowPosition, quadArray[glowIndex].position.x + (quadArray[glowIndex].width / 2), quadArray[glowIndex].position.y + (quadArray[glowIndex].height / 2), this.glowRadius);
 
         var vertexCount = 6 * quadArray.length;
