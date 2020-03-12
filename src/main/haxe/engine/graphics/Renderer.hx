@@ -145,6 +145,7 @@ private class QuadDrawingProgram {
 
     private var animatingGlow:Bool = false;
     private var glowRadius:Float = 0;
+    private var glowRadiusSpeed:Float = 0.001;
 
     private var projection:UniformLocation;
     private var glowPosition:UniformLocation;
@@ -191,6 +192,7 @@ private class QuadDrawingProgram {
         if (Key.SHIFT.currentState == Key.KEY_DOWN && 
             Key.SHIFT.previousState == Key.KEY_UP) {
             this.glowRadius = 0;
+            this.glowRadiusSpeed = 0.001;
             this.animatingGlow = true;
             randFloat1 = Math.random();
             randFloat2 = Math.random();
@@ -198,7 +200,8 @@ private class QuadDrawingProgram {
         }
 
         if (this.animatingGlow) {
-            this.glowRadius += 0.01;
+            this.glowRadiusSpeed += 0.0003;
+            this.glowRadius += glowRadiusSpeed;
             if (this.glowRadius > 1) {
                 this.glowRadius = 0;
                 this.animatingGlow = false;
