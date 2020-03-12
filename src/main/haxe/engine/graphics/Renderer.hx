@@ -144,7 +144,7 @@ private class QuadDrawingProgram {
     private var gameHeight:Int;
 
     private var animatingGlow:Bool = false;
-    private var glowRadius:Float = 15.0;
+    private var glowRadius:Float = 0;
 
     private var projection:UniformLocation;
     private var glowPosition:UniformLocation;
@@ -190,17 +190,17 @@ private class QuadDrawingProgram {
     public function drawQuads(quadArray:Array<Quad>, glowIndex:Int) {
         if (Key.SHIFT.currentState == Key.KEY_DOWN && 
             Key.SHIFT.previousState == Key.KEY_UP) {
+            this.glowRadius = 0;
             this.animatingGlow = true;
-            this.glowRadius = 15.0;
             randFloat1 = Math.random();
             randFloat2 = Math.random();
             randFloat3 = Math.random();
         }
 
         if (this.animatingGlow) {
-            this.glowRadius -= 0.5;
-            if (this.glowRadius < 0.0) {
-                this.glowRadius = 15.0;
+            this.glowRadius += 0.1;
+            if (this.glowRadius > 1) {
+                this.glowRadius = 0;
                 this.animatingGlow = false;
             }
         }
