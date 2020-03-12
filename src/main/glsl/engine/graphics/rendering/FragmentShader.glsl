@@ -12,8 +12,9 @@ void main() {
     float shininess = 0.0;
     if (radius > 0.0001)
     {
-        shininess = 1.0 - sqrt(dot(frag_coord, frag_coord)) / (radius * 2.0);
+        shininess = max(1.0 - sqrt(dot(frag_coord, frag_coord)) / (radius * 2.0), 0.0);
     }
+
     float gamma = 2.2;
-    gl_FragColor = vec4(pow(vec3(color.r + rand.r, color.g + rand.g, color.b + rand.b), vec3(1.0/gamma)) * shininess, 1);
+    gl_FragColor = vec4(pow(vec3(color.r + rand.r, color.g + rand.g, color.b + rand.b) * shininess, vec3(1.0/gamma)), 1);
 }
