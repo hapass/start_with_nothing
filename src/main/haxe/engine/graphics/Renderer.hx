@@ -198,7 +198,7 @@ private class QuadDrawingProgram {
         }
 
         if (this.animatingGlow) {
-            this.glowRadius += 0.1;
+            this.glowRadius += 0.01;
             if (this.glowRadius > 1) {
                 this.glowRadius = 0;
                 this.animatingGlow = false;
