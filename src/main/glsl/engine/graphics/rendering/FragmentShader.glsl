@@ -14,5 +14,5 @@ void main() {
     {
         shininess = 1.0 - sqrt(dot(frag_coord, frag_coord)) / (radius * 2.0);
     }    
-    gl_FragColor = vec4(color.r, color.g, color.b, 1) * shininess;
+    gl_FragColor = vec4(color.r + rand.r, color.g + rand.g, color.b + rand.b, 1) * shininess;
 }
