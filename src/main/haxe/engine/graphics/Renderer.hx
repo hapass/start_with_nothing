@@ -186,8 +186,8 @@ private class QuadDrawingProgram {
     }
 
     public function drawQuads(quadArray:Array<Quad>, glowIndex:Int) {
-        if (Key.SHIFT.currentState == Key.KEY_DOWN && 
-            Key.SHIFT.previousState == Key.KEY_UP) {
+        if (Key.SPACE.currentState == Key.KEY_DOWN && 
+            Key.SPACE.previousState == Key.KEY_UP) {
             this.glowRadius = Config.GLOW_LIGHT_MIN_RADIUS;
             this.glowRadiusSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
             this.animatingGlow = true;
