@@ -20,8 +20,6 @@ shader_token = "INSERT_SHADERS"
 shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>\n</script>\n"
 
 level_data_path = "data"
-level_token = "INSERT_LEVELS"
-level_template = "<div id=\"<id_string>\" data-string=\"<data_string>\"></div>\n"
 
 js_hash_token = "INSERT_VERSION"
 
@@ -31,13 +29,11 @@ def embed_token_into_layout(replace_token, data_to_embed):
     with open(os.path.join(bin_path, layout_file_name), "w") as layout_file_write:
       layout_file_write.write(file_data.replace(replace_token, data_to_embed))
 
-def embed_files_into_layout(files_to_embed_path, replace_token, template, should_flatten_data):
+def embed_files_into_layout(files_to_embed_path, replace_token, template):
   file_data_to_embed = empty_string
   for file_to_embed_name in os.listdir(files_to_embed_path):
     with open(os.path.join(files_to_embed_path, file_to_embed_name), "r") as file_to_embed:
       file_data = file_to_embed.read()
-      if should_flatten_data:
-        file_data = file_data.replace(space_string, empty_string).replace(new_line_string, empty_string)
       file_data_to_embed += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
   embed_token_into_layout(replace_token, file_data_to_embed)
 
@@ -57,10 +53,14 @@ def compile():
   command = add_option(command, "-main", "game.Main")
   command = add_option(command, "-js", os.path.join(bin_path, js_file_name))
 
+  for level_data_file_name in os.listdir(level_data_path):
+    command = add_option(command, "-resource", os.path.join(level_data_path, level_data_file_name) + "@" +  level_data_file_name)
+
   if is_debug:
     command = add_option(command, "-debug", empty_string)
 
   command = add_option(command, "-dce", "full")
+  print command
   os.system(command)
 
 def copy_layout():
@@ -69,8 +69,7 @@ def copy_layout():
 def build():
   compile()
   copy_layout()
-  embed_files_into_layout(shader_data_path, shader_token, shader_template, False)
-  embed_files_into_layout(level_data_path, level_token, level_template, True)
+  embed_files_into_layout(shader_data_path, shader_token, shader_template)
   embed_version_into_layout()
 
 if len(sys.argv) == 1 or sys.argv[1] == "debug":

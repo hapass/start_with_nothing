@@ -1,9 +1,11 @@
 package game;
 
+import haxe.Resource;
 import engine.graphics.Renderer;
 import engine.math.Vec2;
-import engine.data.Data;
 import lang.Debug;
+
+using StringTools;
 
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
@@ -11,7 +13,7 @@ class Level {
     public var glowPosition:Vec2<Float> = new Vec2Float();
 
     public function new() {
-        var stringData = Data.getString("BlindLuck.lvl");
+        var stringData = Resource.getString("BlindLuck.lvl").replace("\n", "").replace(" ", "");
 
         for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
             this.data.push(new Array<Int>());
