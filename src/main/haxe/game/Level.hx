@@ -18,7 +18,7 @@ class Level {
     public var glowPosition:Vec2<Float> = new Vec2Float();
 
     public function new() {
-        var stringData = createLevel("BlindLuck.lvl");
+        this.data = createLevel("BlindLuck.lvl");
 
         for (rowIndex in 0...data.length) {
             for (columnIndex in 0...data[rowIndex].length) {

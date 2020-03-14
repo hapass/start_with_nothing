@@ -24,7 +24,7 @@ class Main {
             switch(result) {
                 case GameResult.Restart:
                     Browser.alert("You've lost. Try again!");
-                    launch();
+                    //launch();
                 case GameResult.Quit:
                     Browser.alert("You won!");
             }
