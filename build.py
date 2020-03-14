@@ -19,8 +19,6 @@ shader_data_path = os.path.join("src", "main", "glsl", "engine", "graphics", "re
 shader_token = "INSERT_SHADERS"
 shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>\n</script>\n"
 
-level_data_path = "data"
-
 js_hash_token = "INSERT_VERSION"
 
 def embed_token_into_layout(replace_token, data_to_embed):
@@ -53,14 +51,10 @@ def compile():
   command = add_option(command, "-main", "game.Main")
   command = add_option(command, "-js", os.path.join(bin_path, js_file_name))
 
-  for level_data_file_name in os.listdir(level_data_path):
-    command = add_option(command, "-resource", os.path.join(level_data_path, level_data_file_name) + "@" +  level_data_file_name)
-
   if is_debug:
     command = add_option(command, "-debug", empty_string)
 
   command = add_option(command, "-dce", "full")
-  print command
   os.system(command)
 
 def copy_layout():

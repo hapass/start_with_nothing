@@ -1,7 +1,5 @@
 package engine.math;
 
-import js.html.TableCaptionElement;
-
 @:generic
 class Vec2<T> {
     public var x:T;

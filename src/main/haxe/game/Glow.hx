@@ -2,7 +2,7 @@ package game;
 
 import lang.Debug;
 import engine.math.Vec2;
-import engine.graphics.Renderer;
+import engine.graphics.Quad;
 
 class Glow {
     public var shape:Quad = new Quad();

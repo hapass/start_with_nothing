@@ -1,11 +1,16 @@
 package game;
 
-import haxe.Resource;
-import engine.graphics.Renderer;
+import engine.graphics.Quad;
 import engine.math.Vec2;
+
+#if macro
+import sys.io.File;
+import haxe.macro.Expr;
+import haxe.macro.Context;
 import lang.Debug;
 
 using StringTools;
+#end
 
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
@@ -13,46 +18,63 @@ class Level {
     public var glowPosition:Vec2<Float> = new Vec2Float();
 
     public function new() {
-        var stringData = Resource.getString("BlindLuck.lvl").replace("\n", "").replace(" ", "");
+        var stringData = createLevel("BlindLuck.lvl");
 
-        for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
-            this.data.push(new Array<Int>());
-            for (column in 0...Config.GAME_WIDTH_BRUSHES) {
-                var char = stringData.charAt(row * Config.GAME_WIDTH_BRUSHES + column);
-                Debug.assert(char != "", 'Incorrect level format. Could not get character at: [$row, $column]');
-                var elementId = Std.parseInt(char);
-                Debug.assert(elementId != null, 'Incorrect level format. Could not parse character at: [$row, $column]');
-                this.data[row].push(elementId);
-            }
-        }
-
-        for (rowIndex in 0...this.data.length) {
-            for (columnIndex in 0...this.data[rowIndex].length) {
+        for (rowIndex in 0...data.length) {
+            for (columnIndex in 0...data[rowIndex].length) {
                 var positionX = columnIndex * Config.BRUSH_WIDTH;
                 var positionY = rowIndex * Config.BRUSH_HEIGHT;
 
-                if (this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2) {
+                if (data[rowIndex][columnIndex] == 1 || data[rowIndex][columnIndex] == 2) {
                     var rect = new Quad();
                     rect.position.set(positionX, positionY);
                     rect.width = Config.BRUSH_WIDTH;
                     rect.height = Config.BRUSH_HEIGHT;
 
-                    if (this.data[rowIndex][columnIndex] == 1) {
+                    if (data[rowIndex][columnIndex] == 1) {
                         rect.color = Config.BRUSH_COLOR;
                     }
 
-                    if (this.data[rowIndex][columnIndex] == 2) {
+                    if (data[rowIndex][columnIndex] == 2) {
                         rect.color = Config.EXIT_COLOR;
                     }
 
-                    this.compositeShape.push(rect);
+                    compositeShape.push(rect);
                 }
 
-                if (this.data[rowIndex][columnIndex] == 3) {
-                    this.glowPosition.set(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
+                if (data[rowIndex][columnIndex] == 3) {
+                    glowPosition.set(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
                 }
             }
         }
+    }
+
+    public static macro function createLevel(level:Expr) {
+        var fileName = switch (level.expr) {
+            case EConst(CString(value)): value;
+            default: "";
+        }
+
+        var data:Array<Array<Int>> = new Array<Array<Int>>();
+
+        var stringData = File.getContent('data/${fileName}').replace("\n", "").replace(" ", "");
+        for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
+            data.push(new Array<Int>());
+            for (column in 0...Config.GAME_WIDTH_BRUSHES) {
+                var char = stringData.charAt(row * Config.GAME_WIDTH_BRUSHES + column);
+                Debug.assert(char != "", 'Incorrect level format. Could not get character at: [$row, $column]');
+                var elementId = Std.parseInt(char);
+                Debug.assert(elementId != null, 'Incorrect level format. Could not parse character at: [$row, $column]');
+                data[row].push(elementId);
+            }
+        }
+
+        var columnExpressions:Array<Expr> = [];
+        for (column in data) {
+            var valueListExpression = [for (value in column) macro $v{value}];
+            columnExpressions.push(macro $a{valueListExpression});
+        }
+        return macro $a{columnExpressions};
     }
 
     public function isCellValid(cell:Vec2<Int>):Bool {
