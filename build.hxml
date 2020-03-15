@@ -1,7 +1,18 @@
+-cp src/build/haxe
+
+-dce full
+-main replace.Main
+
+-neko replace.n
+
+--next
+
 -cp src/main/haxe
 
 -main game.Main
 
--debug
+-dce full
+-resource src/main/glsl/engine/graphics/rendering/FragmentShader.glsl@FragmentShader.glsl
+-resource src/main/glsl/engine/graphics/rendering/VertexShader.glsl@VertexShader.glsl
 
 -js bin/glow.js
