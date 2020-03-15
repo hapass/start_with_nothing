@@ -1,13 +1,8 @@
 package engine.graphics;
 
 import haxe.Resource;
-#if macro
-import sys.io.File;
-import haxe.macro.Expr;
-import haxe.macro.Context;
-#else
-import lang.Debug;
 import game.Config;
+import lang.Debug;
 import engine.input.Key;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
@@ -16,7 +11,6 @@ import js.html.webgl.UniformLocation;
 import js.html.CanvasElement;
 import js.lib.Float32Array;
 import js.Browser;
-#end
 
 class Renderer {
     private var context:RenderingContext;
@@ -83,6 +77,7 @@ class Renderer {
 private class QuadDrawingProgram {
     private static inline var PROJECTION_UNIFORM_NAME:String = "projection";
     private static inline var GLOW_POSITION_UNIFORM_NAME:String = "glow_position";
+    private static inline var SCREEN_SIZE_UNIFORM_NAME:String = "screen_size";
     private static inline var TIME_UNIFORM_NAME:String = "rand";
     private static inline var QUAD_POSITION_ATTRIBUTE_NAME:String = "quad_position";
     private static inline var QUAD_COLOR_ATTRIBUTE_NAME:String = "quad_color";
@@ -105,6 +100,7 @@ private class QuadDrawingProgram {
 
     private var projection:UniformLocation;
     private var glowPosition:UniformLocation;
+    private var screenSize:UniformLocation;
     private var rand:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler, gameWidth:Int, gameHeight:Int) {
@@ -123,6 +119,7 @@ private class QuadDrawingProgram {
 
         this.projection = this.context.getUniformLocation(program, PROJECTION_UNIFORM_NAME);
         this.glowPosition = this.context.getUniformLocation(program, GLOW_POSITION_UNIFORM_NAME);
+        this.screenSize = this.context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
         this.rand = this.context.getUniformLocation(program, TIME_UNIFORM_NAME);
         this.context.useProgram(program);
         setProjection();
@@ -220,6 +217,8 @@ private class QuadDrawingProgram {
               0,    0, 1, 0,
              -1,    1, 0, 1
         ]);
+
+        this.context.uniform2f(this.screenSize, this.context.canvas.width, this.context.canvas.height);
     }
 
     public function dispose() {

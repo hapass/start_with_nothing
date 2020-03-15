@@ -144,6 +144,7 @@ var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,ga
 	this.setupQuadColorAttribute();
 	this.projection = this.context.getUniformLocation(this.program,"projection");
 	this.glowPosition = this.context.getUniformLocation(this.program,"glow_position");
+	this.screenSize = this.context.getUniformLocation(this.program,"screen_size");
 	this.rand = this.context.getUniformLocation(this.program,"rand");
 	this.context.useProgram(this.program);
 	this.setProjection();
@@ -224,6 +225,7 @@ engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
 		var w = this.gameWidth;
 		var h = this.gameHeight;
 		this.context.uniformMatrix4fv(this.projection,false,[2 / w,0,0,0,0,-2 / h,0,0,0,0,1,0,-1,1,0,1]);
+		this.context.uniform2f(this.screenSize,this.context.canvas.width,this.context.canvas.height);
 	}
 	,dispose: function() {
 		this.context.deleteProgram(this.program);
@@ -1002,7 +1004,7 @@ $global.$haxeUID |= 0;
 if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c < 0x10000 ? String.fromCharCode(c) : String.fromCharCode((c>>10)+0xD7C0)+String.fromCharCode((c&0x3FF)+0xDC00); }
 String.__name__ = true;
 Array.__name__ = true;
-haxe_Resource.content = [{ name : "FragmentShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7Cgp2YXJ5aW5nIHZlYzQgY29sb3I7CnVuaWZvcm0gdmVjMyBnbG93X3Bvc2l0aW9uOwp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbjsKdW5pZm9ybSB2ZWMzIHJhbmQ7Cgp2b2lkIG1haW4oKSB7CiAgICB2ZWMyIHNoaW5lX3Bvc2l0aW9uID0gZ2xfRnJhZ0Nvb3JkLnh5IC0gdmVjMihnbG93X3Bvc2l0aW9uLngsIDYwMC4wIC0gZ2xvd19wb3NpdGlvbi55KTsKICAgIHZlYzIgZnJhZ19jb29yZCA9IHZlYzIoc2hpbmVfcG9zaXRpb24ueCAvIDgwMC4wLCBzaGluZV9wb3NpdGlvbi55IC8gNjAwLjApOwogICAgZmxvYXQgcmFkaXVzID0gZ2xvd19wb3NpdGlvbi56OwogICAgZmxvYXQgc2hpbmluZXNzID0gMC4wOwogICAgaWYgKHJhZGl1cyA+IDAuMDAwMSkKICAgIHsKICAgICAgICBzaGluaW5lc3MgPSBtYXgoMS4wIC0gc3FydChkb3QoZnJhZ19jb29yZCwgZnJhZ19jb29yZCkpIC8gKHJhZGl1cyAqIDIuMCksIDAuMCk7CiAgICB9CgogICAgZmxvYXQgZ2FtbWEgPSAyLjI7CiAgICBnbF9GcmFnQ29sb3IgPSB2ZWM0KHBvdyh2ZWMzKGNvbG9yLnIgKyByYW5kLnIsIGNvbG9yLmcgKyByYW5kLmcsIGNvbG9yLmIgKyByYW5kLmIpICogc2hpbmluZXNzLCB2ZWMzKDEuMC9nYW1tYSkpLCAxKTsKfQ"},{ name : "VertexShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7CgphdHRyaWJ1dGUgdmVjMiBxdWFkX3Bvc2l0aW9uOwphdHRyaWJ1dGUgdmVjMyBxdWFkX2NvbG9yOwoKdW5pZm9ybSBtYXQ0IHByb2plY3Rpb247CnZhcnlpbmcgdmVjNCBjb2xvcjsKCnZvaWQgbWFpbigpIHsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbiAqIHZlYzQocXVhZF9wb3NpdGlvbiwgMCwgMSk7CiAgICBjb2xvciA9IHZlYzQocXVhZF9jb2xvciwgMSk7Cn0"}];
+haxe_Resource.content = [{ name : "FragmentShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7Cgp2YXJ5aW5nIHZlYzQgY29sb3I7CnVuaWZvcm0gdmVjMyBnbG93X3Bvc2l0aW9uOwp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbjsKdW5pZm9ybSB2ZWMyIHNjcmVlbl9zaXplOwp1bmlmb3JtIHZlYzMgcmFuZDsKCnZvaWQgbWFpbigpIHsKICAgIHZlYzIgc2hpbmVfcG9zaXRpb24gPSBnbF9GcmFnQ29vcmQueHkgLSB2ZWMyKGdsb3dfcG9zaXRpb24ueCwgc2NyZWVuX3NpemUueSAtIGdsb3dfcG9zaXRpb24ueSk7CiAgICB2ZWMyIGZyYWdfY29vcmQgPSB2ZWMyKHNoaW5lX3Bvc2l0aW9uLnggLyBzY3JlZW5fc2l6ZS54LCBzaGluZV9wb3NpdGlvbi55IC8gc2NyZWVuX3NpemUueSk7CiAgICBmbG9hdCByYWRpdXMgPSBnbG93X3Bvc2l0aW9uLno7CiAgICBmbG9hdCBzaGluaW5lc3MgPSAwLjA7CiAgICBpZiAocmFkaXVzID4gMC4wMDAxKQogICAgewogICAgICAgIHNoaW5pbmVzcyA9IG1heCgxLjAgLSBzcXJ0KGRvdChmcmFnX2Nvb3JkLCBmcmFnX2Nvb3JkKSkgLyAocmFkaXVzICogMi4wKSwgMC4wKTsKICAgIH0KCiAgICBmbG9hdCBnYW1tYSA9IDIuMjsKICAgIGdsX0ZyYWdDb2xvciA9IHZlYzQocG93KHZlYzMoY29sb3IuciArIHJhbmQuciwgY29sb3IuZyArIHJhbmQuZywgY29sb3IuYiArIHJhbmQuYikgKiBzaGluaW5lc3MsIHZlYzMoMS4wL2dhbW1hKSksIDEpOwp9"},{ name : "VertexShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7CgphdHRyaWJ1dGUgdmVjMiBxdWFkX3Bvc2l0aW9uOwphdHRyaWJ1dGUgdmVjMyBxdWFkX2NvbG9yOwoKdW5pZm9ybSBtYXQ0IHByb2plY3Rpb247CnZhcnlpbmcgdmVjNCBjb2xvcjsKCnZvaWQgbWFpbigpIHsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbiAqIHZlYzQocXVhZF9wb3NpdGlvbiwgMCwgMSk7CiAgICBjb2xvciA9IHZlYzQocXVhZF9jb2xvciwgMSk7Cn0"}];
 var __map_reserved = {};
 Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function() {
 	return String(this.val);

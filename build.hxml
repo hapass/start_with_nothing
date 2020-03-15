@@ -1,12 +1,3 @@
--cp src/build/haxe
-
--main replace.Main
-
--dce full
--neko replace.n
-
---next
-
 -cp src/main/haxe
 
 -main game.Main
@@ -16,3 +7,12 @@
 
 -dce full
 -js bin/glow.js
+
+--next
+
+-cp src/build/haxe
+
+-main replace.Main
+
+-dce full
+-neko replace.n
