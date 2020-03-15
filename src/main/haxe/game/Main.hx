@@ -2,7 +2,6 @@ package game;
 
 import engine.graphics.Renderer;
 import engine.loop.GameLoop;
-import engine.loop.GameLoopObserver;
 import engine.math.Vec2;
 import engine.input.Keyboard;
 import lang.Promise;
@@ -24,7 +23,7 @@ class Main {
             switch(result) {
                 case GameResult.Restart:
                     Browser.alert("You've lost. Try again!");
-                    //launch();
+                    launch();
                 case GameResult.Quit:
                     Browser.alert("You won!");
             }
@@ -32,7 +31,7 @@ class Main {
     }
 }
 
-class Game implements GameLoopObserver {
+class Game {
     private var loop:GameLoop = new GameLoop();
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
@@ -49,7 +48,7 @@ class Game implements GameLoopObserver {
         this.glow.setPosition(this.level.glowPosition.x, this.level.glowPosition.y);
         this.renderer.add([glow.shape]);
         this.renderer.add(this.level.compositeShape);
-        this.loop.start(this);
+        this.loop.start(this.update);
         return this.gameResult;
     }
 

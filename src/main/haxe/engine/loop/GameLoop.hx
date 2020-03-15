@@ -1,12 +1,10 @@
 package engine.loop;
 
-import lang.Debug;
 import js.Browser;
-import engine.loop.GameLoopObserver;
 
 class GameLoop {
     private var shouldExitLoop:Bool = false;
-    private var observer:GameLoopObserver = null;
+    private var update:(Float)->Void = (timestamp)->{};
 
     public function new() {}
 
@@ -14,20 +12,18 @@ class GameLoop {
         if(shouldExitLoop)
             return;
 
-        Debug.assert(observer != null, "Loop observer must be set before tick.");
-        observer.update(timestamp);
-
+        update(timestamp);
         Browser.window.requestAnimationFrame(tick);
     }
 
-    public function start(observer:GameLoopObserver) {
+    public function start(update:(Float)->Void) {
         this.shouldExitLoop = false;
-        this.observer = observer;
+        this.update = update;
         tick(0);
     }
 
     public function stop() {
         this.shouldExitLoop = true;
-        this.observer = null;
+        this.update = (timestamp)->{};
     }
 }

@@ -1,7 +1,7 @@
 package lang;
 
 class Promise<T> {
-    private var thenAction:T->Void;
+    private var thenAction:(T)->Void;
 
     private var isResolved:Bool;
     private var resolvedResult:T;
@@ -11,7 +11,7 @@ class Promise<T> {
         this.isResolved = false;
     }
 
-    public function then(action:T->Void):Promise<T> {
+    public function then(action:(T)->Void):Promise<T> {
         this.thenAction = action;
 
         if(this.isResolved) {

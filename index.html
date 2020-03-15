@@ -343,7 +343,9 @@ engine_input_Keyboard.prototype = {
 	}
 };
 var engine_loop_GameLoop = function() {
-	this.observer = null;
+	this.update = function(timestamp) {
+		return;
+	};
 	this.shouldExitLoop = false;
 };
 engine_loop_GameLoop.__name__ = true;
@@ -352,17 +354,19 @@ engine_loop_GameLoop.prototype = {
 		if(this.shouldExitLoop) {
 			return;
 		}
-		this.observer.update(timestamp);
+		this.update(timestamp);
 		window.requestAnimationFrame($bind(this,this.tick));
 	}
-	,start: function(observer) {
+	,start: function(update) {
 		this.shouldExitLoop = false;
-		this.observer = observer;
+		this.update = update;
 		this.tick(0);
 	}
 	,stop: function() {
 		this.shouldExitLoop = true;
-		this.observer = null;
+		this.update = function(timestamp) {
+			return;
+		};
 	}
 };
 var engine_math_Vec2_$Float = function() { };
@@ -558,6 +562,7 @@ game_Main.launch = function() {
 			break;
 		case 1:
 			window.alert("You've lost. Try again!");
+			game_Main.launch();
 			break;
 		}
 	});
@@ -576,7 +581,7 @@ game_Game.prototype = {
 		this.glow.setPosition(this.level.glowPosition.x,this.level.glowPosition.y);
 		this.renderer.add([this.glow.shape]);
 		this.renderer.add(this.level.compositeShape);
-		this.loop.start(this);
+		this.loop.start($bind(this,this.update));
 		return this.gameResult;
 	}
 	,update: function(timestamp) {
