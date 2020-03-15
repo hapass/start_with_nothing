@@ -14,10 +14,7 @@ layout_path = "layout"
 layout_file_name = "index.html"
 
 source_code_path = os.path.join("src", "main", "haxe")
-
 shader_data_path = os.path.join("src", "main", "glsl", "engine", "graphics", "rendering")
-shader_token = "INSERT_SHADERS"
-shader_template = "<script type=\"text/glsl\" id=\"<id_string>\">\n<data_string>\n</script>\n"
 
 js_hash_token = "INSERT_VERSION"
 
@@ -26,14 +23,6 @@ def embed_token_into_layout(replace_token, data_to_embed):
     file_data = layout_file_read.read()
     with open(os.path.join(bin_path, layout_file_name), "w") as layout_file_write:
       layout_file_write.write(file_data.replace(replace_token, data_to_embed))
-
-def embed_files_into_layout(files_to_embed_path, replace_token, template):
-  file_data_to_embed = empty_string
-  for file_to_embed_name in os.listdir(files_to_embed_path):
-    with open(os.path.join(files_to_embed_path, file_to_embed_name), "r") as file_to_embed:
-      file_data = file_to_embed.read()
-      file_data_to_embed += template.replace("<id_string>", file_to_embed_name).replace("<data_string>", file_data)
-  embed_token_into_layout(replace_token, file_data_to_embed)
 
 def embed_version_into_layout():
   md5_hash = os.popen("md5 " + os.path.join(bin_path, js_file_name)).read()
@@ -50,6 +39,8 @@ def compile():
   command = add_option("haxe", "-cp", source_code_path)
   command = add_option(command, "-main", "game.Main")
   command = add_option(command, "-js", os.path.join(bin_path, js_file_name))
+  command = add_option(command, "-resource", os.path.join(shader_data_path, "FragmentShader.glsl") + "@FragmentShader.glsl")
+  command = add_option(command, "-resource", os.path.join(shader_data_path, "VertexShader.glsl") + "@VertexShader.glsl")
 
   if is_debug:
     command = add_option(command, "-debug", empty_string)
@@ -63,7 +54,6 @@ def copy_layout():
 def build():
   compile()
   copy_layout()
-  embed_files_into_layout(shader_data_path, shader_token, shader_template)
   embed_version_into_layout()
 
 if len(sys.argv) == 1 or sys.argv[1] == "debug":

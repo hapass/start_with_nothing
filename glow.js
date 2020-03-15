@@ -35,30 +35,6 @@ Std.__name__ = true;
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
-Std.parseInt = function(x) {
-	if(x != null) {
-		var _g = 0;
-		var _g1 = x.length;
-		while(_g < _g1) {
-			var i = _g++;
-			var c = x.charCodeAt(i);
-			if(c <= 8 || c >= 14 && c != 32 && c != 45) {
-				var v = parseInt(x, (x[(i + 1)]=="x" || x[(i + 1)]=="X") ? 16 : 10);
-				if(isNaN(v)) {
-					return null;
-				} else {
-					return v;
-				}
-			}
-		}
-	}
-	return null;
-};
-var StringTools = function() { };
-StringTools.__name__ = true;
-StringTools.replace = function(s,sub,by) {
-	return s.split(sub).join(by);
-};
 var engine_graphics_Color = function(r,g,b) {
 	this.r = this.correctColor(r);
 	this.g = this.correctColor(g);
@@ -268,9 +244,8 @@ engine_graphics__$Renderer_ProgramCompiler.prototype = {
 		}
 	}
 	,compileShader: function(name,type) {
-		var shaderSource = window.document.getElementById(name).innerText;
 		var shader = this.context.createShader(type);
-		this.context.shaderSource(shader,shaderSource);
+		this.context.shaderSource(shader,haxe_Resource.getString(name));
 		this.context.compileShader(shader);
 		if(!this.context.getShaderParameter(shader,35713)) {
 			var message = this.context.getShaderInfoLog(shader);
@@ -309,6 +284,7 @@ var engine_input_Keyboard = function(keys) {
 	while(_g < keys.length) {
 		var key = keys[_g];
 		++_g;
+		var condition = this.trackedKeys.h[key.code] == null;
 		this.trackedKeys.h[key.code] = key;
 		this.trackedKeyCodes.push(key.code);
 	}
@@ -509,29 +485,15 @@ var game_Level = function() {
 	this.glowPosition = new engine_math_Vec2Float();
 	this.data = [];
 	this.compositeShape = [];
-	var stringData = StringTools.replace(StringTools.replace(haxe_Resource.getString("BlindLuck.lvl"),"\n","")," ","");
+	this.data = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1]];
 	var _g = 0;
-	var _g1 = game_Config.GAME_HEIGHT_BRUSHES;
+	var _g1 = this.data.length;
 	while(_g < _g1) {
-		var row = _g++;
-		this.data.push([]);
+		var rowIndex = _g++;
 		var _g2 = 0;
-		var _g11 = game_Config.GAME_WIDTH_BRUSHES;
+		var _g11 = this.data[rowIndex].length;
 		while(_g2 < _g11) {
-			var column = _g2++;
-			var char = stringData.charAt(row * game_Config.GAME_WIDTH_BRUSHES + column);
-			var elementId = Std.parseInt(char);
-			this.data[row].push(elementId);
-		}
-	}
-	var _g21 = 0;
-	var _g3 = this.data.length;
-	while(_g21 < _g3) {
-		var rowIndex = _g21++;
-		var _g22 = 0;
-		var _g31 = this.data[rowIndex].length;
-		while(_g22 < _g31) {
-			var columnIndex = _g22++;
+			var columnIndex = _g2++;
 			var positionX = columnIndex * game_Config.BRUSH_WIDTH;
 			var positionY = rowIndex * game_Config.BRUSH_HEIGHT;
 			if(this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2) {
@@ -583,7 +545,6 @@ game_Main.launch = function() {
 			break;
 		case 1:
 			window.alert("You've lost. Try again!");
-			game_Main.launch();
 			break;
 		}
 	});
@@ -1030,7 +991,7 @@ $global.$haxeUID |= 0;
 if( String.fromCodePoint == null ) String.fromCodePoint = function(c) { return c < 0x10000 ? String.fromCharCode(c) : String.fromCharCode((c>>10)+0xD7C0)+String.fromCharCode((c&0x3FF)+0xDC00); }
 String.__name__ = true;
 Array.__name__ = true;
-haxe_Resource.content = [{ name : "BlindLuck.lvl", data : "MSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDMgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDIgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMSAgMCAgMSAgMCAgMCAgMSAgMCAgMCAgMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAwICAxICAwICAxICAwICAwICAxICAwICAwICAxICAwICAxICAwICAwICAwICAwICAwICAwICAwICAxICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEgIDAgIDEgIDAgIDAgIDEgIDAgIDEgIDEgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDEKMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMSAgMCAgMCAgMCAgMSAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMCAgMQoxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAxICAwICAwICAwICAxICAwICAwICAwICAwICAwICAwICAwICAwICAxCjEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDEgIDAgIDAgIDAgIDEgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDAgIDE"}];
+haxe_Resource.content = [{ name : "FragmentShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7Cgp2YXJ5aW5nIHZlYzQgY29sb3I7CnVuaWZvcm0gdmVjMyBnbG93X3Bvc2l0aW9uOwp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbjsKdW5pZm9ybSB2ZWMzIHJhbmQ7Cgp2b2lkIG1haW4oKSB7CiAgICB2ZWMyIHNoaW5lX3Bvc2l0aW9uID0gZ2xfRnJhZ0Nvb3JkLnh5IC0gdmVjMihnbG93X3Bvc2l0aW9uLngsIDYwMC4wIC0gZ2xvd19wb3NpdGlvbi55KTsKICAgIHZlYzIgZnJhZ19jb29yZCA9IHZlYzIoc2hpbmVfcG9zaXRpb24ueCAvIDgwMC4wLCBzaGluZV9wb3NpdGlvbi55IC8gNjAwLjApOwogICAgZmxvYXQgcmFkaXVzID0gZ2xvd19wb3NpdGlvbi56OwogICAgZmxvYXQgc2hpbmluZXNzID0gMC4wOwogICAgaWYgKHJhZGl1cyA+IDAuMDAwMSkKICAgIHsKICAgICAgICBzaGluaW5lc3MgPSBtYXgoMS4wIC0gc3FydChkb3QoZnJhZ19jb29yZCwgZnJhZ19jb29yZCkpIC8gKHJhZGl1cyAqIDIuMCksIDAuMCk7CiAgICB9CgogICAgZmxvYXQgZ2FtbWEgPSAyLjI7CiAgICBnbF9GcmFnQ29sb3IgPSB2ZWM0KHBvdyh2ZWMzKGNvbG9yLnIgKyByYW5kLnIsIGNvbG9yLmcgKyByYW5kLmcsIGNvbG9yLmIgKyByYW5kLmIpICogc2hpbmluZXNzLCB2ZWMzKDEuMC9nYW1tYSkpLCAxKTsKfQ"},{ name : "VertexShader.glsl", data : "cHJlY2lzaW9uIG1lZGl1bXAgZmxvYXQ7CgphdHRyaWJ1dGUgdmVjMiBxdWFkX3Bvc2l0aW9uOwphdHRyaWJ1dGUgdmVjMyBxdWFkX2NvbG9yOwoKdW5pZm9ybSBtYXQ0IHByb2plY3Rpb247CnZhcnlpbmcgdmVjNCBjb2xvcjsKCnZvaWQgbWFpbigpIHsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbiAqIHZlYzQocXVhZF9wb3NpdGlvbiwgMCwgMSk7CiAgICBjb2xvciA9IHZlYzQocXVhZF9jb2xvciwgMSk7Cn0"}];
 var __map_reserved = {};
 Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function() {
 	return String(this.val);

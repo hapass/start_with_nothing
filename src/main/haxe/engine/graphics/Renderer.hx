@@ -1,9 +1,14 @@
 package engine.graphics;
 
+import haxe.Resource;
+#if macro
+import sys.io.File;
+import haxe.macro.Expr;
+import haxe.macro.Context;
+#else
+import lang.Debug;
 import game.Config;
 import engine.input.Key;
-import lang.Debug;
-import engine.math.Vec2;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;
@@ -11,6 +16,7 @@ import js.html.webgl.UniformLocation;
 import js.html.CanvasElement;
 import js.lib.Float32Array;
 import js.Browser;
+#end
 
 class Renderer {
     private var context:RenderingContext;
@@ -248,12 +254,9 @@ private class ProgramCompiler {
     }
 
     private function compileShader(name:String, type:Int) {
-        Debug.assert(Browser.document.getElementById(name) != null, "Shaders should be present in the html page.");
-
-        var shaderSource = Browser.document.getElementById(name).innerText;
         var shader = context.createShader(type);
 
-        context.shaderSource(shader, shaderSource);
+        context.shaderSource(shader, Resource.getString(name));
         context.compileShader(shader);
 
         if(!context.getShaderParameter(shader, RenderingContext.COMPILE_STATUS)) {
