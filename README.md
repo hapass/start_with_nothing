@@ -1,11 +1,11 @@
 # Glow
 
-## Build (Mac OS)
+## Build
 
 1. Install [brew](https://brew.sh)
 1. Run. Terminal: *brew install haxe*
-1. Run. Terminal: *python2 build.py release*
+1. Run. Terminal: *./build.sh release*
 
 ## Run
 
-1. Launch index.html or [play here](https://hapass.github.io/start_with_nothing/)
+1. Launch *index.html* or [play here](https://hapass.github.io/start_with_nothing/)
