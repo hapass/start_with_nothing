@@ -7,7 +7,8 @@ uniform vec2 screen_size;
 uniform vec3 rand;
 
 void main() {
-    vec2 shine_position = gl_FragCoord.xy - vec2(glow_position.x, screen_size.y - glow_position.y);
+    vec2 glow_glow_position = vec2((glow_position.x * screen_size.x) / 800.0, (glow_position.y * screen_size.y) / 600.0);
+    vec2 shine_position = gl_FragCoord.xy - vec2(glow_glow_position.x, screen_size.y - glow_glow_position.y);
     vec2 frag_coord = vec2(shine_position.x / screen_size.x, shine_position.y / screen_size.y);
     float radius = glow_position.z;
     float shininess = 0.0;
