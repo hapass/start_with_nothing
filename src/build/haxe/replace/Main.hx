@@ -6,10 +6,8 @@ using StringTools;
 
 class Main {
   static function main() {
-      var index = File.getContent('bin/index.html');
-      var script = File.getContent('bin/glow.js');
-      File.saveContent('bin/index.html', index.replace(
+      File.saveContent('bin/index.html', File.getContent('bin/index.html').replace(
         '<script type="text/javascript" src="glow.js"></script>',
-        '<script type="text/javascript">$script</script>'));
+        '<script type="text/javascript">${File.getContent('bin/glow.js')}</script>'));
   }
 }
