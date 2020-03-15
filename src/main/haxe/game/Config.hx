@@ -1,6 +1,6 @@
 package game;
 
-import engine.graphics.Color;
+import engine.Color;
 
 @:expose
 class Config {

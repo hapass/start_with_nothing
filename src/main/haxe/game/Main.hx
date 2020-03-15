@@ -1,11 +1,10 @@
 package game;
 
-import engine.graphics.Renderer;
-import engine.loop.GameLoop;
-import engine.math.Vec2;
-import engine.input.Keyboard;
+import engine.Renderer;
+import engine.GameLoop;
+import engine.Vec2;
+import engine.Keyboard;
 import lang.Promise;
-import engine.input.Key;
 import js.Browser;
 
 enum GameResult {

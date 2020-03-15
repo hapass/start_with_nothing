@@ -1,4 +1,4 @@
-package engine.math;
+package engine;
 
 @:generic
 class Vec2<T> {

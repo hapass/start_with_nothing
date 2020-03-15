@@ -1,7 +1,7 @@
 package game;
 
-import engine.graphics.Quad;
-import engine.math.Vec2;
+import engine.Quad;
+import engine.Vec2;
 
 #if macro
 import sys.io.File;

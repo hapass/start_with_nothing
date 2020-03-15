@@ -2,8 +2,8 @@
 
 -main game.Main
 
--resource src/main/glsl/engine/graphics/rendering/FragmentShader.glsl@FragmentShader.glsl
--resource src/main/glsl/engine/graphics/rendering/VertexShader.glsl@VertexShader.glsl
+-resource src/main/glsl/engine/FragmentShader.glsl@FragmentShader.glsl
+-resource src/main/glsl/engine/VertexShader.glsl@VertexShader.glsl
 
 -dce full
 -js bin/glow.js

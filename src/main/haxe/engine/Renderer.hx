@@ -1,9 +1,9 @@
-package engine.graphics;
+package engine;
 
-import haxe.Resource;
 import game.Config;
+import engine.Keyboard;
+import haxe.Resource;
 import lang.Debug;
-import engine.input.Key;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;
 import js.html.webgl.Buffer;

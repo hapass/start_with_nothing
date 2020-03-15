@@ -1,6 +1,6 @@
-package engine.graphics;
+package engine;
 
-import engine.math.Vec2;
+import engine.Vec2;
 
 class Quad {
   public var color:Color = Color.WHITE;

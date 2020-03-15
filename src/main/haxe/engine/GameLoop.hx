@@ -1,4 +1,4 @@
-package engine.loop;
+package engine;
 
 import js.Browser;
 

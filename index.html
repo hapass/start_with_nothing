@@ -46,22 +46,22 @@ Std.__name__ = true;
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
-var engine_graphics_Color = function(r,g,b) {
+var engine_Color = function(r,g,b) {
 	this.r = this.correctColor(r);
 	this.g = this.correctColor(g);
 	this.b = this.correctColor(b);
 };
-engine_graphics_Color.__name__ = true;
-engine_graphics_Color.get_RED = function() {
-	return new engine_graphics_Color(1,0,0);
+engine_Color.__name__ = true;
+engine_Color.get_RED = function() {
+	return new engine_Color(1,0,0);
 };
-engine_graphics_Color.get_YELLOW = function() {
-	return new engine_graphics_Color(1,1,0);
+engine_Color.get_YELLOW = function() {
+	return new engine_Color(1,1,0);
 };
-engine_graphics_Color.get_WHITE = function() {
-	return new engine_graphics_Color(1,1,1);
+engine_Color.get_WHITE = function() {
+	return new engine_Color(1,1,1);
 };
-engine_graphics_Color.prototype = {
+engine_Color.prototype = {
 	correctColor: function(value) {
 		if(value < 0) {
 			return 0;
@@ -72,14 +72,103 @@ engine_graphics_Color.prototype = {
 		return value;
 	}
 };
-var engine_graphics_Quad = function() {
-	this.position = new engine_math_Vec2Float();
+var engine_GameLoop = function() {
+	this.update = function(timestamp) {
+		return;
+	};
+	this.shouldExitLoop = false;
+};
+engine_GameLoop.__name__ = true;
+engine_GameLoop.prototype = {
+	tick: function(timestamp) {
+		if(this.shouldExitLoop) {
+			return;
+		}
+		this.update(timestamp);
+		window.requestAnimationFrame($bind(this,this.tick));
+	}
+	,start: function(update) {
+		this.shouldExitLoop = false;
+		this.update = update;
+		this.tick(0);
+	}
+	,stop: function() {
+		this.shouldExitLoop = true;
+		this.update = function(timestamp) {
+			return;
+		};
+	}
+};
+var engine_Key = function(code) {
+	this.previousState = engine_Key.KEY_UP;
+	this.currentState = engine_Key.KEY_UP;
+	this.nextState = engine_Key.KEY_UP;
+	this.code = 0;
+	this.code = code;
+};
+engine_Key.__name__ = true;
+var engine_Keyboard = function(keys) {
+	this.trackedKeyCodes = [];
+	this.trackedKeys = new haxe_ds_IntMap();
+	window.addEventListener("keydown",$bind(this,this.onKeyDown));
+	window.addEventListener("keyup",$bind(this,this.onKeyUp));
+	var _g = 0;
+	while(_g < keys.length) {
+		var key = keys[_g];
+		++_g;
+		var condition = this.trackedKeys.h[key.code] == null;
+		this.trackedKeys.h[key.code] = key;
+		this.trackedKeyCodes.push(key.code);
+	}
+};
+engine_Keyboard.__name__ = true;
+engine_Keyboard.prototype = {
+	onKeyDown: function(event) {
+		var key = this.trackedKeys.h[event.keyCode];
+		if(key == null) {
+			return;
+		}
+		key.nextState = engine_Key.KEY_DOWN;
+	}
+	,onKeyUp: function(event) {
+		var key = this.trackedKeys.h[event.keyCode];
+		if(key == null) {
+			return;
+		}
+		key.nextState = engine_Key.KEY_UP;
+	}
+	,update: function() {
+		var _g = 0;
+		var _g1 = this.trackedKeyCodes;
+		while(_g < _g1.length) {
+			var code = _g1[_g];
+			++_g;
+			this.trackedKeys.h[code].previousState = this.trackedKeys.h[code].currentState;
+			this.trackedKeys.h[code].currentState = this.trackedKeys.h[code].nextState;
+		}
+	}
+	,dispose: function() {
+		window.removeEventListener("keydown",$bind(this,this.onKeyDown));
+		window.removeEventListener("keyup",$bind(this,this.onKeyUp));
+		var _g = 0;
+		var _g1 = this.trackedKeyCodes;
+		while(_g < _g1.length) {
+			var code = _g1[_g];
+			++_g;
+			this.trackedKeys.h[code].previousState = engine_Key.KEY_UP;
+			this.trackedKeys.h[code].currentState = engine_Key.KEY_UP;
+			this.trackedKeys.h[code].nextState = engine_Key.KEY_UP;
+		}
+	}
+};
+var engine_Quad = function() {
+	this.position = new engine_Vec2Float();
 	this.width = 0;
 	this.height = 0;
-	this.color = engine_graphics_Color.get_WHITE();
+	this.color = engine_Color.get_WHITE();
 };
-engine_graphics_Quad.__name__ = true;
-var engine_graphics_Renderer = function(gameWidth,gameHeight) {
+engine_Quad.__name__ = true;
+var engine_Renderer = function(gameWidth,gameHeight) {
 	this.quads = [];
 	this.glowIndex = 0;
 	this.canvas = this.createCanvas(gameWidth,gameHeight);
@@ -88,11 +177,11 @@ var engine_graphics_Renderer = function(gameWidth,gameHeight) {
 	if(this.context == null) {
 		throw new js__$Boot_HaxeError("Your browser doesn't support webgl. Please update your browser.");
 	}
-	var compiler = new engine_graphics__$Renderer_ProgramCompiler(this.context);
-	this.quadDrawingProgram = new engine_graphics__$Renderer_QuadDrawingProgram(this.context,compiler,gameWidth,gameHeight);
+	var compiler = new engine__$Renderer_ProgramCompiler(this.context);
+	this.quadDrawingProgram = new engine__$Renderer_QuadDrawingProgram(this.context,compiler,gameWidth,gameHeight);
 };
-engine_graphics_Renderer.__name__ = true;
-engine_graphics_Renderer.prototype = {
+engine_Renderer.__name__ = true;
+engine_Renderer.prototype = {
 	createCanvas: function(gameWidth,gameHeight) {
 		var canvas = window.document.createElement("canvas");
 		var canvasHeight = window.document.body.clientHeight;
@@ -109,7 +198,7 @@ engine_graphics_Renderer.prototype = {
 			var quad = quadArray[_g];
 			++_g;
 			this.quads.push(quad);
-			if(quad.color == engine_graphics_Color.get_WHITE()) {
+			if(quad.color == engine_Color.get_WHITE()) {
 				this.glowIndex = this.quads.length - 1;
 			}
 		}
@@ -128,7 +217,7 @@ engine_graphics_Renderer.prototype = {
 		window.document.body.removeChild(this.canvas);
 	}
 };
-var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,gameWidth,gameHeight) {
+var engine__$Renderer_QuadDrawingProgram = function(context,compiler,gameWidth,gameHeight) {
 	this.glowRadiusSpeed = 0.0;
 	this.glowRadius = 0.0;
 	this.animatingGlow = false;
@@ -149,8 +238,8 @@ var engine_graphics__$Renderer_QuadDrawingProgram = function(context,compiler,ga
 	this.context.useProgram(this.program);
 	this.setProjection();
 };
-engine_graphics__$Renderer_QuadDrawingProgram.__name__ = true;
-engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
+engine__$Renderer_QuadDrawingProgram.__name__ = true;
+engine__$Renderer_QuadDrawingProgram.prototype = {
 	setupQuadPositionAttribute: function() {
 		var positionAttributeLocation = this.context.getAttribLocation(this.program,"quad_position");
 		this.context.enableVertexAttribArray(positionAttributeLocation);
@@ -162,7 +251,7 @@ engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
 		this.context.vertexAttribPointer(colorAttributeLocation,3,5126,false,20,8);
 	}
 	,drawQuads: function(quadArray,glowIndex) {
-		if(engine_input_Key.SPACE.currentState == engine_input_Key.KEY_DOWN && engine_input_Key.SPACE.previousState == engine_input_Key.KEY_UP) {
+		if(engine_Key.SPACE.currentState == engine_Key.KEY_DOWN && engine_Key.SPACE.previousState == engine_Key.KEY_UP) {
 			this.glowRadius = game_Config.GLOW_LIGHT_MIN_RADIUS;
 			this.glowRadiusSpeed = game_Config.GLOW_LIGHT_STARTING_SPEED;
 			this.animatingGlow = true;
@@ -232,13 +321,13 @@ engine_graphics__$Renderer_QuadDrawingProgram.prototype = {
 		this.context.deleteBuffer(this.quadVertexBuffer);
 	}
 };
-var engine_graphics__$Renderer_ProgramCompiler = function(context) {
+var engine__$Renderer_ProgramCompiler = function(context) {
 	this.context = null;
 	this.programs = new haxe_ds_StringMap();
 	this.context = context;
 };
-engine_graphics__$Renderer_ProgramCompiler.__name__ = true;
-engine_graphics__$Renderer_ProgramCompiler.prototype = {
+engine__$Renderer_ProgramCompiler.__name__ = true;
+engine__$Renderer_ProgramCompiler.prototype = {
 	compileProgram: function(name,vertexShaderName,fragmentShaderName) {
 		var program = this.context.createProgram();
 		this.context.attachShader(program,this.compileShader(vertexShaderName,35633));
@@ -280,98 +369,9 @@ engine_graphics__$Renderer_ProgramCompiler.prototype = {
 		}
 	}
 };
-var engine_input_Key = function(code) {
-	this.previousState = engine_input_Key.KEY_UP;
-	this.currentState = engine_input_Key.KEY_UP;
-	this.nextState = engine_input_Key.KEY_UP;
-	this.code = 0;
-	this.code = code;
-};
-engine_input_Key.__name__ = true;
-var engine_input_Keyboard = function(keys) {
-	this.trackedKeyCodes = [];
-	this.trackedKeys = new haxe_ds_IntMap();
-	window.addEventListener("keydown",$bind(this,this.onKeyDown));
-	window.addEventListener("keyup",$bind(this,this.onKeyUp));
-	var _g = 0;
-	while(_g < keys.length) {
-		var key = keys[_g];
-		++_g;
-		var condition = this.trackedKeys.h[key.code] == null;
-		this.trackedKeys.h[key.code] = key;
-		this.trackedKeyCodes.push(key.code);
-	}
-};
-engine_input_Keyboard.__name__ = true;
-engine_input_Keyboard.prototype = {
-	onKeyDown: function(event) {
-		var key = this.trackedKeys.h[event.keyCode];
-		if(key == null) {
-			return;
-		}
-		key.nextState = engine_input_Key.KEY_DOWN;
-	}
-	,onKeyUp: function(event) {
-		var key = this.trackedKeys.h[event.keyCode];
-		if(key == null) {
-			return;
-		}
-		key.nextState = engine_input_Key.KEY_UP;
-	}
-	,update: function() {
-		var _g = 0;
-		var _g1 = this.trackedKeyCodes;
-		while(_g < _g1.length) {
-			var code = _g1[_g];
-			++_g;
-			this.trackedKeys.h[code].previousState = this.trackedKeys.h[code].currentState;
-			this.trackedKeys.h[code].currentState = this.trackedKeys.h[code].nextState;
-		}
-	}
-	,dispose: function() {
-		window.removeEventListener("keydown",$bind(this,this.onKeyDown));
-		window.removeEventListener("keyup",$bind(this,this.onKeyUp));
-		var _g = 0;
-		var _g1 = this.trackedKeyCodes;
-		while(_g < _g1.length) {
-			var code = _g1[_g];
-			++_g;
-			this.trackedKeys.h[code].previousState = engine_input_Key.KEY_UP;
-			this.trackedKeys.h[code].currentState = engine_input_Key.KEY_UP;
-			this.trackedKeys.h[code].nextState = engine_input_Key.KEY_UP;
-		}
-	}
-};
-var engine_loop_GameLoop = function() {
-	this.update = function(timestamp) {
-		return;
-	};
-	this.shouldExitLoop = false;
-};
-engine_loop_GameLoop.__name__ = true;
-engine_loop_GameLoop.prototype = {
-	tick: function(timestamp) {
-		if(this.shouldExitLoop) {
-			return;
-		}
-		this.update(timestamp);
-		window.requestAnimationFrame($bind(this,this.tick));
-	}
-	,start: function(update) {
-		this.shouldExitLoop = false;
-		this.update = update;
-		this.tick(0);
-	}
-	,stop: function() {
-		this.shouldExitLoop = true;
-		this.update = function(timestamp) {
-			return;
-		};
-	}
-};
-var engine_math_Vec2_$Float = function() { };
-engine_math_Vec2_$Float.__name__ = true;
-engine_math_Vec2_$Float.prototype = {
+var engine_Vec2_$Float = function() { };
+engine_Vec2_$Float.__name__ = true;
+engine_Vec2_$Float.prototype = {
 	add: function(x,y) {
 	}
 	,set: function(x,y) {
@@ -379,50 +379,50 @@ engine_math_Vec2_$Float.prototype = {
 		this.y = y;
 	}
 };
-var engine_math_Vec2Float = function() {
+var engine_Vec2Float = function() {
 	this.x = 0;
 	this.y = 0;
 };
-engine_math_Vec2Float.__name__ = true;
-engine_math_Vec2Float.__super__ = engine_math_Vec2_$Float;
-engine_math_Vec2Float.prototype = $extend(engine_math_Vec2_$Float.prototype,{
+engine_Vec2Float.__name__ = true;
+engine_Vec2Float.__super__ = engine_Vec2_$Float;
+engine_Vec2Float.prototype = $extend(engine_Vec2_$Float.prototype,{
 	add: function(x,y) {
 		this.x += x;
 		this.y += y;
 	}
 });
-var engine_math_Vec2_$Int = function() { };
-engine_math_Vec2_$Int.__name__ = true;
-engine_math_Vec2_$Int.prototype = {
+var engine_Vec2_$Int = function() { };
+engine_Vec2_$Int.__name__ = true;
+engine_Vec2_$Int.prototype = {
 	set: function(x,y) {
 		this.x = x;
 		this.y = y;
 	}
 };
-var engine_math_Vec2Int = function() {
+var engine_Vec2Int = function() {
 	this.x = 0;
 	this.y = 0;
 };
-engine_math_Vec2Int.__name__ = true;
-engine_math_Vec2Int.__super__ = engine_math_Vec2_$Int;
-engine_math_Vec2Int.prototype = $extend(engine_math_Vec2_$Int.prototype,{
+engine_Vec2Int.__name__ = true;
+engine_Vec2Int.__super__ = engine_Vec2_$Int;
+engine_Vec2Int.prototype = $extend(engine_Vec2_$Int.prototype,{
 });
 var game_Config = $hx_exports["game"]["Config"] = function() { };
 game_Config.__name__ = true;
 var game_Glow = function() {
 	this.isOutOfScreen = false;
 	this.isExitIntersecting = false;
-	this.bottomRightCornerPreviousCell = new engine_math_Vec2Int();
-	this.bottomLeftCornerPreviousCell = new engine_math_Vec2Int();
-	this.topRightCornerPreviousCell = new engine_math_Vec2Int();
-	this.topLeftCornerPreviousCell = new engine_math_Vec2Int();
-	this.bottomRightCornerCell = new engine_math_Vec2Int();
-	this.bottomLeftCornerCell = new engine_math_Vec2Int();
-	this.topRightCornerCell = new engine_math_Vec2Int();
-	this.topLeftCornerCell = new engine_math_Vec2Int();
-	this.position = new engine_math_Vec2Float();
-	this.currentSpeed = new engine_math_Vec2Float();
-	this.shape = new engine_graphics_Quad();
+	this.bottomRightCornerPreviousCell = new engine_Vec2Int();
+	this.bottomLeftCornerPreviousCell = new engine_Vec2Int();
+	this.topRightCornerPreviousCell = new engine_Vec2Int();
+	this.topLeftCornerPreviousCell = new engine_Vec2Int();
+	this.bottomRightCornerCell = new engine_Vec2Int();
+	this.bottomLeftCornerCell = new engine_Vec2Int();
+	this.topRightCornerCell = new engine_Vec2Int();
+	this.topLeftCornerCell = new engine_Vec2Int();
+	this.position = new engine_Vec2Float();
+	this.currentSpeed = new engine_Vec2Float();
+	this.shape = new engine_Quad();
 	this.shape.width = game_Config.GLOW_WIDTH;
 	this.shape.height = game_Config.GLOW_HEIGHT;
 	this.shape.color = game_Config.GLOW_COLOR;
@@ -499,7 +499,7 @@ game_Glow.prototype = {
 	}
 };
 var game_Level = function() {
-	this.glowPosition = new engine_math_Vec2Float();
+	this.glowPosition = new engine_Vec2Float();
 	this.data = [];
 	this.compositeShape = [];
 	this.data = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1]];
@@ -514,7 +514,7 @@ var game_Level = function() {
 			var positionX = columnIndex * game_Config.BRUSH_WIDTH;
 			var positionY = rowIndex * game_Config.BRUSH_HEIGHT;
 			if(this.data[rowIndex][columnIndex] == 1 || this.data[rowIndex][columnIndex] == 2) {
-				var rect = new engine_graphics_Quad();
+				var rect = new engine_Quad();
 				rect.position.set(positionX,positionY);
 				rect.width = game_Config.BRUSH_WIDTH;
 				rect.height = game_Config.BRUSH_HEIGHT;
@@ -571,9 +571,9 @@ var game_Game = function() {
 	this.gameResult = new lang_Promise();
 	this.level = new game_Level();
 	this.glow = new game_Glow();
-	this.renderer = new engine_graphics_Renderer(game_Config.GAME_WIDTH,game_Config.GAME_HEIGHT);
-	this.keyboard = new engine_input_Keyboard([engine_input_Key.SPACE,engine_input_Key.RIGHT,engine_input_Key.LEFT,engine_input_Key.SHIFT]);
-	this.loop = new engine_loop_GameLoop();
+	this.renderer = new engine_Renderer(game_Config.GAME_WIDTH,game_Config.GAME_HEIGHT);
+	this.keyboard = new engine_Keyboard([engine_Key.SPACE,engine_Key.RIGHT,engine_Key.LEFT,engine_Key.SHIFT]);
+	this.loop = new engine_GameLoop();
 };
 game_Game.__name__ = true;
 game_Game.prototype = {
@@ -595,14 +595,14 @@ game_Game.prototype = {
 		}
 		this.keyboard.update();
 		this.glow.currentSpeed.add(0,game_Config.GLOW_FALL_ACCELERATION);
-		if(engine_input_Key.RIGHT.currentState == engine_input_Key.KEY_DOWN) {
+		if(engine_Key.RIGHT.currentState == engine_Key.KEY_DOWN) {
 			this.glow.currentSpeed.set(game_Config.GLOW_SPEED,this.glow.currentSpeed.y);
-		} else if(engine_input_Key.LEFT.currentState == engine_input_Key.KEY_DOWN) {
+		} else if(engine_Key.LEFT.currentState == engine_Key.KEY_DOWN) {
 			this.glow.currentSpeed.set(-game_Config.GLOW_SPEED,this.glow.currentSpeed.y);
 		} else {
 			this.glow.currentSpeed.set(0,this.glow.currentSpeed.y);
 		}
-		if(engine_input_Key.SPACE.currentState == engine_input_Key.KEY_DOWN && engine_input_Key.SPACE.previousState == engine_input_Key.KEY_UP) {
+		if(engine_Key.SPACE.currentState == engine_Key.KEY_DOWN && engine_Key.SPACE.previousState == engine_Key.KEY_UP) {
 			this.glow.currentSpeed.add(0,game_Config.GLOW_JUMP_ACCELERATION);
 		}
 		this.glow.moveHorizontally();
@@ -1015,20 +1015,20 @@ Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function()
 	return String(this.val);
 }});
 js_Boot.__toStr = ({ }).toString;
-engine_input_Key.KEY_DOWN = "KEY_DOWN";
-engine_input_Key.KEY_UP = "KEY_UP";
-engine_input_Key.SPACE = new engine_input_Key(32);
-engine_input_Key.RIGHT = new engine_input_Key(39);
-engine_input_Key.LEFT = new engine_input_Key(37);
-engine_input_Key.SHIFT = new engine_input_Key(16);
-game_Config.BRUSH_COLOR = engine_graphics_Color.get_RED();
+engine_Key.KEY_DOWN = "KEY_DOWN";
+engine_Key.KEY_UP = "KEY_UP";
+engine_Key.SPACE = new engine_Key(32);
+engine_Key.RIGHT = new engine_Key(39);
+engine_Key.LEFT = new engine_Key(37);
+engine_Key.SHIFT = new engine_Key(16);
+game_Config.BRUSH_COLOR = engine_Color.get_RED();
 game_Config.BRUSH_WIDTH = 20;
 game_Config.BRUSH_HEIGHT = 20;
 game_Config.GAME_WIDTH_BRUSHES = 40;
 game_Config.GAME_HEIGHT_BRUSHES = 30;
 game_Config.GAME_WIDTH = game_Config.GAME_WIDTH_BRUSHES * game_Config.BRUSH_WIDTH;
 game_Config.GAME_HEIGHT = game_Config.GAME_HEIGHT_BRUSHES * game_Config.BRUSH_HEIGHT;
-game_Config.GLOW_COLOR = engine_graphics_Color.get_WHITE();
+game_Config.GLOW_COLOR = engine_Color.get_WHITE();
 game_Config.GLOW_SPEED = 1;
 game_Config.GLOW_WIDTH_BRUSHES = 1;
 game_Config.GLOW_HEIGHT_BRUSHES = 1;
@@ -1038,7 +1038,7 @@ game_Config.GLOW_LIGHT_MIN_RADIUS = 0.015;
 game_Config.GLOW_LIGHT_MAX_RADIUS = 0.2;
 game_Config.GLOW_LIGHT_STARTING_SPEED = 0.0008;
 game_Config.GLOW_LIGHT_ACCELERATION = 0.0007;
-game_Config.EXIT_COLOR = engine_graphics_Color.get_YELLOW();
+game_Config.EXIT_COLOR = engine_Color.get_YELLOW();
 game_Config.GLOW_FALL_ACCELERATION = 1;
 game_Config.GLOW_JUMP_ACCELERATION = -15;
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

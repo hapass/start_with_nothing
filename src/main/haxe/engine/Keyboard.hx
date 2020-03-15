@@ -1,9 +1,28 @@
-package engine.input;
+package engine;
 
 import js.Browser;
 import js.html.KeyboardEvent;
-import engine.input.Key;
 import lang.Debug;
+
+class Key {
+    public static var KEY_DOWN = "KEY_DOWN";
+    public static var KEY_UP = "KEY_UP";
+
+    public static var SPACE:Key = new Key(32);
+    public static var RIGHT:Key = new Key(39);
+    public static var LEFT:Key = new Key(37);
+    public static var SHIFT:Key = new Key(16);
+
+    public var code:Int = 0;
+
+    public var nextState:String = KEY_UP;
+    public var currentState:String = KEY_UP;
+    public var previousState:String = KEY_UP;
+
+    private function new(code:Int) {
+        this.code = code;
+    }
+}
 
 class Keyboard {
     private var trackedKeys:Map<Int, Key> = new Map<Int, Key>();
@@ -12,7 +31,7 @@ class Keyboard {
     public function new (keys:Array<Key>) {
         Browser.window.addEventListener("keydown", onKeyDown);
         Browser.window.addEventListener("keyup", onKeyUp);
-        for(key in keys) {
+        for (key in keys) {
             Debug.assert(this.trackedKeys[key.code] == null, "Tracked keys cannot repeat in keyboard."); 
             this.trackedKeys[key.code] = key;
             this.trackedKeyCodes.push(key.code);
@@ -23,7 +42,7 @@ class Keyboard {
         var key = trackedKeys[event.keyCode];
 
         //key is not being tracked
-        if(key == null)
+        if (key == null)
             return;
         
         key.nextState = Key.KEY_DOWN;
@@ -33,7 +52,7 @@ class Keyboard {
         var key = trackedKeys[event.keyCode];
 
         //key is not being tracked
-        if(key == null)
+        if (key == null)
             return;
 
         key.nextState = Key.KEY_UP;
