@@ -97,6 +97,7 @@ class Game {
             
             if (this.glow.light.radius > Config.GLOW_LIGHT_MAX_RADIUS) {
                 this.glow.isAnimatingLight = false;
+                this.glow.light.radius = 0.0;
             }
         }
 

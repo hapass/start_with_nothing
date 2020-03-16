@@ -19,10 +19,10 @@ class Config {
     public static var GLOW_HEIGHT_BRUSHES:Int = 1;
     public static var GLOW_WIDTH:Int = GLOW_WIDTH_BRUSHES * BRUSH_WIDTH;
     public static var GLOW_HEIGHT:Int = GLOW_HEIGHT_BRUSHES * BRUSH_HEIGHT;
-    public static var GLOW_LIGHT_MIN_RADIUS:Float = 0.015;
-    public static var GLOW_LIGHT_MAX_RADIUS:Float = 0.2;
-    public static var GLOW_LIGHT_STARTING_SPEED:Float = 0.0008;
-    public static var GLOW_LIGHT_ACCELERATION:Float = 0.0007;
+    public static var GLOW_LIGHT_MIN_RADIUS:Float = 40;
+    public static var GLOW_LIGHT_MAX_RADIUS:Float = 600;
+    public static var GLOW_LIGHT_STARTING_SPEED:Float = 10;
+    public static var GLOW_LIGHT_ACCELERATION:Float = 1;
     
     public static var EXIT_COLOR:Color = Color.YELLOW;
 
