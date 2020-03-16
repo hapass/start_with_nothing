@@ -14,7 +14,7 @@
 
 1. Light radius should be set in resolution independent units.
 1. Fix window resize.
-1. Fix debug build.
+1. Bring back changing colors.
 1. Add particles.
 1. Fix collisions for floating point fall speeds.
 1. It should be easier to slide in into opening in the wall.
