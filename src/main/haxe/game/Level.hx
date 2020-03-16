@@ -2,15 +2,15 @@ package game;
 
 import engine.Quad;
 import engine.Vec2;
+import engine.Debug;
 
 #if macro
 import sys.io.File;
 import haxe.macro.Expr;
 import haxe.macro.Context;
-import lang.Debug;
+#end
 
 using StringTools;
-#end
 
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();

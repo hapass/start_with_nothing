@@ -1,6 +1,6 @@
 package game;
 
-import lang.Debug;
+import engine.Debug;
 import engine.Vec2;
 import engine.Quad;
 

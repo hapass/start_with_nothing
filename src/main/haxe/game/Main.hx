@@ -4,7 +4,7 @@ import engine.Renderer;
 import engine.GameLoop;
 import engine.Vec2;
 import engine.Keyboard;
-import lang.Promise;
+import engine.Promise;
 import js.Browser;
 
 enum GameResult {

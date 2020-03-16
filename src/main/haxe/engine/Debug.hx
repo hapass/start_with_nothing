@@ -1,4 +1,4 @@
-package lang;
+package engine;
 
 class Debug {
     public static inline function assert(condition:Bool, message:String) {

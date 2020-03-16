@@ -2,7 +2,6 @@ package engine;
 
 import js.Browser;
 import js.html.KeyboardEvent;
-import lang.Debug;
 
 class Key {
     public static var KEY_DOWN = "KEY_DOWN";

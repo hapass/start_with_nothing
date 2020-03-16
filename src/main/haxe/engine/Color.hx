@@ -1,7 +1,5 @@
 package engine;
 
-import lang.Debug;
-
 class Color {
   public var r(default, null):Float;
   public var g(default, null):Float;

@@ -1,4 +1,4 @@
-package lang;
+package engine;
 
 class Promise<T> {
     private var thenAction:(T)->Void;
