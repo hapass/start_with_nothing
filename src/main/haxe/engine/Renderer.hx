@@ -15,7 +15,7 @@ class Renderer {
     private var context:RenderingContext;
     private var canvas:CanvasElement;
     private var quads:Array<Quad>;
-    private var glowIndex:Int;
+    private var light:Light;
 
     private static inline var CANVAS_WIDTH_PROPERTY = "width";
     private static inline var CANVAS_HEIGHT_PROPERTY = "height";
@@ -24,7 +24,7 @@ class Renderer {
 
     public function new(gameWidth:Int, gameHeight:Int) {
         this.quads = new Array<Quad>();
-        this.glowIndex = 0;
+        this.light = new Light();
         this.canvas = createCanvas(gameWidth, gameHeight);
         this.context = canvas.getContextWebGL();
         this.context.viewport(0, 0, context.canvas.width, context.canvas.height);
@@ -47,18 +47,19 @@ class Renderer {
         return canvas;
     }
 
+    public function setLight(light:Light) {
+        this.light = light;
+    }
+
     public function add(quadArray:Array<Quad>) {
         for (quad in quadArray) {
             this.quads.push(quad);
-            if (quad.color == Color.WHITE) {
-                this.glowIndex = this.quads.length - 1;
-            }
         }
     }
 
     public function draw() {
         clear();
-        this.quadDrawingProgram.drawQuads(this.quads, this.glowIndex);
+        this.quadDrawingProgram.drawQuads(this.quads, this.light);
     }
 
     private function clear() {
@@ -74,10 +75,9 @@ class Renderer {
 }
 
 private class QuadDrawingProgram {
-    private static inline var PROJECTION_UNIFORM_NAME:String = "projection";
-    private static inline var GLOW_POSITION_UNIFORM_NAME:String = "glow_position";
-    private static inline var SCREEN_SIZE_UNIFORM_NAME:String = "screen_size";
-    private static inline var TIME_UNIFORM_NAME:String = "rand";
+    private static inline var CLIP_SPACE_PROJECTION_UNIFORM_NAME:String = "clip_space_projection";
+    private static inline var SCREEN_SPACE_PROJECTION_UNIFORM_NAME:String = "screen_space_projection";
+    private static inline var LIGHT_CONFIGURATION_UNIFORM_NAME:String = "light_configuration";
     private static inline var QUAD_POSITION_ATTRIBUTE_NAME:String = "quad_position";
     private static inline var QUAD_COLOR_ATTRIBUTE_NAME:String = "quad_color";
     private static inline var PROGRAM_ID:String = "quad_drawing_program";
@@ -93,14 +93,9 @@ private class QuadDrawingProgram {
     private var gameWidth:Int;
     private var gameHeight:Int;
 
-    private var animatingGlow:Bool = false;
-    private var glowRadius:Float = 0.0;
-    private var glowRadiusSpeed:Float = 0.0;
-
-    private var projection:UniformLocation;
-    private var glowPosition:UniformLocation;
-    private var screenSize:UniformLocation;
-    private var rand:UniformLocation;
+    private var clipSpaceProjection:UniformLocation;
+    private var screenSpaceProjection:UniformLocation;
+    private var lightConfiguration:UniformLocation;
 
     public function new(context:RenderingContext, compiler:ProgramCompiler, gameWidth:Int, gameHeight:Int) {
         this.gameWidth = gameWidth;
@@ -116,12 +111,13 @@ private class QuadDrawingProgram {
         setupQuadPositionAttribute();
         setupQuadColorAttribute();
 
-        this.projection = this.context.getUniformLocation(program, PROJECTION_UNIFORM_NAME);
-        this.glowPosition = this.context.getUniformLocation(program, GLOW_POSITION_UNIFORM_NAME);
-        this.screenSize = this.context.getUniformLocation(program, SCREEN_SIZE_UNIFORM_NAME);
-        this.rand = this.context.getUniformLocation(program, TIME_UNIFORM_NAME);
+        this.clipSpaceProjection = this.context.getUniformLocation(program, CLIP_SPACE_PROJECTION_UNIFORM_NAME);
+        this.screenSpaceProjection = this.context.getUniformLocation(program, SCREEN_SPACE_PROJECTION_UNIFORM_NAME);
+        this.lightConfiguration = this.context.getUniformLocation(program, LIGHT_CONFIGURATION_UNIFORM_NAME);
+
         this.context.useProgram(program);
-        setProjection();
+        setClipSpaceProjection();
+        setScreenSpaceProjection();
     }
 
     private function setupQuadPositionAttribute() {
@@ -136,26 +132,8 @@ private class QuadDrawingProgram {
         this.context.vertexAttribPointer(colorAttributeLocation, VEC3_DIMENSIONS_NUMBER, RenderingContext.FLOAT, false, VEC2_DIMENSIONS_NUMBER * 4 + VEC3_DIMENSIONS_NUMBER * 4, VEC2_DIMENSIONS_NUMBER * 4);
     }
 
-    public function drawQuads(quadArray:Array<Quad>, glowIndex:Int) {
-        if (Key.SPACE.currentState == Key.KEY_DOWN && 
-            Key.SPACE.previousState == Key.KEY_UP) {
-            this.glowRadius = Config.GLOW_LIGHT_MIN_RADIUS;
-            this.glowRadiusSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
-            this.animatingGlow = true;
-            this.context.uniform3f(this.rand, Math.random(), Math.random(), Math.random());
-        }
-
-        if (this.animatingGlow) {
-            this.glowRadiusSpeed += Config.GLOW_LIGHT_ACCELERATION;
-            this.glowRadius += glowRadiusSpeed;
-            
-            if (this.glowRadius > Config.GLOW_LIGHT_MAX_RADIUS) {
-                this.glowRadius = 0.0;
-                this.animatingGlow = false;
-            }
-        }
-
-        this.context.uniform3f(this.glowPosition, quadArray[glowIndex].position.x + (quadArray[glowIndex].width / 2), quadArray[glowIndex].position.y + (quadArray[glowIndex].height / 2), this.glowRadius);
+    public function drawQuads(quadArray:Array<Quad>, light:Light) {
+        this.context.uniform3f(this.lightConfiguration, light.position.x, light.position.y, light.radius);
 
         var vertexCount = 6 * quadArray.length;
         var attributeCount = 5 * vertexCount;
@@ -202,22 +180,37 @@ private class QuadDrawingProgram {
             this.vertexArray[index+28] = quadArray[i].color.g;
             this.vertexArray[index+29] = quadArray[i].color.b;
         }
+
         this.context.bufferData(RenderingContext.ARRAY_BUFFER, this.vertexArray, RenderingContext.DYNAMIC_DRAW);
         this.context.drawArrays(RenderingContext.TRIANGLES, 0, vertexCount);
     }
 
-    private function setProjection() {
+    private function setClipSpaceProjection() {
         var w = this.gameWidth;
         var h = this.gameHeight;
+        var tw = 2;
+        var th = 2;
 
-        this.context.uniformMatrix4fv(this.projection, false, [
-            2/w,    0, 0, 0,
-              0, -2/h, 0, 0,
-              0,    0, 1, 0,
-             -1,    1, 0, 1
+        this.context.uniformMatrix4fv(this.clipSpaceProjection, false, [
+            tw/w,     0, 0, 0,
+               0, -th/h, 0, 0,
+               0,     0, 1, 0,
+              -1,     1, 0, 1
         ]);
+    }
 
-        this.context.uniform2f(this.screenSize, this.context.canvas.width, this.context.canvas.height);
+    private function setScreenSpaceProjection() {
+        var w = this.gameWidth;
+        var h = this.gameHeight;
+        var tw = this.context.canvas.width;
+        var th = this.context.canvas.height;
+
+        this.context.uniformMatrix4fv(this.screenSpaceProjection, false, [
+            tw/w,     0, 0, 0,
+               0, -th/h, 0, 0,
+               0,     0, 1, 0,
+               0,    th, 0, 1
+        ]);
     }
 
     public function dispose() {

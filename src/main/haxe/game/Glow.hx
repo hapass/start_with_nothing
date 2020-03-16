@@ -1,5 +1,6 @@
 package game;
 
+import engine.Light;
 import engine.Debug;
 import engine.Vec2;
 import engine.Quad;
@@ -8,6 +9,10 @@ class Glow {
     public var shape:Quad = new Quad();
     public var currentSpeed:Vec2<Float> = new Vec2Float();
     public var position:Vec2<Float> = new Vec2Float();
+
+    public var light:Light = new Light();
+    public var isAnimatingLight:Bool = false;
+    public var lightSpeed:Float = 0.0;
 
     public var topLeftCornerCell:Vec2<Int> = new Vec2Int();
     public var topRightCornerCell:Vec2<Int> = new Vec2Int();
@@ -48,6 +53,7 @@ class Glow {
 
         this.position.set(x, y);
         this.shape.position = this.position;
+        this.light.position.set(this.position.x + Config.GLOW_WIDTH / 2, this.position.y + Config.GLOW_HEIGHT / 2);
 
         this.topLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y));
         this.topRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y));

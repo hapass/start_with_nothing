@@ -1,22 +1,21 @@
 precision mediump float;
 
 varying vec4 color;
-uniform vec3 glow_position;
-uniform mat4 projection;
-uniform vec2 screen_size;
-uniform vec3 rand;
+uniform vec3 light_configuration;
+uniform mat4 screen_space_projection;
 
 void main() {
-    vec2 glow_glow_position = vec2((glow_position.x * screen_size.x) / 800.0, (glow_position.y * screen_size.y) / 600.0);
-    vec2 shine_position = gl_FragCoord.xy - vec2(glow_glow_position.x, screen_size.y - glow_glow_position.y);
-    vec2 frag_coord = vec2(shine_position.x / screen_size.x, shine_position.y / screen_size.y);
-    float radius = glow_position.z;
-    float shininess = 0.0;
-    if (radius > 0.0001)
+    vec2 light_position = light_configuration.xy;
+    float light_radius = light_configuration.z;
+
+    vec2 light_fragment_difference = gl_FragCoord.xy - (screen_space_projection * vec4(light_position, 0, 1)).xy;
+
+    float light_intensity = 0.0;
+    if (light_radius > 0.0001)
     {
-        shininess = max(1.0 - sqrt(dot(frag_coord, frag_coord)) / (radius * 2.0), 0.0);
+        light_intensity = max(1.0 - dot(light_fragment_difference, light_fragment_difference) / (light_radius * light_radius), 0.0);
     }
 
     float gamma = 2.2;
-    gl_FragColor = vec4(pow(vec3(color.r + rand.r, color.g + rand.g, color.b + rand.b) * shininess, vec3(1.0/gamma)), 1);
+    gl_FragColor = vec4(pow(vec3(color.r, color.g, color.b) * light_intensity, vec3(1.0 / gamma)), 1);
 }

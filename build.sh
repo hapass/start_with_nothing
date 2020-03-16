@@ -9,7 +9,7 @@ rm -rf bin/*
 cp layout/index.html bin/index.html
 
 if [ "$configuration" == "debug" ]; then
-    haxe build.hxml -debug
+    haxe -debug build.hxml
 else
     haxe build.hxml
     cd bin

@@ -31,6 +31,9 @@ class Main {
 }
 
 class Game {
+    private var animatingGlow:Bool = false;
+    private var glowRadiusSpeed:Float = 0.0;
+
     private var loop:GameLoop = new GameLoop();
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
@@ -46,6 +49,7 @@ class Game {
     public function run():Promise<GameResult> {
         this.glow.setPosition(this.level.glowPosition.x, this.level.glowPosition.y);
         this.renderer.add([glow.shape]);
+        this.renderer.setLight(glow.light);
         this.renderer.add(this.level.compositeShape);
         this.loop.start(this.update);
         return this.gameResult;
@@ -80,7 +84,20 @@ class Game {
         }
 
         if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+            this.glow.lightSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
+            this.glow.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
+            this.glow.isAnimatingLight = true;
             this.glow.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
+        }
+
+        //process light animation
+        if (this.glow.isAnimatingLight) {
+            this.glow.lightSpeed += Config.GLOW_LIGHT_ACCELERATION;
+            this.glow.light.radius += this.glow.lightSpeed;
+            
+            if (this.glow.light.radius > Config.GLOW_LIGHT_MAX_RADIUS) {
+                this.glow.isAnimatingLight = false;
+            }
         }
 
         //intersect
