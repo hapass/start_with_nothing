@@ -1,7 +1,5 @@
 package engine;
 
-import engine.Keyboard.Key;
-import game.Config;
 import haxe.Resource;
 import js.html.webgl.Program;
 import js.html.webgl.RenderingContext;

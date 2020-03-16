@@ -12,10 +12,31 @@ import haxe.macro.Context;
 
 using StringTools;
 
+class Cell {
+    public var x:Int = 0;
+    public var y:Int = 0;
+
+    public function new() {}
+
+    public function set(x:Int, y:Int) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public function copy(cell:Cell) {
+        this.x = cell.x;
+        this.y = cell.y;
+    }
+
+    public function equals(cell:Cell) {
+        return this.x == cell.x && this.y == cell.y;
+    }
+}
+
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
     public var data:Array<Array<Int>> = new Array<Array<Int>>();
-    public var glowPosition:Vec2<Float> = new Vec2Float();
+    public var glowPosition:Vec2 = new Vec2();
 
     public function new() {
         this.data = createLevel("BlindLuck.lvl");
@@ -77,13 +98,13 @@ class Level {
         return macro $a{columnExpressions};
     }
 
-    public function isCellValid(cell:Vec2<Int>):Bool {
+    public function isCellValid(cell:Cell):Bool {
         return 
             0 <= cell.y && cell.y < this.data.length && 
             0 <= cell.x && cell.x < this.data[cell.y].length;
     }
 
-    public function getCellType(cell:Vec2<Int>):Int {
+    public function getCellType(cell:Cell):Int {
         return data[cell.y][cell.x];
     }
 }

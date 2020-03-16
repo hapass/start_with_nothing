@@ -1,5 +1,6 @@
 package game;
 
+import game.Level.Cell;
 import engine.Light;
 import engine.Debug;
 import engine.Vec2;
@@ -7,22 +8,27 @@ import engine.Quad;
 
 class Glow {
     public var shape:Quad = new Quad();
-    public var currentSpeed:Vec2<Float> = new Vec2Float();
-    public var position:Vec2<Float> = new Vec2Float();
+    public var currentSpeed:Vec2 = new Vec2();
+    public var position:Vec2 = new Vec2();
 
     public var light:Light = new Light();
     public var isAnimatingLight:Bool = false;
     public var lightSpeed:Float = 0.0;
 
-    public var topLeftCornerCell:Vec2<Int> = new Vec2Int();
-    public var topRightCornerCell:Vec2<Int> = new Vec2Int();
-    public var bottomLeftCornerCell:Vec2<Int> = new Vec2Int();
-    public var bottomRightCornerCell:Vec2<Int> = new Vec2Int();
+    public var topLeftCornerCell:Cell = new Cell();
+    public var topRightCornerCell:Cell = new Cell();
+    public var bottomLeftCornerCell:Cell = new Cell();
+    public var bottomRightCornerCell:Cell = new Cell();
 
-    public var topLeftCornerPreviousCell:Vec2<Int> = new Vec2Int();
-    public var topRightCornerPreviousCell:Vec2<Int> = new Vec2Int();
-    public var bottomLeftCornerPreviousCell:Vec2<Int> = new Vec2Int();
-    public var bottomRightCornerPreviousCell:Vec2<Int> = new Vec2Int();
+    public var topLeftCornerCellTemp:Cell = new Cell();
+    public var topRightCornerCellTemp:Cell = new Cell();
+    public var bottomLeftCornerCellTemp:Cell = new Cell();
+    public var bottomRightCornerCellTemp:Cell = new Cell();
+
+    public var topLeftCornerPreviousCell:Cell = new Cell();
+    public var topRightCornerPreviousCell:Cell = new Cell();
+    public var bottomLeftCornerPreviousCell:Cell = new Cell();
+    public var bottomRightCornerPreviousCell:Cell = new Cell();
 
     public var isExitIntersecting:Bool = false;
     public var isOutOfScreen:Bool = false;
@@ -42,14 +48,10 @@ class Glow {
     }
 
     public function setPosition(x:Float, y:Float) {
-        var topLeftCornerCellx = this.topLeftCornerCell.x;
-        var topLeftCornerCelly = this.topLeftCornerCell.y;
-        var topRightCornerCelly = this.topRightCornerCell.y;
-        var topRightCornerCellx = this.topRightCornerCell.x;
-        var bottomLeftCornerCellx = this.bottomLeftCornerCell.x;
-        var bottomLeftCornerCelly = this.bottomLeftCornerCell.y;
-        var bottomRightCornerCellx = this.bottomRightCornerCell.x;
-        var bottomRightCornerCelly = this.bottomRightCornerCell.y;
+        this.topLeftCornerCellTemp.copy(this.topLeftCornerCell);
+        this.topRightCornerCellTemp.copy(this.topRightCornerCell);
+        this.bottomLeftCornerCellTemp.copy(this.bottomLeftCornerCell);
+        this.bottomRightCornerCellTemp.copy(this.bottomRightCornerCell);
 
         this.position.set(x, y);
         this.shape.position = this.position;
@@ -60,24 +62,20 @@ class Glow {
         this.bottomLeftCornerCell.set(getColumn(this.position.x), getRow(this.position.y + Config.GLOW_HEIGHT - 1));
         this.bottomRightCornerCell.set(getColumn(this.position.x + Config.GLOW_WIDTH - 1), getRow(this.position.y + Config.GLOW_HEIGHT - 1));
         
-        if (topLeftCornerCellx != this.topLeftCornerCell.x ||
-            topLeftCornerCelly != this.topLeftCornerCell.y) {
-            this.topLeftCornerPreviousCell.set(topLeftCornerCellx, topLeftCornerCelly);
+        if (!this.topLeftCornerCell.equals(this.topLeftCornerCellTemp)) {
+            this.topLeftCornerPreviousCell.copy(this.topLeftCornerCellTemp);
         }
 
-        if (topRightCornerCelly != this.topRightCornerCell.y ||
-            topRightCornerCellx != this.topRightCornerCell.x) {
-            this.topRightCornerPreviousCell.set(topRightCornerCellx, topRightCornerCelly);
+        if (!this.topRightCornerCell.equals(this.topRightCornerCellTemp)) {
+            this.topRightCornerPreviousCell.copy(this.topRightCornerCellTemp);
         }
 
-        if (bottomLeftCornerCellx != this.bottomLeftCornerCell.x ||
-            bottomLeftCornerCelly != this.bottomLeftCornerCell.y) {
-            this.bottomLeftCornerPreviousCell.set(bottomLeftCornerCellx, bottomLeftCornerCelly);
+        if (!this.bottomLeftCornerCell.equals(this.bottomLeftCornerCellTemp)) {
+            this.bottomLeftCornerPreviousCell.copy(this.bottomLeftCornerCellTemp);
         }
 
-        if (bottomRightCornerCellx != this.bottomRightCornerCell.x ||
-            bottomRightCornerCelly != this.bottomRightCornerCell.y) {
-            this.bottomRightCornerPreviousCell.set(bottomRightCornerCellx, bottomRightCornerCelly);
+        if (!this.bottomRightCornerCell.equals(this.bottomRightCornerCellTemp)) {
+            this.bottomRightCornerPreviousCell.copy(this.bottomRightCornerCellTemp);
         }
 
         Debug.log('Cell previous ${this.bottomLeftCornerPreviousCell.y}');
@@ -85,19 +83,19 @@ class Glow {
         Debug.log('Position ${this.position.y}');
     }
 
-    public function isTop(cell:Vec2<Int>):Bool {
+    public function isTop(cell:Cell):Bool {
         return cell == this.topLeftCornerCell || cell == this.topRightCornerCell;
     }
 
-    public function isBottom(cell:Vec2<Int>):Bool {
+    public function isBottom(cell:Cell):Bool {
         return cell == this.bottomLeftCornerCell || cell == this.bottomRightCornerCell;
     }
 
-    public function isRight(cell:Vec2<Int>):Bool {
+    public function isRight(cell:Cell):Bool {
         return cell == this.bottomRightCornerCell || cell == this.topRightCornerCell;
     }
 
-    public function isLeft(cell:Vec2<Int>):Bool {
+    public function isLeft(cell:Cell):Bool {
         return cell == this.bottomLeftCornerCell || cell == this.topLeftCornerCell;
     }
 

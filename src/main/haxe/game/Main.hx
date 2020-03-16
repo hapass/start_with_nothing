@@ -1,5 +1,6 @@
 package game;
 
+import game.Level;
 import engine.Renderer;
 import engine.GameLoop;
 import engine.Vec2;
@@ -42,7 +43,7 @@ class Game {
     private var level:Level = new Level();
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
-    private var bottomIntersectionOffset:Vec2<Float> = new Vec2Float();
+    private var bottomIntersectionOffset:Vec2 = new Vec2();
 
     public function new() {}
 
@@ -118,7 +119,7 @@ class Game {
         setGlowIntersections(this.glow.bottomLeftCornerCell, this.glow.bottomLeftCornerPreviousCell, isHorizontal);
     }
 
-    private function setGlowIntersections(cell:Vec2<Int>, previousCell:Vec2<Int>, isHorizontal:Bool) {
+    private function setGlowIntersections(cell:Cell, previousCell:Cell, isHorizontal:Bool) {
         if (level.isCellValid(cell)) {
             if(level.getCellType(cell) == 1) {
                 if (isHorizontal)
