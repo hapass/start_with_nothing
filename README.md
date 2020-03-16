@@ -12,7 +12,6 @@
 
 ## TODO
 
-1. Light radius should be set in resolution independent units.
 1. Fix window resize.
 1. Bring back changing colors.
 1. Add particles.
