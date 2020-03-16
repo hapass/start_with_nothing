@@ -122,15 +122,13 @@ class Game {
     private function setGlowIntersections(cell:Cell, previousCell:Cell, isHorizontal:Bool) {
         if (level.isCellValid(cell)) {
             if(level.getCellType(cell) == 1) {
-                if (isHorizontal)
-                {
+                if (isHorizontal) {
                     if ((cell.x > previousCell.x && this.glow.isRight(cell)) || 
                         (cell.x < previousCell.x && this.glow.isLeft(cell))) {
                         this.glow.setPosition(previousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
                     }
                 }
-                else
-                {
+                else {
                     if ((cell.y < previousCell.y && this.glow.isTop(cell)) || 
                         (cell.y > previousCell.y && this.glow.isBottom(cell))) {
                         this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);

@@ -5,14 +5,13 @@ uniform vec3 light_configuration;
 uniform mat4 screen_space_projection;
 
 void main() {
-    vec2 light_position = light_configuration.xy;
-    float light_radius = light_configuration.z;
-
-    vec2 light_fragment_difference = gl_FragCoord.xy - (screen_space_projection * vec4(light_position, 0, 1)).xy;
+    vec4 light_configuration_screen_space = screen_space_projection * vec4(light_configuration, 1);
+    float light_radius = light_configuration_screen_space.z;
 
     float light_intensity = 0.0;
     if (light_radius > 0.0001)
     {
+        vec2 light_fragment_difference = gl_FragCoord.xy - light_configuration_screen_space.xy;
         light_intensity = max(1.0 - dot(light_fragment_difference, light_fragment_difference) / (light_radius * light_radius), 0.0);
     }
 

@@ -203,11 +203,14 @@ private class QuadDrawingProgram {
         var tw = this.context.canvas.width;
         var th = this.context.canvas.height;
 
+        var r = Math.sqrt(w * w + h * h);
+        var tr = Math.sqrt(tw * tw + th * th);
+
         this.context.uniformMatrix4fv(this.screenSpaceProjection, false, [
-            tw/w,     0, 0, 0,
-               0, -th/h, 0, 0,
-               0,     0, 1, 0,
-               0,    th, 0, 1
+            tw/w,     0,    0, 0,
+               0, -th/h,    0, 0,
+               0,     0, tr/r, 0,
+               0,    th,    0, 1
         ]);
     }
 
