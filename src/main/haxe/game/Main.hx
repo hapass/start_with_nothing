@@ -1,10 +1,8 @@
 package game;
 
-import engine.Debug;
 import game.Level;
 import engine.Renderer;
 import engine.GameLoop;
-import engine.Vec2;
 import engine.Keyboard;
 import engine.Promise;
 import js.Browser;
@@ -33,9 +31,6 @@ class Main {
 }
 
 class Game {
-    private var animatingGlow:Bool = false;
-    private var glowRadiusSpeed:Float = 0.0;
-
     private var loop:GameLoop = new GameLoop();
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
@@ -43,8 +38,6 @@ class Game {
     private var glow:Glow = new Glow();
     private var level:Level = new Level();
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
-
-    private var bottomIntersectionOffset:Vec2 = new Vec2();
 
     public function new() {}
 

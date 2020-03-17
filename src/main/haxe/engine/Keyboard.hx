@@ -40,9 +40,10 @@ class Keyboard {
     private function onKeyDown(event:KeyboardEvent) {
         var key = trackedKeys[event.keyCode];
 
-        //key is not being tracked
-        if (key == null)
+        if (key == null) {
+            Debug.log('Key is not tracked: ${key.code}');
             return;
+        }
         
         key.nextState = Key.KEY_DOWN;
     }
@@ -50,9 +51,10 @@ class Keyboard {
     private function onKeyUp(event:KeyboardEvent) {
         var key = trackedKeys[event.keyCode];
 
-        //key is not being tracked
-        if (key == null)
+        if (key == null) {
+            Debug.log('Key is not tracked: ${key.code}');
             return;
+        }
 
         key.nextState = Key.KEY_UP;
     }
