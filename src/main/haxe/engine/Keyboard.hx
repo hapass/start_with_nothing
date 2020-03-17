@@ -18,6 +18,16 @@ class Key {
     public var currentState:String = KEY_UP;
     public var previousState:String = KEY_UP;
 
+    public function wasPressed() {
+        return 
+            this.currentState == Key.KEY_DOWN && 
+            this.previousState == Key.KEY_UP;
+    }
+
+    public function isPressed() {
+        return this.currentState == Key.KEY_DOWN;
+    }
+
     private function new(code:Int) {
         this.code = code;
     }

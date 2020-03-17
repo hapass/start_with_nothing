@@ -17,6 +17,9 @@ class Glow {
     public var isAnimatingLight:Bool = false;
     public var lightSpeed:Float = 0.0;
 
+    public var isOnGround:Bool = false;
+    public var isDoubleJump:Bool = false;
+
     public function new() {
         this.shape.position = this.position;
         this.shape.width = Config.TILE_SIZE;
@@ -25,30 +28,32 @@ class Glow {
     }
 
     public function update(level:Level) {
+        emitLight();
         calculateSpeed();
         move(level);
-        emitLight();
     }
 
     private function calculateSpeed() {
         this.currentSpeed.add(0, Config.GLOW_FALL_ACCELERATION);
 
-        if (Key.RIGHT.currentState == Key.KEY_DOWN) {
+        if (Key.RIGHT.isPressed()) {
             this.currentSpeed.set(Config.GLOW_SPEED, this.currentSpeed.y);
         }
-        else if (Key.LEFT.currentState == Key.KEY_DOWN) {
+        else if (Key.LEFT.isPressed()) {
             this.currentSpeed.set(-Config.GLOW_SPEED, this.currentSpeed.y);
         }
         else {
             this.currentSpeed.set(0, this.currentSpeed.y);
         }
 
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+        if (Key.SPACE.wasPressed() && (this.isOnGround || this.isDoubleJump)) {
             this.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
+            this.isDoubleJump = this.isOnGround;
         }
     }
 
     private function move(level:Level) {
+        this.isOnGround = false;
         moveHorizontally(this.position.x + this.currentSpeed.x, level);
         moveVertically(this.position.y + this.currentSpeed.y, level);
     }
@@ -107,6 +112,7 @@ class Glow {
             if (left == Wall || right == Wall) {
                 this.position.y = getPosition(row - 1);
                 this.currentSpeed.set(this.currentSpeed.x, 0);
+                this.isOnGround = true;
             }
             else
                 this.position.y = y;
@@ -132,7 +138,7 @@ class Glow {
     }
 
     private function emitLight() {
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
+        if (Key.SPACE.wasPressed()) {
             this.lightSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
             this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
             this.isAnimatingLight = true;
