@@ -126,8 +126,8 @@ class Glow {
                 this.position.y = y;
         }
         else {
-            //moving down
             /*
+            Moving down.
             Detection points:
             ***
             ***
