@@ -12,6 +12,7 @@
 
 ## TODO
 
+1. Should be only double jump. No flying.
 1. Add min and max horizontal speed.
 1. It should be easier to slide in into opening in the wall.
 1. Fix window resize.
