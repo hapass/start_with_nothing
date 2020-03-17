@@ -16,5 +16,5 @@ void main() {
     }
 
     float gamma = 2.2;
-    gl_FragColor = vec4(pow(vec3(color.r, color.g, color.b) * light_intensity, vec3(1.0 / gamma)), 1);
+    gl_FragColor = vec4(pow(vec3(color.r, color.g, color.b) * 1.0, vec3(1.0 / gamma)), 1);
 }

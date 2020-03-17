@@ -22,17 +22,17 @@ class Level {
 
         for (rowIndex in 0...data.length) {
             for (columnIndex in 0...data[rowIndex].length) {
-                var positionX = columnIndex * Config.BRUSH_WIDTH;
-                var positionY = rowIndex * Config.BRUSH_HEIGHT;
+                var positionX = columnIndex * Config.TILE_SIZE;
+                var positionY = rowIndex * Config.TILE_SIZE;
 
                 if (data[rowIndex][columnIndex] == 1 || data[rowIndex][columnIndex] == 2) {
                     var rect = new Quad();
                     rect.position.set(positionX, positionY);
-                    rect.width = Config.BRUSH_WIDTH;
-                    rect.height = Config.BRUSH_HEIGHT;
+                    rect.width = Config.TILE_SIZE;
+                    rect.height = Config.TILE_SIZE;
 
                     if (data[rowIndex][columnIndex] == 1) {
-                        rect.color = Config.BRUSH_COLOR;
+                        rect.color = Config.LEVEL_COLOR;
                     }
 
                     if (data[rowIndex][columnIndex] == 2) {
@@ -43,7 +43,7 @@ class Level {
                 }
 
                 if (data[rowIndex][columnIndex] == 3) {
-                    glowPosition.set(columnIndex * Config.BRUSH_WIDTH, rowIndex * Config.BRUSH_HEIGHT);
+                    glowPosition.set(columnIndex * Config.TILE_SIZE, rowIndex * Config.TILE_SIZE);
                 }
             }
         }
@@ -58,10 +58,10 @@ class Level {
         var data:Array<Array<Int>> = new Array<Array<Int>>();
 
         var stringData = File.getContent('data/${fileName}').replace("\n", "").replace(" ", "");
-        for (row in 0...Config.GAME_HEIGHT_BRUSHES) {
+        for (row in 0...Config.GAME_HEIGHT_TILES) {
             data.push(new Array<Int>());
-            for (column in 0...Config.GAME_WIDTH_BRUSHES) {
-                var char = stringData.charAt(row * Config.GAME_WIDTH_BRUSHES + column);
+            for (column in 0...Config.GAME_WIDTH_TILES) {
+                var char = stringData.charAt(row * Config.GAME_WIDTH_TILES + column);
                 Debug.assert(char != "", 'Incorrect level format. Could not get character at: [$row, $column]');
                 var elementId = Std.parseInt(char);
                 Debug.assert(elementId != null, 'Incorrect level format. Could not parse character at: [$row, $column]');

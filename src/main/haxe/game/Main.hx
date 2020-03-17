@@ -50,7 +50,7 @@ class Game {
 
     public function run():Promise<GameResult> {
         this.glow.position.set(this.level.glowPosition.x, this.level.glowPosition.y);
-        this.glow.light.position.set(this.glow.position.x + Config.GLOW_WIDTH / 2, this.glow.position.y + Config.GLOW_HEIGHT / 2);
+        this.glow.light.position.set(this.glow.position.x + Config.TILE_SIZE / 2, this.glow.position.y + Config.TILE_SIZE / 2);
         this.renderer.add([glow.shape]);
         this.renderer.setLight(glow.light);
         this.renderer.add(this.level.compositeShape);
@@ -59,20 +59,23 @@ class Game {
     }
 
     public function update(timestamp:Float):Void {
-        //death
-        if (this.glow.isOutOfScreen) {
+        this.keyboard.update();
+        this.glow.update(this.level);
+
+        var result = level.getIntersection(
+            Math.floor((this.glow.position.y + Config.TILE_SIZE / 2) / Config.TILE_SIZE),
+            Math.floor((this.glow.position.x + Config.TILE_SIZE / 2) / Config.TILE_SIZE)
+        );
+
+        if (result == -1) {
             stop(GameResult.Restart);
             return;
         }
 
-        //win
-        if (this.glow.isExitIntersecting) {
+        if (result == 2) {
             stop(GameResult.Quit);
             return;
         }
-
-        this.keyboard.update();
-        this.glow.update(this.level);
 
         this.renderer.draw();
     }
