@@ -59,41 +59,27 @@ class Glow {
         }
 
         if (x < this.position.x) {
-            /*
-            Moving left.
-            Detection points:
-            o***
-             ***
-            o***
-            */
-            var column = Math.floor((x - 1) / Config.TILE_SIZE);
-            var top = level.getIntersection(Math.floor(this.position.y / Config.TILE_SIZE), column);
-            var bottom = level.getIntersection(Math.floor((this.position.y + Config.TILE_SIZE - 1) / Config.TILE_SIZE), column);
+            var column = getTileIndex(x - 1);
+            var top = level.getTileType(getTileIndex(this.position.y), column);
+            var bottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
 
-            if (top == 1 || bottom == 1)
-                this.position.x = (column + 1) * Config.TILE_SIZE;
+            if (top == Wall || bottom == Wall)
+                this.position.x = getPosition(column + 1);
             else
                 this.position.x = x;
         }
         else {
-            /*
-            Moving right.
-            Detection points:
-            ***o
-            ***
-            ***o
-            */
-            var column = Math.floor((x + Config.TILE_SIZE) / Config.TILE_SIZE);
-            var top = level.getIntersection(Math.floor(this.position.y / Config.TILE_SIZE), column);
-            var bottom = level.getIntersection(Math.floor((this.position.y + Config.TILE_SIZE - 1) / Config.TILE_SIZE), column);
+            var column = getTileIndex(getEnd(x) + 1);
+            var top = level.getTileType(getTileIndex(this.position.y), column);
+            var bottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
 
-            if (top == 1 || bottom == 1)
-                this.position.x = (column - 1) * Config.TILE_SIZE;
+            if (top == Wall || bottom == Wall)
+                this.position.x = getPosition(column - 1);
             else
                 this.position.x = x;
         }
 
-        this.light.position.x = this.position.x + Config.TILE_SIZE / 2;
+        this.light.position.x = getCenter(this.position.x);
     }
 
     private function moveVertically(y:Float, level:Level) {
@@ -102,47 +88,47 @@ class Glow {
         }
 
         if (y < this.position.y) {
-            /*
-            Moving up.
-            Detection points:
-            o o
-            ***
-            ***
-            ***
-            */
-            var row = Math.floor((y - 1) / Config.TILE_SIZE);
-            var left = level.getIntersection(row, Math.floor(this.position.x / Config.TILE_SIZE));
-            var right = level.getIntersection(row, Math.floor((this.position.x + Config.TILE_SIZE - 1) / Config.TILE_SIZE));
+            var row = getTileIndex(y - 1);
+            var left = level.getTileType(row, getTileIndex(this.position.x));
+            var right = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
 
-            if (left == 1 || right == 1) {
-                this.position.y = (row + 1) * Config.TILE_SIZE;
+            if (left == Wall || right == Wall) {
+                this.position.y = getPosition(row + 1);
                 this.currentSpeed.set(this.currentSpeed.x, 0);
             }
             else
                 this.position.y = y;
         }
         else {
-            /*
-            Moving down.
-            Detection points:
-            ***
-            ***
-            ***
-            o o
-            */
-            var row = Math.floor((y + Config.TILE_SIZE) / Config.TILE_SIZE);
-            var left = level.getIntersection(row, Math.floor(this.position.x / Config.TILE_SIZE));
-            var right = level.getIntersection(row, Math.floor((this.position.x + Config.TILE_SIZE - 1) / Config.TILE_SIZE));
+            var row = getTileIndex(getEnd(y) + 1);
+            var left = level.getTileType(row, getTileIndex(this.position.x));
+            var right = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
 
-            if (left == 1 || right == 1) {
-                this.position.y = (row - 1) * Config.TILE_SIZE;
+            if (left == Wall || right == Wall) {
+                this.position.y = getPosition(row - 1);
                 this.currentSpeed.set(this.currentSpeed.x, 0);
             }
             else
                 this.position.y = y;
         }
 
-        this.light.position.y = this.position.y + Config.TILE_SIZE / 2;
+        this.light.position.y = getCenter(this.position.y);
+    }
+
+    private function getTileIndex(offset:Float):Int {
+        return Math.floor(offset / Config.TILE_SIZE);
+    }
+
+    private function getPosition(tileIndex:Int):Float {
+        return tileIndex * Config.TILE_SIZE;
+    }
+
+    private function getCenter(offset:Float):Float {
+        return offset + Config.TILE_SIZE / 2;
+    }
+
+    private function getEnd(offset:Float):Float {
+        return offset + Config.TILE_SIZE - 1;
     }
 
     private function emitLight() {

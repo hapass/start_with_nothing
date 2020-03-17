@@ -10,8 +10,8 @@ import engine.Promise;
 import js.Browser;
 
 enum GameResult {
-    Quit;
-    Restart;
+    Win;
+    Fail;
 }
 
 class Main {
@@ -22,10 +22,10 @@ class Main {
     public static function launch() {
         new Game().run().then(function(result:GameResult) {
             switch(result) {
-                case GameResult.Restart:
+                case GameResult.Fail:
                     Browser.alert("You've lost. Try again!");
                     launch();
-                case GameResult.Quit:
+                case GameResult.Win:
                     Browser.alert("You won!");
             }
         });
@@ -62,18 +62,18 @@ class Game {
         this.keyboard.update();
         this.glow.update(this.level);
 
-        var result = level.getIntersection(
+        var result:TileType = level.getTileType(
             Math.floor((this.glow.position.y + Config.TILE_SIZE / 2) / Config.TILE_SIZE),
             Math.floor((this.glow.position.x + Config.TILE_SIZE / 2) / Config.TILE_SIZE)
         );
 
-        if (result == -1) {
-            stop(GameResult.Restart);
+        if (result == None) {
+            stop(GameResult.Fail);
             return;
         }
 
-        if (result == 2) {
-            stop(GameResult.Quit);
+        if (result == Exit) {
+            stop(GameResult.Win);
             return;
         }
 

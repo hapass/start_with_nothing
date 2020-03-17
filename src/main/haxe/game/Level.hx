@@ -12,6 +12,14 @@ import haxe.macro.Context;
 
 using StringTools;
 
+enum abstract TileType(Int) from Int to Int {
+    var None = -1;
+    var Empty = 0;
+    var Wall = 1;
+    var Exit = 2;
+    var Spawn = 3;
+}
+
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
     public var data:Array<Array<Int>> = new Array<Array<Int>>();
@@ -25,24 +33,24 @@ class Level {
                 var positionX = columnIndex * Config.TILE_SIZE;
                 var positionY = rowIndex * Config.TILE_SIZE;
 
-                if (data[rowIndex][columnIndex] == 1 || data[rowIndex][columnIndex] == 2) {
-                    var rect = new Quad();
-                    rect.position.set(positionX, positionY);
-                    rect.width = Config.TILE_SIZE;
-                    rect.height = Config.TILE_SIZE;
+                if (data[rowIndex][columnIndex] == Wall || data[rowIndex][columnIndex] == Exit) {
+                    var tile = new Quad();
+                    tile.position.set(positionX, positionY);
+                    tile.width = Config.TILE_SIZE;
+                    tile.height = Config.TILE_SIZE;
 
-                    if (data[rowIndex][columnIndex] == 1) {
-                        rect.color = Config.LEVEL_COLOR;
+                    if (data[rowIndex][columnIndex] == Wall) {
+                        tile.color = Config.WALL_COLOR;
                     }
 
-                    if (data[rowIndex][columnIndex] == 2) {
-                        rect.color = Config.EXIT_COLOR;
+                    if (data[rowIndex][columnIndex] == Exit) {
+                        tile.color = Config.EXIT_COLOR;
                     }
 
-                    compositeShape.push(rect);
+                    compositeShape.push(tile);
                 }
 
-                if (data[rowIndex][columnIndex] == 3) {
+                if (data[rowIndex][columnIndex] == Spawn) {
                     glowPosition.set(columnIndex * Config.TILE_SIZE, rowIndex * Config.TILE_SIZE);
                 }
             }
@@ -69,7 +77,7 @@ class Level {
             }
         }
 
-        var columnExpressions:Array<Expr> = [];
+        var columnExpressions:Array<Expr> = new Array<Expr>();
         for (column in data) {
             var valueListExpression = [for (value in column) macro $v{value}];
             columnExpressions.push(macro $a{valueListExpression});
@@ -77,25 +85,11 @@ class Level {
         return macro $a{columnExpressions};
     }
 
-    private function isCellValid(row:Int, column:Int):Bool {
-        return 
-            0 <= row && row < this.data.length && 
-            0 <= column && column < this.data[row].length;
-    }
-
-    public function getIntersection(row:Int, column:Int):Int {
-        if (!isCellValid(row, column)) {
-            return -1;
+    public function getTileType(row:Int, column:Int):TileType {
+        if (0 <= row && row < this.data.length && 0 <= column && column < this.data[row].length) {
+            return data[row][column];
         }
 
-        if (data[row][column] == 2) {
-            return 2;
-        }
-
-        if (data[row][column] == 1) {
-            return 1;
-        }
-
-        return 0;
+        return None;
     }
 }

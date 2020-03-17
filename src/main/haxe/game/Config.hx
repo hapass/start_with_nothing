@@ -19,7 +19,7 @@ class Config {
     public static var GLOW_LIGHT_ACCELERATION:Float = 2;
     
     public static var EXIT_COLOR:Color = Color.YELLOW;
-    public static var LEVEL_COLOR:Color = Color.RED;
+    public static var WALL_COLOR:Color = Color.RED;
 
     public static var GLOW_FALL_ACCELERATION:Float = 0.2;
     public static var GLOW_JUMP_ACCELERATION:Float = -5;
