@@ -17,8 +17,7 @@ class Glow {
     public var isAnimatingLight:Bool = false;
     public var lightSpeed:Float = 0.0;
 
-    public var isOnGround:Bool = false;
-    public var isDoubleJump:Bool = false;
+    public var jumpCount:Int = 0;
 
     public function new() {
         this.shape.position = this.position;
@@ -46,14 +45,13 @@ class Glow {
             this.currentSpeed.set(0, this.currentSpeed.y);
         }
 
-        if (Key.SPACE.wasPressed() && (this.isOnGround || this.isDoubleJump)) {
-            this.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
-            this.isDoubleJump = this.isOnGround;
+        if (Key.SPACE.wasPressed() && jumpCount > 0) {
+            this.currentSpeed.set(this.currentSpeed.x, Config.GLOW_JUMP_ACCELERATION);
+            jumpCount--;
         }
     }
 
     private function move(level:Level) {
-        this.isOnGround = false;
         moveHorizontally(this.position.x + this.currentSpeed.x, level);
         moveVertically(this.position.y + this.currentSpeed.y, level);
     }
@@ -112,7 +110,7 @@ class Glow {
             if (left == Wall || right == Wall) {
                 this.position.y = getPosition(row - 1);
                 this.currentSpeed.set(this.currentSpeed.x, 0);
-                this.isOnGround = true;
+                this.jumpCount = Config.JUMP_COUNT;
             }
             else
                 this.position.y = y;

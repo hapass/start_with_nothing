@@ -12,7 +12,6 @@
 
 ## TODO
 
-1. Should be only double jump. No flying.
 1. Add min and max horizontal speed.
 1. Create more levels.
 1. Bring back changing colors.
