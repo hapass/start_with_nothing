@@ -12,27 +12,6 @@ import haxe.macro.Context;
 
 using StringTools;
 
-class Cell {
-    public var x:Int = 0;
-    public var y:Int = 0;
-
-    public function new() {}
-
-    public function set(x:Int, y:Int) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public function copy(cell:Cell) {
-        this.x = cell.x;
-        this.y = cell.y;
-    }
-
-    public function equals(cell:Cell) {
-        return this.x == cell.x && this.y == cell.y;
-    }
-}
-
 class Level {
     public var compositeShape:Array<Quad> = new Array<Quad>();
     public var data:Array<Array<Int>> = new Array<Array<Int>>();
@@ -98,13 +77,25 @@ class Level {
         return macro $a{columnExpressions};
     }
 
-    public function isCellValid(cell:Cell):Bool {
+    private function isCellValid(row:Int, column:Int):Bool {
         return 
-            0 <= cell.y && cell.y < this.data.length && 
-            0 <= cell.x && cell.x < this.data[cell.y].length;
+            0 <= row && row < this.data.length && 
+            0 <= column && column < this.data[row].length;
     }
 
-    public function getCellType(cell:Cell):Int {
-        return data[cell.y][cell.x];
+    public function getIntersection(row:Int, column:Int):Int {
+        if (!isCellValid(row, column)) {
+            return -1;
+        }
+
+        if (data[row][column] == 2) {
+            return 2;
+        }
+
+        if (data[row][column] == 1) {
+            return 1;
+        }
+
+        return 0;
     }
 }

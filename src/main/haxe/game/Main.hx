@@ -1,5 +1,6 @@
 package game;
 
+import engine.Debug;
 import game.Level;
 import engine.Renderer;
 import engine.GameLoop;
@@ -48,7 +49,8 @@ class Game {
     public function new() {}
 
     public function run():Promise<GameResult> {
-        this.glow.setPosition(this.level.glowPosition.x, this.level.glowPosition.y);
+        this.glow.position.set(this.level.glowPosition.x, this.level.glowPosition.y);
+        this.glow.light.position.set(this.glow.position.x + Config.GLOW_WIDTH / 2, this.glow.position.y + Config.GLOW_HEIGHT / 2);
         this.renderer.add([glow.shape]);
         this.renderer.setLight(glow.light);
         this.renderer.add(this.level.compositeShape);
@@ -70,79 +72,9 @@ class Game {
         }
 
         this.keyboard.update();
-
-        //move
-        this.glow.currentSpeed.add(0, Config.GLOW_FALL_ACCELERATION);
-
-        if (Key.RIGHT.currentState == Key.KEY_DOWN) {
-            this.glow.currentSpeed.set(Config.GLOW_SPEED, this.glow.currentSpeed.y);
-        }
-        else if (Key.LEFT.currentState == Key.KEY_DOWN) {
-            this.glow.currentSpeed.set(-Config.GLOW_SPEED, this.glow.currentSpeed.y);
-        }
-        else {
-            this.glow.currentSpeed.set(0, this.glow.currentSpeed.y);
-        }
-
-        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
-            this.glow.lightSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
-            this.glow.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
-            this.glow.isAnimatingLight = true;
-            this.glow.currentSpeed.add(0, Config.GLOW_JUMP_ACCELERATION);
-        }
-
-        //process light animation
-        if (this.glow.isAnimatingLight) {
-            this.glow.lightSpeed += Config.GLOW_LIGHT_ACCELERATION;
-            this.glow.light.radius += this.glow.lightSpeed;
-            
-            if (this.glow.light.radius > Config.GLOW_LIGHT_MAX_RADIUS) {
-                this.glow.isAnimatingLight = false;
-                this.glow.light.radius = 0.0;
-            }
-        }
-
-        //intersect
-        this.glow.moveHorizontally();
-        checkIntersections(true);
-
-        this.glow.moveVertically();
-        checkIntersections(false);
+        this.glow.update(this.level);
 
         this.renderer.draw();
-    }
-
-    private function checkIntersections(isHorizontal:Bool) {
-        setGlowIntersections(this.glow.topLeftCornerCell, this.glow.topLeftCornerPreviousCell, isHorizontal);
-        setGlowIntersections(this.glow.topRightCornerCell, this.glow.topRightCornerPreviousCell, isHorizontal);
-        setGlowIntersections(this.glow.bottomRightCornerCell, this.glow.bottomRightCornerPreviousCell, isHorizontal);
-        setGlowIntersections(this.glow.bottomLeftCornerCell, this.glow.bottomLeftCornerPreviousCell, isHorizontal);
-    }
-
-    private function setGlowIntersections(cell:Cell, previousCell:Cell, isHorizontal:Bool) {
-        if (level.isCellValid(cell)) {
-            if(level.getCellType(cell) == 1) {
-                if (isHorizontal) {
-                    if ((cell.x > previousCell.x && this.glow.isRight(cell)) || 
-                        (cell.x < previousCell.x && this.glow.isLeft(cell))) {
-                        this.glow.setPosition(previousCell.x * Config.BRUSH_WIDTH, this.glow.position.y);
-                    }
-                }
-                else {
-                    if ((cell.y < previousCell.y && this.glow.isTop(cell)) || 
-                        (cell.y > previousCell.y && this.glow.isBottom(cell))) {
-                        this.glow.currentSpeed.set(this.glow.currentSpeed.x, 0);
-                        this.glow.setPosition(this.glow.position.x, previousCell.y * Config.BRUSH_HEIGHT);
-                    }
-                }
-            }
-            else if (level.getCellType(cell) == 2) {
-                this.glow.isExitIntersecting = true;
-            }
-        }
-        else {
-            this.glow.isOutOfScreen = true;
-        }
     }
 
     private function stop(result:GameResult) {
