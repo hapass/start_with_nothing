@@ -14,9 +14,9 @@ class Config {
     public static var GLOW_COLOR:Color = Color.WHITE;
     public static var GLOW_SPEED:Int = 1;
     public static var GLOW_LIGHT_MIN_RADIUS:Float = 20;
-    public static var GLOW_LIGHT_MAX_RADIUS:Float = 40;
+    public static var GLOW_LIGHT_MAX_RADIUS:Float = 220;
     public static var GLOW_LIGHT_STARTING_SPEED:Float = 1;
-    public static var GLOW_LIGHT_ACCELERATION:Float = 1;
+    public static var GLOW_LIGHT_ACCELERATION:Float = 2;
     
     public static var EXIT_COLOR:Color = Color.YELLOW;
     public static var LEVEL_COLOR:Color = Color.RED;

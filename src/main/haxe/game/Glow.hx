@@ -17,9 +17,6 @@ class Glow {
     public var isAnimatingLight:Bool = false;
     public var lightSpeed:Float = 0.0;
 
-    public var isExitIntersecting:Bool = false;
-    public var isOutOfScreen:Bool = false;
-
     public function new() {
         this.shape.position = this.position;
         this.shape.width = Config.TILE_SIZE;
@@ -149,7 +146,7 @@ class Glow {
     }
 
     private function emitLight() {
-        if (Key.SHIFT.currentState == Key.KEY_DOWN && Key.SHIFT.previousState == Key.KEY_UP) {
+        if (Key.SPACE.currentState == Key.KEY_DOWN && Key.SPACE.previousState == Key.KEY_UP) {
             this.lightSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
             this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
             this.isAnimatingLight = true;
