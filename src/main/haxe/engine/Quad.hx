@@ -1,10 +1,17 @@
 package engine;
 
 class Quad {
-  public var color:Color = Color.WHITE;
-  public var height:Float = 0;
-  public var width:Float = 0;
-  public var position:Vec2 = new Vec2();
+    public var color:Color;
+    public var size:Float;
+    public var position:Vec2;
 
-  public function new() {}
+    public function new(
+        color:Color,
+        size:Float,
+        position:Vec2
+    ) {
+        this.color = color;
+        this.size = size;
+        this.position = position;
+    }
 }

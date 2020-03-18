@@ -1,6 +1,6 @@
 package game;
 
-import engine.Keyboard;
+import engine.Key;
 import engine.Light;
 import engine.Vec2;
 import engine.Quad;
@@ -9,9 +9,10 @@ import game.Level;
 using engine.FloatExtensions;
 
 class Glow {
-    public var shape:Quad = new Quad();
+    public var position:Vec2;
+    public var shape:Quad;
+
     public var currentSpeed:Vec2 = new Vec2();
-    public var position:Vec2 = new Vec2();
 
     public var light:Light = new Light();
     public var isAnimatingLight:Bool = false;
@@ -19,11 +20,11 @@ class Glow {
 
     public var jumpCount:Int = 0;
 
-    public function new() {
-        this.shape.position = this.position;
-        this.shape.width = Config.TILE_SIZE;
-        this.shape.height = Config.TILE_SIZE;
-        this.shape.color = Config.GLOW_COLOR;
+    public function new(position:Vec2) {
+        this.position = position;
+        this.light.position.x = getCenter(this.position.x);
+        this.light.position.y = getCenter(this.position.y);
+        this.shape = new Quad(Config.GLOW_COLOR, Config.TILE_SIZE, this.position);
     }
 
     public function update(level:Level) {
@@ -40,7 +41,10 @@ class Glow {
                 this.currentSpeed.x = Config.GLOW_MIN_SPEED;
             } 
             else {
-                this.currentSpeed.x = Math.min(this.currentSpeed.x + Config.GLOW_ACCELERATION, Config.GLOW_MAX_SPEED);
+                this.currentSpeed.x = Math.min(
+                    this.currentSpeed.x + Config.GLOW_ACCELERATION,
+                    Config.GLOW_MAX_SPEED
+                );
             }
         }
         else if (Key.LEFT.isPressed()) {
@@ -48,7 +52,10 @@ class Glow {
                 this.currentSpeed.x = -Config.GLOW_MIN_SPEED;
             } 
             else {
-                this.currentSpeed.x = Math.max(this.currentSpeed.x - Config.GLOW_ACCELERATION, -Config.GLOW_MAX_SPEED);
+                this.currentSpeed.x = Math.max(
+                    this.currentSpeed.x - Config.GLOW_ACCELERATION,
+                    -Config.GLOW_MAX_SPEED
+                );
             }
         }
         else {

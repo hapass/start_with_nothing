@@ -148,32 +148,32 @@ private class QuadDrawingProgram {
             this.vertexArray[index+3] = quadArray[i].color.g;
             this.vertexArray[index+4] = quadArray[i].color.b;
 
-            this.vertexArray[index+5] = quadArray[i].width + quadArray[i].position.x;
+            this.vertexArray[index+5] = quadArray[i].size + quadArray[i].position.x;
             this.vertexArray[index+6] = quadArray[i].position.y;
             this.vertexArray[index+7] = quadArray[i].color.r;
             this.vertexArray[index+8] = quadArray[i].color.g;
             this.vertexArray[index+9] = quadArray[i].color.b;
 
             this.vertexArray[index+10] = quadArray[i].position.x;
-            this.vertexArray[index+11] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+11] = quadArray[i].size + quadArray[i].position.y;
             this.vertexArray[index+12] = quadArray[i].color.r;
             this.vertexArray[index+13] = quadArray[i].color.g;
             this.vertexArray[index+14] = quadArray[i].color.b;
 
             this.vertexArray[index+15] = quadArray[i].position.x;
-            this.vertexArray[index+16] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+16] = quadArray[i].size + quadArray[i].position.y;
             this.vertexArray[index+17] = quadArray[i].color.r;
             this.vertexArray[index+18] = quadArray[i].color.g;
             this.vertexArray[index+19] = quadArray[i].color.b;
 
-            this.vertexArray[index+20] = quadArray[i].width + quadArray[i].position.x;
+            this.vertexArray[index+20] = quadArray[i].size + quadArray[i].position.x;
             this.vertexArray[index+21] = quadArray[i].position.y;
             this.vertexArray[index+22] = quadArray[i].color.r;
             this.vertexArray[index+23] = quadArray[i].color.g;
             this.vertexArray[index+24] = quadArray[i].color.b;
 
-            this.vertexArray[index+25] = quadArray[i].width + quadArray[i].position.x;
-            this.vertexArray[index+26] = quadArray[i].height + quadArray[i].position.y;
+            this.vertexArray[index+25] = quadArray[i].size + quadArray[i].position.x;
+            this.vertexArray[index+26] = quadArray[i].size + quadArray[i].position.y;
             this.vertexArray[index+27] = quadArray[i].color.r;
             this.vertexArray[index+28] = quadArray[i].color.g;
             this.vertexArray[index+29] = quadArray[i].color.b;
