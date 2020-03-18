@@ -12,7 +12,8 @@
 
 ## TODO
 
-1. Create more levels.
+1. Do not recreate game on level switch.
+1. Level fail should reset glow position.
 1. Bring back changing colors.
 1. Light animation acceleration should be configurable with Bezier curve.
 1. Fix window resize.
