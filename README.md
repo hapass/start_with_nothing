@@ -12,7 +12,6 @@
 
 ## TODO
 
-1. Bring back changing colors.
 1. Light animation acceleration should be configurable with Bezier curve.
 1. Fix window resize.
 1. Add simple jump sound with web audio.
@@ -25,4 +24,6 @@
 1. It should be easier to slide in into opening in the wall.
 1. Do example tutorials.
 1. Play testing.
-1. Optimization.
+1. Optimize size of the app. Store levels differently.
+1. Optimize allocations - target no GC.
+1. Optimize rendering - too many vertices uploaded every frame.

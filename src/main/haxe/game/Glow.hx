@@ -1,5 +1,6 @@
 package game;
 
+import engine.Color;
 import engine.Key;
 import engine.Light;
 import engine.Vec2;
@@ -154,6 +155,9 @@ class Glow {
 
     private function emitLight() {
         if (Key.SPACE.wasPressed()) {
+            this.light.color.r = Color.correctColor(Math.random());
+            this.light.color.g = Color.correctColor(Math.random());
+            this.light.color.b = Color.correctColor(Math.random());
             this.lightSpeed = Config.GLOW_LIGHT_MIN_SPEED;
             this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
             this.isAnimatingLight = true;

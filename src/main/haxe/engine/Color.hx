@@ -1,9 +1,9 @@
 package engine;
 
 class Color {
-  public var r(default, null):Float;
-  public var g(default, null):Float;
-  public var b(default, null):Float;
+  public var r:Float;
+  public var g:Float;
+  public var b:Float;
 
   public static var RED(get, never):Color;
   static function get_RED():Color return new Color(1, 0, 0);
@@ -29,9 +29,7 @@ class Color {
       this.b = correctColor(b);
   }
 
-  private function correctColor(value:Float):Float {
-      Debug.assert(value >= 0 && value <= 1, "Each color value should be between 0 and 1.");
-
+  public static function correctColor(value:Float):Float {
       if(value < 0)
           return 0;
       
