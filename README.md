@@ -12,7 +12,6 @@
 
 ## TODO
 
-1. Add min and max horizontal speed.
 1. Create more levels.
 1. Bring back changing colors.
 1. Light animation acceleration should be configurable with Bezier curve.

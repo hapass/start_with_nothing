@@ -13,10 +13,14 @@ class Config {
     public static var GAME_HEIGHT:Int = GAME_HEIGHT_TILES * TILE_SIZE;
 
     public static var GLOW_COLOR:Color = Color.WHITE;
-    public static var GLOW_SPEED:Int = 1;
+    public static var GLOW_MIN_SPEED:Float = 0.2;
+    public static var GLOW_MAX_SPEED:Float = 2;
+    public static var GLOW_ACCELERATION:Float = 0.1;
+
     public static var GLOW_LIGHT_MIN_RADIUS:Float = 20;
     public static var GLOW_LIGHT_MAX_RADIUS:Float = 220;
-    public static var GLOW_LIGHT_STARTING_SPEED:Float = 1;
+    public static var GLOW_LIGHT_MIN_SPEED:Float = 1;
+    public static var GLOW_LIGHT_MAX_SPEED:Float = 4;
     public static var GLOW_LIGHT_ACCELERATION:Float = 2;
     
     public static var EXIT_COLOR:Color = Color.YELLOW;

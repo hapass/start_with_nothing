@@ -33,20 +33,30 @@ class Glow {
     }
 
     private function calculateSpeed() {
-        this.currentSpeed.add(0, Config.GLOW_FALL_ACCELERATION);
+        this.currentSpeed.y += Config.GLOW_FALL_ACCELERATION;
 
         if (Key.RIGHT.isPressed()) {
-            this.currentSpeed.set(Config.GLOW_SPEED, this.currentSpeed.y);
+            if (this.currentSpeed.x.equals(0)) {
+                this.currentSpeed.x = Config.GLOW_MIN_SPEED;
+            } 
+            else {
+                this.currentSpeed.x = Math.min(this.currentSpeed.x + Config.GLOW_ACCELERATION, Config.GLOW_MAX_SPEED);
+            }
         }
         else if (Key.LEFT.isPressed()) {
-            this.currentSpeed.set(-Config.GLOW_SPEED, this.currentSpeed.y);
+            if (this.currentSpeed.x.equals(0)) {
+                this.currentSpeed.x = -Config.GLOW_MIN_SPEED;
+            } 
+            else {
+                this.currentSpeed.x = Math.max(this.currentSpeed.x - Config.GLOW_ACCELERATION, -Config.GLOW_MAX_SPEED);
+            }
         }
         else {
-            this.currentSpeed.set(0, this.currentSpeed.y);
+            this.currentSpeed.x = 0;
         }
 
         if (Key.SPACE.wasPressed() && jumpCount > 0) {
-            this.currentSpeed.set(this.currentSpeed.x, Config.GLOW_JUMP_ACCELERATION);
+            this.currentSpeed.y = Config.GLOW_JUMP_ACCELERATION;
             jumpCount--;
         }
     }
@@ -97,7 +107,7 @@ class Glow {
 
             if (left == Wall || right == Wall) {
                 this.position.y = getPosition(row + 1);
-                this.currentSpeed.set(this.currentSpeed.x, 0);
+                this.currentSpeed.y = 0;
             }
             else
                 this.position.y = y;
@@ -109,7 +119,7 @@ class Glow {
 
             if (left == Wall || right == Wall) {
                 this.position.y = getPosition(row - 1);
-                this.currentSpeed.set(this.currentSpeed.x, 0);
+                this.currentSpeed.y = 0;
                 this.jumpCount = Config.JUMP_COUNT;
             }
             else
@@ -137,13 +147,16 @@ class Glow {
 
     private function emitLight() {
         if (Key.SPACE.wasPressed()) {
-            this.lightSpeed = Config.GLOW_LIGHT_STARTING_SPEED;
+            this.lightSpeed = Config.GLOW_LIGHT_MIN_SPEED;
             this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
             this.isAnimatingLight = true;
         }
 
         if (this.isAnimatingLight) {
-            this.lightSpeed += Config.GLOW_LIGHT_ACCELERATION;
+            this.lightSpeed = Math.min(
+                this.lightSpeed + Config.GLOW_LIGHT_ACCELERATION,
+                Config.GLOW_LIGHT_MAX_SPEED
+            );
             this.light.radius += this.lightSpeed;
             
             if (this.light.radius > Config.GLOW_LIGHT_MAX_RADIUS) {

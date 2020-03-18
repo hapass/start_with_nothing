@@ -6,11 +6,6 @@ class Vec2 {
 
     public function new() {}
 
-    public function add(x:Float, y:Float):Void {
-        this.x += x;
-        this.y += y;
-    }
-
     public function set(x:Float, y:Float):Void {
         this.x = x;
         this.y = y;
