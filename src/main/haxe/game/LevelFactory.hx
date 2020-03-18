@@ -1,6 +1,5 @@
 package game;
 
-import engine.Color;
 #if macro
 import sys.io.File;
 import sys.FileSystem;
@@ -10,20 +9,24 @@ import game.Level;
 import engine.Debug;
 import engine.Quad;
 import engine.Vec2;
+import engine.Color;
 
 using StringTools;
 #end
 
 class LevelFactory {
     public static macro function createLevels() {
-        var fileNames = FileSystem.readDirectory('data');
+        var fileNames = FileSystem.readDirectory('levels');
+        fileNames.sort((first:String, second:String)->{
+            return Std.parseInt(first.split("_")[0]) - Std.parseInt(second.split("_")[0]);
+        });
         var levels = new Array<Level>();
         for (fileName in fileNames) {
             var glow;
             var shape = new Array<Quad>();
             var data = new Array<Array<Int>>();
 
-            var stringData = File.getContent('data/${fileName}').replace("\n", "").replace(" ", "");
+            var stringData = File.getContent('levels/${fileName}').replace("\n", "").replace(" ", "");
             for (row in 0...Config.GAME_HEIGHT_TILES) {
                 data.push(new Array<Int>());
                 for (column in 0...Config.GAME_WIDTH_TILES) {
@@ -56,48 +59,14 @@ class LevelFactory {
 
             levels.push(new Level(shape, data, glow));
         }
-        
 
-        /**
-            [
-                new Level(
-                    [
-                        new Quad(
-                            Config.WALL_COLOR, 
-                            Config.TILE_SIZE, 
-                            new Vec2(float, float)
-                        )
-                    ], 
-                    [
-                        [float, float],
-                        [float, float]
-                    ],
-                    new Glow(new Vec2(float, float))
-                ),
-                new Level(
-                    [
-                        new Quad(
-                            Config.WALL_COLOR, 
-                            Config.TILE_SIZE, 
-                            new Vec2(float, float)
-                        )
-                    ], 
-                    [
-                        [float, float],
-                        [float, float]
-                    ],
-                    new Glow(new Vec2(float, float))
-                )
-            ]
-        **/
         var levelExpressions:Array<Expr> = new Array<Expr>();
         for (level in levels) {
-
             var quadExpressions:Array<Expr> = new Array<Expr>();
             for (quad in level.shape) {
                 var quadPositionExpression:Expr = macro new engine.Vec2($v{quad.position.x}, $v{quad.position.y});
                 var colorExpression:Expr = 
-                    if(quad.color == Config.EXIT_COLOR) macro $p{["game", "Config", "EXIT_COLOR"]};
+                    if (quad.color == Config.EXIT_COLOR) macro $p{["game", "Config", "EXIT_COLOR"]};
                     else macro $p{["game", "Config", "WALL_COLOR"]};
                 quadExpressions.push(macro new engine.Quad($e{colorExpression}, $v{Config.TILE_SIZE}, $e{quadPositionExpression}));
             }
@@ -116,6 +85,4 @@ class LevelFactory {
 
         return macro $a{levelExpressions};
     }
-
-
 }

@@ -11,19 +11,24 @@ import js.Browser;
 enum GameResult {
     Win;
     Fail;
+    NextLevel;
 }
 
 class Main {
     static function main() {
-        launch();
+        var levels:Array<Level> = LevelFactory.createLevels();
+        launch(levels, 0);
     }
 
-    public static function launch() {
-        new Game().run().then(function(result:GameResult) {
+    public static function launch(levels:Array<Level>, currentLevel:Int) {
+        new Game().run(levels, currentLevel).then(function(result:GameResult) {
             switch(result) {
+                case GameResult.NextLevel:
+                    Browser.alert("Level complete!");
+                    launch(levels, ++currentLevel);
                 case GameResult.Fail:
                     Browser.alert("You've lost. Try again!");
-                    launch();
+                    launch(levels, currentLevel);
                 case GameResult.Win:
                     Browser.alert("You won!");
             }
@@ -36,20 +41,23 @@ class Game {
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
-    private var levels:Array<Level>;
     private var level:Level;
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
-    public function new() {
-        this.levels = LevelFactory.createLevels();
-    }
+    public function new() {}
 
-    public function run():Promise<GameResult> {
-        this.level = this.levels[0];
+    public function run(levels:Array<Level>, currentLevel:Int):Promise<GameResult> {
+        if (currentLevel == levels.length) {
+            this.gameResult.resolve(GameResult.Win);
+            return this.gameResult;
+        }
+
+        this.level = levels[currentLevel];
         this.renderer.add([this.level.glow.shape]);
         this.renderer.setLight(this.level.glow.light);
         this.renderer.add(this.level.shape);
         this.loop.start(this.update);
+
         return this.gameResult;
     }
 
@@ -68,7 +76,7 @@ class Game {
         }
 
         if (result == Exit) {
-            stop(GameResult.Win);
+            stop(GameResult.NextLevel);
             return;
         }
 
