@@ -1,6 +1,7 @@
 package game;
 
 import engine.Quad;
+import engine.Vec2;
 
 enum abstract TileType(Int) from Int to Int {
     var None = -1;
@@ -13,12 +14,12 @@ enum abstract TileType(Int) from Int to Int {
 class Level {
     public var shape:Array<Quad>;
     public var data:Array<Array<Int>>;
-    public var glow:Glow;
+    public var spawn:Vec2;
 
-    public function new(shape:Array<Quad>, data:Array<Array<Int>>, glow:Glow) {
+    public function new(shape:Array<Quad>, data:Array<Array<Int>>, spawn:Vec2) {
         this.shape = shape;
         this.data = data;
-        this.glow = glow;
+        this.spawn = spawn;
     }
 
     public function getTileType(row:Int, column:Int):TileType {

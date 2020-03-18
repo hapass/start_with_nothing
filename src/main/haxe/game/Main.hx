@@ -1,5 +1,6 @@
 package game;
 
+import engine.Vec2;
 import game.Level;
 import engine.Renderer;
 import engine.GameLoop;
@@ -42,6 +43,7 @@ class Game {
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
     private var level:Level;
+    private var glow:Glow;
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
 
     public function new() {}
@@ -53,8 +55,9 @@ class Game {
         }
 
         this.level = levels[currentLevel];
-        this.renderer.add([this.level.glow.shape]);
-        this.renderer.setLight(this.level.glow.light);
+        this.glow = new Glow(new Vec2(this.level.spawn.x, this.level.spawn.y));
+        this.renderer.add([this.glow.shape]);
+        this.renderer.setLight(this.glow.light);
         this.renderer.add(this.level.shape);
         this.loop.start(this.update);
 
@@ -63,11 +66,11 @@ class Game {
 
     public function update(timestamp:Float):Void {
         this.keyboard.update();
-        this.level.glow.update(this.level);
+        this.glow.update(this.level);
 
         var result:TileType = level.getTileType(
-            Math.floor((this.level.glow.position.y + Config.TILE_SIZE / 2) / Config.TILE_SIZE),
-            Math.floor((this.level.glow.position.x + Config.TILE_SIZE / 2) / Config.TILE_SIZE)
+            Math.floor((this.glow.position.y + Config.TILE_SIZE / 2) / Config.TILE_SIZE),
+            Math.floor((this.glow.position.x + Config.TILE_SIZE / 2) / Config.TILE_SIZE)
         );
 
         if (result == None) {

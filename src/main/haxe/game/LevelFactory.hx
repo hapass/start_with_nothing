@@ -22,7 +22,7 @@ class LevelFactory {
         });
         var levels = new Array<Level>();
         for (fileName in fileNames) {
-            var glow;
+            var spawn;
             var shape = new Array<Quad>();
             var data = new Array<Array<Int>>();
 
@@ -52,12 +52,12 @@ class LevelFactory {
                     }
     
                     if (data[rowIndex][columnIndex] == Spawn) {
-                        glow = new Glow(new Vec2(positionX, positionY));
+                        spawn = new Vec2(positionX, positionY);
                     }
                 }
             }
 
-            levels.push(new Level(shape, data, glow));
+            levels.push(new Level(shape, data, spawn));
         }
 
         var levelExpressions:Array<Expr> = new Array<Expr>();
@@ -77,10 +77,8 @@ class LevelFactory {
                 columnExpressions.push(macro $a{valueListExpression});
             }
 
-            var glowPositionExpression:Expr = macro new engine.Vec2($v{level.glow.position.x}, $v{level.glow.position.y});
-            var glowExpression:Expr = macro new game.Glow($e{glowPositionExpression});
-
-            levelExpressions.push(macro new game.Level($a{quadExpressions}, $a{columnExpressions}, $e{glowExpression}));
+            var glowPositionExpression:Expr = macro new engine.Vec2($v{level.spawn.x}, $v{level.spawn.y});
+            levelExpressions.push(macro new game.Level($a{quadExpressions}, $a{columnExpressions}, $e{glowPositionExpression}));
         }
 
         return macro $a{levelExpressions};
