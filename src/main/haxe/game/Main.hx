@@ -64,9 +64,9 @@ class Game {
         return this.gameResult;
     }
 
-    public function update(timestamp:Float):Void {
+    public function update(tickTime:Float):Void {
         this.keyboard.update();
-        this.glow.update(this.level);
+        this.glow.update(this.level, tickTime);
 
         var result:TileType = level.getTileType(
             Math.floor((this.glow.position.y + Config.TILE_SIZE / 2) / Config.TILE_SIZE),

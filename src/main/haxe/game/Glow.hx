@@ -1,5 +1,7 @@
 package game;
 
+import engine.Debug;
+import js.html.TableRowElement;
 import engine.Color;
 import engine.Key;
 import engine.Light;
@@ -17,19 +19,22 @@ class Glow {
 
     public var light:Light = new Light();
     public var isAnimatingLight:Bool = false;
-    public var lightSpeed:Float = 0.0;
+    public var lightAnimationTick:Int = 0;
+    public var bezierAnimationCurve:Bezier;
 
     public var jumpCount:Int = 0;
+
 
     public function new(position:Vec2) {
         this.position = position;
         this.light.position.x = getCenter(this.position.x);
         this.light.position.y = getCenter(this.position.y);
         this.shape = new Quad(Config.GLOW_COLOR, Config.TILE_SIZE, this.position);
+        this.bezierAnimationCurve = new Bezier();
     }
 
-    public function update(level:Level) {
-        emitLight();
+    public function update(level:Level, tickTime:Float) {
+        emitLight(tickTime);
         calculateSpeed();
         move(level);
     }
@@ -153,27 +158,27 @@ class Glow {
         return offset + Config.TILE_SIZE - 1;
     }
 
-    private function emitLight() {
+    private function emitLight(tickTime:Float) {
         if (Key.SPACE.wasPressed()) {
             this.light.color.r = Color.correctColor(Math.random());
             this.light.color.g = Color.correctColor(Math.random());
             this.light.color.b = Color.correctColor(Math.random());
-            this.lightSpeed = Config.GLOW_LIGHT_MIN_SPEED;
-            this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS;
+            this.lightAnimationTick = 0;
             this.isAnimatingLight = true;
         }
 
         if (this.isAnimatingLight) {
-            this.lightSpeed = Math.min(
-                this.lightSpeed + Config.GLOW_LIGHT_ACCELERATION,
-                Config.GLOW_LIGHT_MAX_SPEED
-            );
-            this.light.radius += this.lightSpeed;
-            
-            if (this.light.radius > Config.GLOW_LIGHT_MAX_RADIUS) {
+            if (this.lightAnimationTick == this.bezierAnimationCurve.bezier.length) {
                 this.isAnimatingLight = false;
                 this.light.radius = 0.0;
+            } 
+            else {
+                this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS + (Config.GLOW_LIGHT_MAX_RADIUS - Config.GLOW_LIGHT_MIN_RADIUS) * this.bezierAnimationCurve.bezier[this.lightAnimationTick];
             }
+
+            Debug.log('Light radius: ${this.light.radius}');
+
+            this.lightAnimationTick++;
         }
     }
 }
