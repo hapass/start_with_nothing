@@ -1,7 +1,5 @@
 package game;
 
-import engine.Debug;
-import js.html.TableRowElement;
 import engine.Color;
 import engine.Key;
 import engine.Light;
@@ -18,19 +16,15 @@ class Glow {
     public var currentSpeed:Vec2 = new Vec2();
 
     public var light:Light = new Light();
-    public var isAnimatingLight:Bool = false;
-    public var lightAnimationTick:Int = 0;
-    public var bezierAnimationCurve:Bezier;
+    public var lightAnimation:LightAnimation = new LightAnimation();
 
     public var jumpCount:Int = 0;
-
 
     public function new(position:Vec2) {
         this.position = position;
         this.light.position.x = getCenter(this.position.x);
         this.light.position.y = getCenter(this.position.y);
         this.shape = new Quad(Config.GLOW_COLOR, Config.TILE_SIZE, this.position);
-        this.bezierAnimationCurve = new Bezier();
     }
 
     public function update(level:Level, tickTime:Float) {
@@ -163,22 +157,9 @@ class Glow {
             this.light.color.r = Color.correctColor(Math.random());
             this.light.color.g = Color.correctColor(Math.random());
             this.light.color.b = Color.correctColor(Math.random());
-            this.lightAnimationTick = 0;
-            this.isAnimatingLight = true;
+            this.lightAnimation.play();
         }
 
-        if (this.isAnimatingLight) {
-            if (this.lightAnimationTick == this.bezierAnimationCurve.bezier.length) {
-                this.isAnimatingLight = false;
-                this.light.radius = 0.0;
-            } 
-            else {
-                this.light.radius = Config.GLOW_LIGHT_MIN_RADIUS + (Config.GLOW_LIGHT_MAX_RADIUS - Config.GLOW_LIGHT_MIN_RADIUS) * this.bezierAnimationCurve.bezier[this.lightAnimationTick];
-            }
-
-            Debug.log('Light radius: ${this.light.radius}');
-
-            this.lightAnimationTick++;
-        }
+        this.light.radius = this.lightAnimation.updateRadius();
     }
 }
