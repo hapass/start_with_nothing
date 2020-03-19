@@ -12,17 +12,17 @@
 
 ## TODO
 
-1. Fix window resize.
 1. Add simple jump sound with web audio.
 1. Add other sound effects with web audio.
 1. Add particles.
 1. Render text.
 1. Do proper win-lose screens.
 1. Do not recreate game on level switch.
-1. Fix letterbox for portrait mode.
 1. It should be easier to slide in into opening in the wall.
 1. Do example tutorials.
-1. Play testing.
+1. Play testing. Design levels.
+1. Fix window resize.
+1. Fix letterbox for portrait mode.
 1. Optimize size of the app. Bezier curve calculation.
 1. Optimize size of the app. Store levels differently.
 1. Optimize allocations - target no GC.

@@ -154,9 +154,9 @@ class Glow {
 
     private function emitLight(tickTime:Float) {
         if (Key.SPACE.wasPressed()) {
-            this.light.color.r = Color.correctColor(Math.random());
-            this.light.color.g = Color.correctColor(Math.random());
-            this.light.color.b = Color.correctColor(Math.random());
+            this.light.color.r = Math.random();
+            this.light.color.g = Math.random();
+            this.light.color.b = Math.random();
             this.lightAnimation.play();
         }
 
