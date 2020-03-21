@@ -92,6 +92,7 @@ class Game {
         this.loop.stop();
         this.renderer.dispose();
         this.keyboard.dispose();
+        this.audio.dispose();
         this.gameResult.resolve(result);
     }
 }

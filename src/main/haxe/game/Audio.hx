@@ -37,4 +37,13 @@ class Audio {
             this.isPlaying = false;
         }
     }
+
+    public function dispose() {
+        if (this.isPlaying) {
+            this.oscillator.disconnect(this.context.destination);
+        }
+        this.isPlaying = false;
+        this.oscillator = null;
+        this.context.close();
+    }
 }
