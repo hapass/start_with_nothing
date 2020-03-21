@@ -12,7 +12,6 @@
 
 ## TODO
 
-1. Add simple jump sound with web audio.
 1. Add other sound effects with web audio.
 1. Add particles.
 1. Render text.
