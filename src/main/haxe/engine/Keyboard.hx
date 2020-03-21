@@ -6,6 +6,7 @@ import js.html.KeyboardEvent;
 class Keyboard {
     private var trackedKeys:Map<Int, Key> = new Map<Int, Key>();
     private var trackedKeyCodes:Array<Int> = new Array<Int>();
+    public var onceOnUserInput:()->Void = null;
 
     public function new (keys:Array<Key>) {
         Browser.window.addEventListener("keydown", onKeyDown);
@@ -19,6 +20,11 @@ class Keyboard {
 
     private function onKeyDown(event:KeyboardEvent) {
         var key = trackedKeys[event.keyCode];
+
+        if (this.onceOnUserInput != null) {
+            this.onceOnUserInput();
+            this.onceOnUserInput = null;
+        }
 
         if (key == null) {
             Debug.log('Key is not tracked: ${key.code}');
@@ -47,6 +53,7 @@ class Keyboard {
     }
 
     public function dispose() {
+        this.onceOnUserInput = null;
         Browser.window.removeEventListener("keydown", onKeyDown);
         Browser.window.removeEventListener("keyup", onKeyUp);
         for (code in this.trackedKeyCodes) {

@@ -1,7 +1,7 @@
 package game;
 
-import engine.Vec2;
 import game.Level;
+import engine.Vec2;
 import engine.Renderer;
 import engine.GameLoop;
 import engine.Keyboard;
@@ -38,8 +38,9 @@ class Main {
 }
 
 class Game {
-    private var loop:GameLoop = new GameLoop();
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
+    private var audio:Audio = new Audio();
+    private var loop:GameLoop = new GameLoop();
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
     private var level:Level;
@@ -49,13 +50,14 @@ class Game {
     public function new() {}
 
     public function run(levels:Array<Level>, currentLevel:Int):Promise<GameResult> {
+        keyboard.onceOnUserInput = audio.initialize;
         if (currentLevel == levels.length) {
             this.gameResult.resolve(GameResult.Win);
             return this.gameResult;
         }
 
         this.level = levels[currentLevel];
-        this.glow = new Glow(new Vec2(this.level.spawn.x, this.level.spawn.y));
+        this.glow = new Glow(new Vec2(this.level.spawn.x, this.level.spawn.y), audio);
         this.renderer.add([this.glow.shape]);
         this.renderer.setLight(this.glow.light);
         this.renderer.add(this.level.shape);

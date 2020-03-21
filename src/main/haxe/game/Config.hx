@@ -19,6 +19,8 @@ class Config {
 
     public static var GLOW_LIGHT_MIN_RADIUS:Float = 20;
     public static var GLOW_LIGHT_MAX_RADIUS:Float = 220;
+    public static var GLOW_LIGHT_MIN_FREQUENCY = 220;
+    public static var GLOW_LIGHT_MAX_FREQUENCY = 440;
     public static var GLOW_LIGHT_TIME:Float = 0.5;
     public static var GLOW_LIGHT_P0:Float = 0;
     public static var GLOW_LIGHT_P1:Float = 1;

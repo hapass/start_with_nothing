@@ -16,14 +16,15 @@ class Glow {
     public var currentSpeed:Vec2 = new Vec2();
 
     public var light:Light = new Light();
-    public var lightAnimation:LightAnimation = new LightAnimation();
+    public var lightAnimation:LightAnimation;
 
     public var jumpCount:Int = 0;
 
-    public function new(position:Vec2) {
+    public function new(position:Vec2, audio:Audio) {
         this.position = position;
         this.light.position.x = getCenter(this.position.x);
         this.light.position.y = getCenter(this.position.y);
+        this.lightAnimation = new LightAnimation(audio);
         this.shape = new Quad(Config.GLOW_COLOR, Config.TILE_SIZE, this.position);
     }
 

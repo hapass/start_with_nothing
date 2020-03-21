@@ -1,31 +1,48 @@
 package game;
 
+#if macro
 import haxe.macro.Expr;
+#end
 
 class LightAnimation {
     public var isPlaying:Bool = false;
     public var currentFrame:Int = 0;
     public var frames:Array<Float>;
+    #if !macro
+    public var audio:Audio;
+    #end
 
-    public function new() {
+    public function new(#if !macro audio:Audio #end) {
         this.frames = getFrames();
+        #if !macro
+        this.audio = audio;
+        #end
     }
 
     public function play() {
         this.currentFrame = 0;
         this.isPlaying = true;
+        #if !macro
+        this.audio.play();
+        #end
     }
 
     public function updateRadius():Float {
         if (this.currentFrame == this.frames.length) {
             this.currentFrame = 0;
             this.isPlaying = false;
+            #if !macro
+            this.audio.stop();
+            #end
         } 
 
         if (this.isPlaying) {
             var minRadius = Config.GLOW_LIGHT_MIN_RADIUS;
             var radiusDistance = Config.GLOW_LIGHT_MAX_RADIUS - Config.GLOW_LIGHT_MIN_RADIUS;
             var currentRadius = minRadius + radiusDistance * this.frames[this.currentFrame];
+            #if !macro
+            this.audio.setValue(Config.GLOW_LIGHT_MIN_FREQUENCY + (Config.GLOW_LIGHT_MAX_FREQUENCY - Config.GLOW_LIGHT_MIN_FREQUENCY) * this.frames[this.currentFrame]);
+            #end
             this.currentFrame++;
             return currentRadius;
         }
