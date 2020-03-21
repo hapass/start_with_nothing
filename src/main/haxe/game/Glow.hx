@@ -63,9 +63,9 @@ class Glow {
             this.currentSpeed.x = 0;
         }
 
-        if (Key.SPACE.wasPressed() && jumpCount > 0) {
+        if (Key.SPACE.wasPressed() && this.jumpCount > 0) {
             this.currentSpeed.y = Config.GLOW_JUMP_ACCELERATION;
-            jumpCount--;
+            this.jumpCount--;
         }
     }
 
@@ -154,7 +154,7 @@ class Glow {
     }
 
     private function emitLight(tickTime:Float) {
-        if (Key.SPACE.wasPressed()) {
+        if (Key.SPACE.wasPressed() && this.jumpCount > 0) {
             this.light.color.r = Math.random();
             this.light.color.g = Math.random();
             this.light.color.b = Math.random();
