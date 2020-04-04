@@ -32,7 +32,7 @@ class Audio {
     public var vca_env_a:Vec2 = new Vec2();
     public var vca_env_d:Vec2 = new Vec2();
     public var vca_env_s:Vec2 = new Vec2();
-    public var vca_is_lfo:Bool = true;
+    public var vca_is_lfo:Bool = false;
 
     public function new() {}
 
@@ -43,7 +43,7 @@ class Audio {
         this.vcf.type = BiquadFilterType.LOWPASS;
         this.vcf.frequency.value = 400;
         this.vcf_lfo = this.context.createOscillator();
-        this.vcf_lfo.frequency.value = 20;
+        this.vcf_lfo.frequency.value = 40;
         this.vcf_lfo_amp = this.context.createGain();
         this.vcf_lfo_amp.gain.value = 400;
         this.vcf_lfo.start();
@@ -51,7 +51,7 @@ class Audio {
         this.vca = this.context.createGain();
         this.vca.gain.value = 1;
         this.vca_lfo = this.context.createOscillator();
-        this.vca_lfo.frequency.value = 20;
+        this.vca_lfo.frequency.value = 40;
         this.vca_lfo_amp = this.context.createGain();
         this.vca_lfo_amp.gain.value = 1;
         this.vca_lfo.start();
@@ -72,7 +72,7 @@ class Audio {
         }
         this.osc_1 = this.context.createOscillator();
         this.osc_1.type = OscillatorType.SAWTOOTH;
-        this.osc_1.frequency.value = 220;
+        this.osc_1.frequency.value = 120;
         this.osc_1.connect(this.vcf);
 
         if (this.osc_2 != null) {
@@ -81,7 +81,7 @@ class Audio {
         }
         this.osc_2 = this.context.createOscillator();
         this.osc_2.type = OscillatorType.SAWTOOTH;
-        this.osc_2.frequency.value = 221;
+        this.osc_2.frequency.value = 121;
         this.osc_2.connect(this.vcf);
 
         this.vcf_lfo_amp.connect(this.vcf.frequency);
