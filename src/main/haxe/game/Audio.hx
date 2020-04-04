@@ -24,7 +24,7 @@ class Audio {
     public var vcf_env_a:Vec2 = new Vec2();
     public var vcf_env_d:Vec2 = new Vec2();
     public var vcf_env_s:Vec2 = new Vec2();
-    public var vcf_is_lfo:Bool = false;
+    public var vcf_is_lfo:Bool = true;
 
     public var vca:GainNode;
     public var vca_lfo:OscillatorNode;
@@ -32,7 +32,7 @@ class Audio {
     public var vca_env_a:Vec2 = new Vec2();
     public var vca_env_d:Vec2 = new Vec2();
     public var vca_env_s:Vec2 = new Vec2();
-    public var vca_is_lfo:Bool = false;
+    public var vca_is_lfo:Bool = true;
 
     public function new() {}
 
@@ -43,17 +43,17 @@ class Audio {
         this.vcf.type = BiquadFilterType.LOWPASS;
         this.vcf.frequency.value = 400;
         this.vcf_lfo = this.context.createOscillator();
-        this.vcf_lfo.frequency.value = 2;
+        this.vcf_lfo.frequency.value = 20;
         this.vcf_lfo_amp = this.context.createGain();
-        this.vcf_lfo_amp.gain.value = 20;
+        this.vcf_lfo_amp.gain.value = 400;
         this.vcf_lfo.start();
 
         this.vca = this.context.createGain();
         this.vca.gain.value = 1;
         this.vca_lfo = this.context.createOscillator();
-        this.vca_lfo.frequency.value = 2;
+        this.vca_lfo.frequency.value = 20;
         this.vca_lfo_amp = this.context.createGain();
-        this.vca_lfo_amp.gain.value = 20;
+        this.vca_lfo_amp.gain.value = 1;
         this.vca_lfo.start();
 
         this.vcf_lfo.connect(this.vcf_lfo_amp);
@@ -96,7 +96,7 @@ class Audio {
             this.vca_lfo_amp.disconnect(this.vca.gain);
         }
 
-        var time:Float = 2;
+        var time:Float = 0.5;
 
         this.osc_1_is_playing = true;
         this.osc_1.start();
