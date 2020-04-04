@@ -31,18 +31,12 @@ class LightAnimation {
         if (this.currentFrame == this.frames.length) {
             this.currentFrame = 0;
             this.isPlaying = false;
-            #if !macro
-            this.audio.stop();
-            #end
         } 
 
         if (this.isPlaying) {
             var minRadius = Config.GLOW_LIGHT_MIN_RADIUS;
             var radiusDistance = Config.GLOW_LIGHT_MAX_RADIUS - Config.GLOW_LIGHT_MIN_RADIUS;
             var currentRadius = minRadius + radiusDistance * this.frames[this.currentFrame];
-            #if !macro
-            this.audio.setValue(Config.GLOW_LIGHT_MIN_FREQUENCY + (Config.GLOW_LIGHT_MAX_FREQUENCY - Config.GLOW_LIGHT_MIN_FREQUENCY) * this.frames[this.currentFrame]);
-            #end
             this.currentFrame++;
             return currentRadius;
         }
