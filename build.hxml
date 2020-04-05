@@ -1,18 +1,20 @@
--cp src/main/haxe
+-cp src/haxe
+-dce full
+
+--each
+
+-resource src/glsl/engine/FragmentShader.glsl@FragmentShader.glsl
+-resource src/glsl/engine/VertexShader.glsl@VertexShader.glsl
 
 -main game.Main
-
--resource src/main/glsl/engine/FragmentShader.glsl@FragmentShader.glsl
--resource src/main/glsl/engine/VertexShader.glsl@VertexShader.glsl
-
--dce full
 -js bin/glow.js
 
 --next
 
--cp src/build/haxe
-
 -main replace.Main
-
--dce full
 -neko replace.n
+
+--next
+
+-main synth.Main
+-js bin/synth.js

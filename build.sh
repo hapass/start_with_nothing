@@ -6,7 +6,8 @@ fi
 
 mkdir -p bin
 rm -rf bin/*
-cp layout/index.html bin/index.html
+cp src/html/game/index.html bin/index.html
+cp src/html/synth/synth.html bin/synth.html
 
 if [ "$configuration" == "debug" ]; then
     haxe -debug build.hxml
