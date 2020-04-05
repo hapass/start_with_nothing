@@ -12,6 +12,8 @@ import js.html.audio.AudioContext;
 class Audio {
     private var context:AudioContext;
 
+    public var isInitialized:Bool = false;
+
     public var osc_1:OscillatorNode;
     public var osc_1_is_playing:Bool = false;
 
@@ -33,6 +35,8 @@ class Audio {
     public var vca_env_d:Vec2 = new Vec2();
     public var vca_env_s:Vec2 = new Vec2();
     public var vca_is_lfo:Bool = false;
+
+    public var time:Float = 0.5;
 
     public function new() {}
 
@@ -59,6 +63,8 @@ class Audio {
         this.vcf_lfo.connect(this.vcf_lfo_amp);
         this.vca_lfo.connect(this.vca_lfo_amp);
         this.vcf.connect(this.vca).connect(context.destination);
+
+        this.isInitialized = true;
     }
 
     public function play() {
@@ -96,18 +102,16 @@ class Audio {
             this.vca_lfo_amp.disconnect(this.vca.gain);
         }
 
-        var time:Float = 0.5;
-
         this.osc_1_is_playing = true;
         this.osc_1.start();
-        this.osc_1.stop(context.currentTime + time);
+        this.osc_1.stop(this.context.currentTime + this.time);
         this.osc_1.onended = ()->{
             this.osc_1_is_playing = false;
         };
 
         this.osc_2_is_playing = true;
         this.osc_2.start();
-        this.osc_2.stop(context.currentTime + time);
+        this.osc_2.stop(this.context.currentTime + this.time);
         this.osc_2.onended = ()->{
             this.osc_2_is_playing = false;
         };
