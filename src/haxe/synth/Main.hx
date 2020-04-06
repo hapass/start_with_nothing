@@ -1,5 +1,6 @@
 package synth;
 
+import js.html.SelectElement;
 import engine.Debug;
 import engine.Audio;
 import js.html.Element;
@@ -13,6 +14,8 @@ class Main {
         var time = get("time", InputElement);
         var osc1Frequency = get("osc_1_frequency", InputElement);
         var osc2Frequency = get("osc_2_frequency", InputElement);
+        var osc1Wave = get("osc_1_wave", SelectElement);
+        var osc2Wave = get("osc_2_wave", SelectElement);
 
         var audio:Audio = null;
         button.addEventListener("click", (event)->{
@@ -27,10 +30,10 @@ class Main {
             parameters.name = "test";
             parameters.time = time.valueAsNumber;
             parameters.oscillatorOne.frequency = osc1Frequency.valueAsNumber;
-            parameters.oscillatorOne.type = "sine";
+            parameters.oscillatorOne.type = osc1Wave.value;
 
             parameters.oscillatorTwo.frequency = osc2Frequency.valueAsNumber;
-            parameters.oscillatorTwo.type = "sine";
+            parameters.oscillatorTwo.type = osc2Wave.value;
 
             parameters.amplifier.modulation = ModulationType.Envelope;
             parameters.amplifier.sustain = 0.5;
