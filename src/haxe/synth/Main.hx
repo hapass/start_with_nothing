@@ -30,10 +30,10 @@ class Main {
             parameters.name = "test";
             parameters.time = time.valueAsNumber;
             parameters.oscillatorOne.frequency = osc1Frequency.valueAsNumber;
-            parameters.oscillatorOne.type = osc1Wave.value;
+            parameters.oscillatorOne.wave = osc1Wave.value;
 
             parameters.oscillatorTwo.frequency = osc2Frequency.valueAsNumber;
-            parameters.oscillatorTwo.type = osc2Wave.value;
+            parameters.oscillatorTwo.wave = osc2Wave.value;
 
             parameters.amplifier.modulation = ModulationType.Envelope;
             parameters.amplifier.sustain = 0.5;
@@ -45,6 +45,7 @@ class Main {
             parameters.filter.modulation = ModulationType.Lfo;
             parameters.filter.amplitude = 400;
             parameters.filter.frequency = 4;
+            parameters.filter.wave = "triangle";
 
             audio.playSound(parameters);
         });

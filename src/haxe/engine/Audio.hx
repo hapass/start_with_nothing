@@ -29,6 +29,7 @@ class ModulationParameters {
     //lfo
     public var amplitude:Float = 0.0;
     public var frequency:Float = 0.0;
+    public var wave:String;
 
     public function new() {}
 }
@@ -36,7 +37,7 @@ class ModulationParameters {
 class OscillatorParameters {
     public var frequency:Float = 0.0;
     public var level:Float = 0.0;
-    public var type:String;
+    public var wave:String;
 
     public function new() {}
 }
@@ -80,6 +81,13 @@ class Filter {
                 this.filter.frequency.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.filter.frequency.linearRampToValueAtTime(0, releaseTime);
             case Lfo:
+                this.oscillator.type = switch (this.parameters.wave) {
+                    case "sine": OscillatorType.SINE;
+                    case "square": OscillatorType.SQUARE;
+                    case "sawtooth": OscillatorType.SAWTOOTH;
+                    case "triangle": OscillatorType.TRIANGLE;
+                    default: OscillatorType.SINE;
+                };
                 this.oscillator.frequency.value = this.parameters.frequency;
                 this.oscillatorAmplifier.gain.value = this.parameters.amplitude;
                 this.oscillator.connect(this.oscillatorAmplifier).connect(this.filter.frequency);
@@ -119,6 +127,13 @@ class Amplifier {
                 this.amplifier.gain.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.amplifier.gain.linearRampToValueAtTime(0, releaseTime);
             case Lfo:
+                this.oscillator.type = switch (this.parameters.wave) {
+                    case "sine": OscillatorType.SINE;
+                    case "square": OscillatorType.SQUARE;
+                    case "sawtooth": OscillatorType.SAWTOOTH;
+                    case "triangle": OscillatorType.TRIANGLE;
+                    default: OscillatorType.SINE;
+                };
                 this.oscillator.frequency.value = this.parameters.frequency;
                 this.oscillatorAmplifier.gain.value = this.parameters.amplitude;
                 this.oscillator.connect(this.oscillatorAmplifier).connect(this.amplifier.gain);
@@ -142,7 +157,7 @@ class Oscillator {
         this.context = context;
         this.parameters = parameters;
         this.oscillator = this.context.createOscillator();
-        this.oscillator.type = switch (this.parameters.type) {
+        this.oscillator.type = switch (this.parameters.wave) {
             case "sine": OscillatorType.SINE;
             case "square": OscillatorType.SQUARE;
             case "sawtooth": OscillatorType.SAWTOOTH;
