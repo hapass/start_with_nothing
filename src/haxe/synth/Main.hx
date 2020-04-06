@@ -1,25 +1,18 @@
 package synth;
 
-import js.html.audio.AudioNode;
-import js.html.InputElement;
 import engine.Debug;
 import engine.Audio;
+import js.html.Element;
+import js.html.InputElement;
 import js.html.ButtonElement;
 import js.Browser;
 
 class Main {
     static function main() {
-        var button:ButtonElement = Std.downcast(Browser.document.getElementById("play"), ButtonElement);
-        Debug.assert(button != null, "Play button doesn't exist.");
-
-        var time:InputElement = Std.downcast(Browser.document.getElementById("time"), InputElement);
-        Debug.assert(time != null, "Time input doesn't exist.");
-
-        var osc1Frequency:InputElement = Std.downcast(Browser.document.getElementById("osc_1_frequency"), InputElement);
-        Debug.assert(time != null, "Oscillator 1 frequency input doesn't exist.");
-
-        var osc2Frequency:InputElement = Std.downcast(Browser.document.getElementById("osc_2_frequency"), InputElement);
-        Debug.assert(time != null, "Oscillator 2 frequency input doesn't exist.");
+        var button = get("play", ButtonElement);
+        var time = get("time", InputElement);
+        var osc1Frequency = get("osc_1_frequency", InputElement);
+        var osc2Frequency = get("osc_2_frequency", InputElement);
 
         var audio:Audio = null;
         button.addEventListener("click", (event)->{
@@ -52,5 +45,11 @@ class Main {
 
             audio.playSound(parameters);
         });
+    }
+
+    public static function get<T:Element>(name:String, cls:Class<T>):T {
+        var result:T = Std.downcast(Browser.document.getElementById(name), cls);
+        Debug.assert(result != null, 'Cannot find ${name}');
+        return result;
     }
 }
