@@ -5,6 +5,7 @@ import engine.Key;
 import engine.Light;
 import engine.Vec2;
 import engine.Quad;
+import engine.Audio;
 import game.Level;
 
 using engine.FloatExtensions;

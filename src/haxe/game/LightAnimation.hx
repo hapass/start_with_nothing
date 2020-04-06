@@ -4,6 +4,10 @@ package game;
 import haxe.macro.Expr;
 #end
 
+#if !macro
+import engine.Audio;
+#end
+
 class LightAnimation {
     public var isPlaying:Bool = false;
     public var currentFrame:Int = 0;
@@ -23,7 +27,7 @@ class LightAnimation {
         this.currentFrame = 0;
         this.isPlaying = true;
         #if !macro
-        this.audio.play();
+        this.audio.playSound(new SoundParameters());
         #end
     }
 

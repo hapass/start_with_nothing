@@ -5,6 +5,7 @@ import engine.Vec2;
 import engine.Renderer;
 import engine.GameLoop;
 import engine.Keyboard;
+import engine.Audio;
 import engine.Key;
 import engine.Promise;
 import js.Browser;
@@ -50,7 +51,6 @@ class Game {
     public function new() {}
 
     public function run(levels:Array<Level>, currentLevel:Int):Promise<GameResult> {
-        keyboard.onceOnUserInput = audio.initialize;
         if (currentLevel == levels.length) {
             this.gameResult.resolve(GameResult.Win);
             return this.gameResult;
@@ -86,10 +86,12 @@ class Game {
         }
 
         this.renderer.draw();
+        this.audio.update();
     }
 
     private function stop(result:GameResult) {
         this.loop.stop();
+        this.audio.dispose();
         this.renderer.dispose();
         this.keyboard.dispose();
         this.gameResult.resolve(result);
