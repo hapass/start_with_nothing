@@ -27,10 +27,16 @@
 <body>
   <div class="column">
     <div class="row">
+      <!--Oscillators-->
       <div class="column">
         <div class="row">
           <div class="column">
-            <div class="element">Oscillator 1</div>
+            <div class="element">Oscillators</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="element">First</div>
             <div class="element">
               <input type="range" id="osc_1_frequency" min="0" max="600">
             </div>
@@ -46,12 +52,92 @@
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">Oscillator 2</div>
+            <div class="element">Second</div>
             <div class="element">
               <input type="range" id="osc_2_frequency" min="0" max="600">
             </div>
             <div class="element">
               <select id="osc_2_wave">
+                <option value="sine">sine</option>
+                <option value="square">square</option>
+                <option value="sawtooth">sawtooth</option>
+                <option value="triangle">triangle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Filter-->
+      <div class="column">
+        <div class="row">
+          <div class="column">
+            <div class="element">Filter</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="element">Envelope</div>
+            <div class="element">
+              <input type="range" min="0" max="600">
+            </div>
+            <div class="element">
+              <select>
+                <option value="sine">sine</option>
+                <option value="square">square</option>
+                <option value="sawtooth">sawtooth</option>
+                <option value="triangle">triangle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="element">LFO</div>
+            <div class="element">
+              <input type="range" min="0" max="600">
+            </div>
+            <div class="element">
+              <select>
+                <option value="sine">sine</option>
+                <option value="square">square</option>
+                <option value="sawtooth">sawtooth</option>
+                <option value="triangle">triangle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Amplifier-->
+      <div class="column">
+        <div class="row">
+          <div class="column">
+            <div class="element">Amplifier</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="element">Envelope</div>
+            <div class="element">
+              <input type="range"min="0" max="600">
+            </div>
+            <div class="element">
+              <select>
+                <option value="sine">sine</option>
+                <option value="square">square</option>
+                <option value="sawtooth">sawtooth</option>
+                <option value="triangle">triangle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="element">LFO</div>
+            <div class="element">
+              <input type="range" min="0" max="600">
+            </div>
+            <div class="element">
+              <select>
                 <option value="sine">sine</option>
                 <option value="square">square</option>
                 <option value="sawtooth">sawtooth</option>
