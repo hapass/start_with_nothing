@@ -5,22 +5,19 @@
   .row {
     flex-direction: row;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     display: flex;
+    margin: 3px;
+    padding: 3px;
   }
 
   .column {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: start;
+    align-items: flex-start;
     display: flex;
-    margin: 5px;
-    padding: 5px;
-  }
-
-  .element {
-    margin: 5px;
-    padding: 5px;
+    margin: 3px;
+    padding: 3px;
   }
 </style>
 </head>
@@ -36,33 +33,49 @@
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">First</div>
-            <div class="element">
-              <input type="range" id="osc_1_frequency" min="0" max="600">
+            <div class="row">First</div>
+            <div class="row">
+              <div class="column"><label for="osc_1_frequency">Frequency:</label></div>
+              <div class="column"><input type="range" id="osc_1_frequency" min="0" max="600"></div>
             </div>
-            <div class="element">
-              <select id="osc_1_wave">
-                <option value="sine">sine</option>
-                <option value="square">square</option>
-                <option value="sawtooth">sawtooth</option>
-                <option value="triangle">triangle</option>
-              </select>
+            <div class="row">
+              <div class="column"><label for="osc_1_level">Level:</label></div>
+              <div class="column"><input type="range" id="osc_1_level" min="0" max="1" step="0.01"></div>
+            </div>
+            <div class="row">
+              <div class="column"><label for="osc_1_wave">Wave:</label></div>
+              <div class="column">
+                <select id="osc_1_wave">
+                  <option value="sine">sine</option>
+                  <option value="square">square</option>
+                  <option value="sawtooth">sawtooth</option>
+                  <option value="triangle">triangle</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">Second</div>
-            <div class="element">
-              <input type="range" id="osc_2_frequency" min="0" max="600">
+            <div class="row">Second</div>
+            <div class="row">
+              <div class="column"><label for="osc_2_frequency">Frequency:</label></div>
+              <div class="column"><input type="range" id="osc_2_frequency" min="0" max="600"></div>
             </div>
-            <div class="element">
-              <select id="osc_2_wave">
-                <option value="sine">sine</option>
-                <option value="square">square</option>
-                <option value="sawtooth">sawtooth</option>
-                <option value="triangle">triangle</option>
-              </select>
+            <div class="row">
+              <div class="column"><label for="osc_2_level">Level:</label></div>
+              <div class="column"><input type="range" id="osc_2_level" min="0" max="1" step="0.01"></div>
+            </div>
+            <div class="row">
+              <div class="column"><label for="osc_2_wave">Wave:</label></div>
+              <div class="column">
+                <select id="osc_2_wave">
+                  <option value="sine">sine</option>
+                  <option value="square">square</option>
+                  <option value="sawtooth">sawtooth</option>
+                  <option value="triangle">triangle</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -71,16 +84,16 @@
       <div class="column">
         <div class="row">
           <div class="column">
-            <div class="element">Filter</div>
+            <div class="row">Filter</div>
           </div>
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">Envelope</div>
-            <div class="element">
+            <div class="row">Envelope</div>
+            <div class="row">
               <input type="range" min="0" max="600">
             </div>
-            <div class="element">
+            <div class="row">
               <select>
                 <option value="sine">sine</option>
                 <option value="square">square</option>
@@ -92,11 +105,11 @@
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">LFO</div>
-            <div class="element">
+            <div class="row">LFO</div>
+            <div class="row">
               <input type="range" min="0" max="600">
             </div>
-            <div class="element">
+            <div class="row">
               <select>
                 <option value="sine">sine</option>
                 <option value="square">square</option>
@@ -111,16 +124,16 @@
       <div class="column">
         <div class="row">
           <div class="column">
-            <div class="element">Amplifier</div>
+            <div class="row">Amplifier</div>
           </div>
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">Envelope</div>
-            <div class="element">
+            <div class="row">Envelope</div>
+            <div class="row">
               <input type="range"min="0" max="600">
             </div>
-            <div class="element">
+            <div class="row">
               <select>
                 <option value="sine">sine</option>
                 <option value="square">square</option>
@@ -132,11 +145,11 @@
         </div>
         <div class="row">
           <div class="column">
-            <div class="element">LFO</div>
-            <div class="element">
+            <div class="row">LFO</div>
+            <div class="row">
               <input type="range" min="0" max="600">
             </div>
-            <div class="element">
+            <div class="row">
               <select>
                 <option value="sine">sine</option>
                 <option value="square">square</option>
@@ -150,15 +163,13 @@
     </div>
     <div class="row">
       <div class="column">
-        <div class="element">
-          <label for="time">Time:</label>
-          <input type="number" id="time">
-        </div>
+        <label for="time">Time:</label>
       </div>
       <div class="column">
-        <div class="element">
-          <button id="play">Play</button>
-        </div>
+        <input type="number" id="time" step="0.1" min="0" max="20">
+      </div>
+      <div class="column">
+        <button id="play">Play</button>
       </div>
     </div>
   </div>
