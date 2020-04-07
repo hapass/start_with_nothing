@@ -15,7 +15,7 @@ enum ModulationType {
 }
 
 class ModulationParameters {
-    public var modulation:ModulationType;
+    public var modulation:ModulationType = ModulationType.Lfo;
 
     //timing percentage
     public var attack:Float = 0.0;
@@ -27,23 +27,21 @@ class ModulationParameters {
     public var peak:Float = 0.0;
 
     //lfo
-    public var amplitude:Float = 0.0;
-    public var frequency:Float = 0.0;
-    public var wave:String;
+    public var lfo:OscillatorParameters = new OscillatorParameters();
 
     public function new() {}
 }
 
 class OscillatorParameters {
-    public var frequency:Float = 0.0;
-    public var level:Float = 0.0;
-    public var wave:String;
+    public var frequency:Float = 200.0;
+    public var amplitude:Float = 1.0;
+    public var wave:String = "sine";
 
     public function new() {}
 }
 
 class SoundParameters {
-    public var name:String;
+    public var name:String = "default";
     public var time:Float = 0.5;
     public var oscillatorOne:OscillatorParameters = new OscillatorParameters();
     public var oscillatorTwo:OscillatorParameters = new OscillatorParameters();
@@ -81,15 +79,15 @@ class Filter {
                 this.filter.frequency.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.filter.frequency.linearRampToValueAtTime(0, releaseTime);
             case Lfo:
-                this.oscillator.type = switch (this.parameters.wave) {
+                this.oscillator.type = switch (this.parameters.lfo.wave) {
                     case "sine": OscillatorType.SINE;
                     case "square": OscillatorType.SQUARE;
                     case "sawtooth": OscillatorType.SAWTOOTH;
                     case "triangle": OscillatorType.TRIANGLE;
                     default: OscillatorType.SINE;
                 };
-                this.oscillator.frequency.value = this.parameters.frequency;
-                this.oscillatorAmplifier.gain.value = this.parameters.amplitude;
+                this.oscillator.frequency.value = this.parameters.lfo.frequency;
+                this.oscillatorAmplifier.gain.value = this.parameters.lfo.amplitude;
                 this.oscillator.connect(this.oscillatorAmplifier).connect(this.filter.frequency);
                 this.oscillator.start();
         }
@@ -127,15 +125,15 @@ class Amplifier {
                 this.amplifier.gain.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.amplifier.gain.linearRampToValueAtTime(0, releaseTime);
             case Lfo:
-                this.oscillator.type = switch (this.parameters.wave) {
+                this.oscillator.type = switch (this.parameters.lfo.wave) {
                     case "sine": OscillatorType.SINE;
                     case "square": OscillatorType.SQUARE;
                     case "sawtooth": OscillatorType.SAWTOOTH;
                     case "triangle": OscillatorType.TRIANGLE;
                     default: OscillatorType.SINE;
                 };
-                this.oscillator.frequency.value = this.parameters.frequency;
-                this.oscillatorAmplifier.gain.value = this.parameters.amplitude;
+                this.oscillator.frequency.value = this.parameters.lfo.frequency;
+                this.oscillatorAmplifier.gain.value = this.parameters.lfo.amplitude;
                 this.oscillator.connect(this.oscillatorAmplifier).connect(this.amplifier.gain);
                 this.oscillator.start();
         }
