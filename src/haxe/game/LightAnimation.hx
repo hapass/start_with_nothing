@@ -27,7 +27,7 @@ class LightAnimation {
         this.currentFrame = 0;
         this.isPlaying = true;
         #if !macro
-        this.audio.playSound(new SoundParameters());
+        this.audio.playSound(SoundParameters.fromJSON(""));
         #end
     }
 

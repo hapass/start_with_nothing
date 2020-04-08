@@ -1,5 +1,6 @@
 package synth;
 
+import js.html.Storage;
 import js.html.SelectElement;
 import engine.Debug;
 import engine.Audio;
@@ -23,7 +24,8 @@ typedef EnvelopeElements = {
 }
 
 typedef UI = {
-    button:ButtonElement,
+    play:ButtonElement,
+    download:ButtonElement,
     time:InputElement,
     firstOscillator:OscillatorElements,
     secondOscillator:OscillatorElements,
@@ -43,7 +45,8 @@ class Main {
 
     static function main() {
         var ui:UI = {
-            button: get("play", ButtonElement),
+            play: get("play", ButtonElement),
+            download: get("download", ButtonElement),
             time: get("time", InputElement),
             firstOscillator: getOscillator("osc_1"),
             secondOscillator: getOscillator("osc_2"),
@@ -59,11 +62,14 @@ class Main {
             filterLfoRoot: get("filter_lfo", Element)
         }
 
-        var parameters = new SoundParameters();
+        var soundName = "sound";
+        var storage:Storage = Browser.getLocalStorage();
+
+        var parameters = SoundParameters.fromJSON(storage.getItem(soundName));
         updateUI(parameters, ui);
 
         var audio:Audio = null;
-        ui.button.addEventListener("click", (event)->{
+        ui.play.addEventListener("click", (event)->{
             if (audio != null) {
                 audio.dispose();
             }
@@ -72,6 +78,11 @@ class Main {
 
             syncModelAndUI(parameters, ui);
             audio.playSound(parameters);
+            storage.setItem(soundName, SoundParameters.toJSON(parameters));
+        });
+
+        ui.download.addEventListener("click", (event)->{
+            downloadJSON(storage.getItem(soundName));
         });
 
         ui.filterModulation.addEventListener("change", (event)->{
@@ -142,6 +153,16 @@ class Main {
             ui.filterEnvelopeRoot.classList.add("hidden");
             ui.filterLfoRoot.classList.remove("hidden");
         }
+    }
+
+    public static function downloadJSON(json:String){
+        var data = "data:text/json;charset=utf-8," + StringTools.urlEncode(json);
+        var downloadElement = Browser.document.createElement('a');
+        downloadElement.setAttribute("href", data);
+        downloadElement.setAttribute("download", "sound.json");
+        Browser.document.body.appendChild(downloadElement);
+        downloadElement.click();
+        downloadElement.remove();
     }
 
     public static function updateModel(parameters:SoundParameters, ui:UI) {

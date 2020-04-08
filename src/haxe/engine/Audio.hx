@@ -1,5 +1,6 @@
 package engine;
 
+import haxe.Json;
 import js.html.audio.BiquadFilterType;
 import js.html.audio.BiquadFilterNode;
 import js.html.audio.GainNode;
@@ -33,6 +34,35 @@ class OscillatorParameters {
     public function new() {}
 }
 
+typedef SoundParametersStored = {
+    name:String,
+    time:Float,
+    oscillatorOneFrequency:Float,
+    oscillatorOneAmplitude:Float,
+    oscillatorOneWave:String,
+    oscillatorTwoFrequency:Float,
+    oscillatorTwoAmplitude:Float,
+    oscillatorTwoWave:String,
+    filterModulation:String,
+    filterAttack:Float,
+    filterDecay:Float,
+    filterRelease:Float,
+    filterSustain:Float,
+    filterPeak:Float,
+    filterFrequency:Float,
+    filterAmplitude:Float,
+    filterWave:String,
+    amplifierModulation:String,
+    amplifierAttack:Float,
+    amplifierDecay:Float,
+    amplifierRelease:Float,
+    amplifierSustain:Float,
+    amplifierPeak:Float,
+    amplifierFrequency:Float,
+    amplifierAmplitude:Float,
+    amplifierWave:String
+}
+
 class SoundParameters {
     public var name:String = "default";
     public var time:Float = 0.5;
@@ -41,7 +71,79 @@ class SoundParameters {
     public var filter:ModulationParameters = new ModulationParameters();
     public var amplifier:ModulationParameters = new ModulationParameters();
 
-    public function new() {}
+    private function new() {}
+
+    public static function toJSON(parameters:SoundParameters):String {
+        var storedObject:SoundParametersStored = {
+            name: parameters.name,
+            time: parameters.time,
+            oscillatorOneFrequency: parameters.oscillatorOne.amplitude,
+            oscillatorOneAmplitude: parameters.oscillatorOne.amplitude,
+            oscillatorOneWave: parameters.oscillatorOne.wave,
+            oscillatorTwoFrequency: parameters.oscillatorTwo.frequency,
+            oscillatorTwoAmplitude: parameters.oscillatorTwo.amplitude,
+            oscillatorTwoWave: parameters.oscillatorTwo.wave,
+            filterModulation: parameters.filter.modulation,
+            filterAttack: parameters.filter.attack,
+            filterDecay: parameters.filter.decay,
+            filterRelease: parameters.filter.release,
+            filterSustain: parameters.filter.sustain,
+            filterPeak: parameters.filter.peak,
+            filterFrequency: parameters.filter.lfo.frequency,
+            filterAmplitude: parameters.filter.lfo.amplitude,
+            filterWave: parameters.filter.lfo.wave,
+            amplifierModulation: parameters.amplifier.modulation,
+            amplifierAttack: parameters.amplifier.attack,
+            amplifierDecay: parameters.amplifier.decay,
+            amplifierRelease: parameters.amplifier.release,
+            amplifierSustain: parameters.amplifier.sustain,
+            amplifierPeak: parameters.amplifier.peak,
+            amplifierFrequency: parameters.amplifier.lfo.frequency,
+            amplifierAmplitude: parameters.amplifier.lfo.amplitude,
+            amplifierWave: parameters.amplifier.lfo.wave
+        };
+
+        return Json.stringify(storedObject);
+    }
+
+    public static function fromJSON(json:String):SoundParameters {
+        var parameters = new SoundParameters();
+
+        try {
+            var storedObject:Dynamic = Json.parse(json);
+
+            parameters.name = storedObject.name;
+            parameters.time = storedObject.time;
+            parameters.oscillatorOne.amplitude = storedObject.oscillatorOneFrequency;
+            parameters.oscillatorOne.amplitude = storedObject.oscillatorOneAmplitude;
+            parameters.oscillatorOne.wave = storedObject.oscillatorOneWave;
+            parameters.oscillatorTwo.frequency = storedObject.oscillatorTwoFrequency;
+            parameters.oscillatorTwo.amplitude = storedObject.oscillatorTwoAmplitude;
+            parameters.oscillatorTwo.wave = storedObject.oscillatorTwoWave;
+            parameters.filter.modulation = storedObject.filterModulation;
+            parameters.filter.attack = storedObject.filterAttack;
+            parameters.filter.decay = storedObject.filterDecay;
+            parameters.filter.release = storedObject.filterRelease;
+            parameters.filter.sustain = storedObject.filterSustain;
+            parameters.filter.peak = storedObject.filterPeak;
+            parameters.filter.lfo.frequency = storedObject.filterFrequency;
+            parameters.filter.lfo.amplitude = storedObject.filterAmplitude;
+            parameters.filter.lfo.wave = storedObject.filterWave;
+            parameters.amplifier.modulation = storedObject.amplifierModulation;
+            parameters.amplifier.attack = storedObject.amplifierAttack;
+            parameters.amplifier.decay = storedObject.amplifierDecay;
+            parameters.amplifier.release = storedObject.amplifierRelease;
+            parameters.amplifier.sustain = storedObject.amplifierSustain;
+            parameters.amplifier.peak = storedObject.amplifierPeak;
+            parameters.amplifier.lfo.frequency = storedObject.amplifierFrequency;
+            parameters.amplifier.lfo.amplitude = storedObject.amplifierAmplitude;
+            parameters.amplifier.lfo.wave = storedObject.amplifierWave;
+        } catch(e:Dynamic) {
+            Debug.log("SoundParameters parsing failed. Returning default value.");
+        }
+
+        return parameters;
+    }
 }
 
 class Filter {
