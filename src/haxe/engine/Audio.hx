@@ -143,6 +143,7 @@ class Oscillator {
     private var oscillator:OscillatorNode;
     private var parameters:OscillatorParameters;
     private var context:AudioContext;
+    private var amplifier:GainNode;
 
     public function new(context:AudioContext, parameters:OscillatorParameters, time:Float) {
         this.context = context;
@@ -157,6 +158,10 @@ class Oscillator {
         };
         this.oscillator.frequency.value = this.parameters.frequency;
 
+        this.amplifier = this.context.createGain();
+        this.amplifier.gain.value = this.parameters.amplitude;
+        this.oscillator.connect(this.amplifier);
+
         this.isPlaying = true;
         this.oscillator.start();
         this.oscillator.stop(this.context.currentTime + time);
@@ -164,7 +169,7 @@ class Oscillator {
     }
 
     public function getNode() {
-        return this.oscillator;
+        return this.amplifier;
     }
 }
 
