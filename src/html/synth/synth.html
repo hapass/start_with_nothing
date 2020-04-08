@@ -2,13 +2,17 @@
 <html>
 <head>
 <style>
+  html {
+    width: 90%; 
+  }
+
   .row {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
     display: flex;
-    margin: 3px;
     padding: 3px;
+    width: 100%;
   }
 
   .column {
@@ -16,13 +20,26 @@
     justify-content: start;
     align-items: flex-start;
     display: flex;
-    margin: 3px;
     padding: 3px;
+    width: 100%;
+  }
+
+  .synthesizer {
+    background-color: #e2e3ea;
+    border-radius: 10px;
+  }
+
+  .element {
+    margin: 3px;
+  }
+
+  .row.hidden {
+    display: none;
   }
 </style>
 </head>
 <body>
-  <div class="column">
+  <div class="column synthesizer">
     <div class="row">
       <!--Oscillators-->
       <div class="column">
@@ -35,15 +52,15 @@
           <div class="column">
             <div class="row">First</div>
             <div class="row">
-              <div class="column"><label for="osc_1_frequency">Frequency:</label></div>
+              <div class="column"><label for="osc_1_frequency">Frequency</label></div>
               <div class="column"><input type="range" id="osc_1_frequency" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="osc_1_amplitude">Level:</label></div>
+              <div class="column"><label for="osc_1_amplitude">Level</label></div>
               <div class="column"><input type="range" id="osc_1_amplitude" min="0" max="1" step="0.01"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="osc_1_wave">Wave:</label></div>
+              <div class="column"><label for="osc_1_wave">Wave</label></div>
               <div class="column">
                 <select id="osc_1_wave">
                   <option value="sine">sine</option>
@@ -59,15 +76,15 @@
           <div class="column">
             <div class="row">Second</div>
             <div class="row">
-              <div class="column"><label for="osc_2_frequency">Frequency:</label></div>
+              <div class="column"><label for="osc_2_frequency">Frequency</label></div>
               <div class="column"><input type="range" id="osc_2_frequency" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="osc_2_amplitude">Level:</label></div>
+              <div class="column"><label for="osc_2_amplitude">Level</label></div>
               <div class="column"><input type="range" id="osc_2_amplitude" min="0" max="1" step="0.01"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="osc_2_wave">Wave:</label></div>
+              <div class="column"><label for="osc_2_wave">Wave</label></div>
               <div class="column">
                 <select id="osc_2_wave">
                   <option value="sine">sine</option>
@@ -88,50 +105,50 @@
           </div>
         </div>
         <div class="row">
+          <div class="column">Modulation</div>
+          <div class="column">
+            <select id="filter_modulation">
+              <option value="envelope">envelope</option>
+              <option value="lfo">lfo</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" id="filter_envelope">
           <div class="column">
             <div class="row">
-              <div class="column">Modulation</div>
-              <div class="column">
-                <select id="filter_modulation">
-                  <option value="envelope">envelope</option>
-                  <option value="lfo">lfo</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="column"><label for="filter_attack">Attack:</label></div>
+              <div class="column"><label for="filter_attack">Attack</label></div>
               <div class="column"><input type="number" id="filter_attack" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_decay">Decay:</label></div>
+              <div class="column"><label for="filter_decay">Decay</label></div>
               <div class="column"><input type="number" id="filter_decay" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_release">Release:</label></div>
+              <div class="column"><label for="filter_release">Release</label></div>
               <div class="column"><input type="number" id="filter_release" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_peak">Peak:</label></div>
+              <div class="column"><label for="filter_peak">Peak</label></div>
               <div class="column"><input type="range" id="filter_peak" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_sustain">Sustain:</label></div>
+              <div class="column"><label for="filter_sustain">Sustain</label></div>
               <div class="column"><input type="range" id="filter_sustain" min="0" max="600"></div>
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row" id="filter_lfo">
           <div class="column">
             <div class="row">
-              <div class="column"><label for="filter_lfo_frequency">Frequency:</label></div>
+              <div class="column"><label for="filter_lfo_frequency">Frequency</label></div>
               <div class="column"><input type="range" id="filter_lfo_frequency" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_lfo_amplitude">Amplitude:</label></div>
+              <div class="column"><label for="filter_lfo_amplitude">Amplitude</label></div>
               <div class="column"><input type="range" id="filter_lfo_amplitude" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="filter_lfo_wave">Wave:</label></div>
+              <div class="column"><label for="filter_lfo_wave">Wave</label></div>
               <div class="column">
                 <select id="filter_lfo_wave">
                   <option value="sine">sine</option>
@@ -152,50 +169,50 @@
           </div>
         </div>
         <div class="row">
+          <div class="column">Modulation</div>
+          <div class="column">
+            <select id="amplifier_modulation">
+              <option value="envelope">envelope</option>
+              <option value="lfo">lfo</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" id="amplifier_envelope">
           <div class="column">
             <div class="row">
-              <div class="column">Modulation</div>
-              <div class="column">
-                <select id="amplifier_modulation">
-                  <option value="envelope">envelope</option>
-                  <option value="lfo">lfo</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="column"><label for="amplifier_attack">Attack:</label></div>
+              <div class="column"><label for="amplifier_attack">Attack</label></div>
               <div class="column"><input type="number" id="amplifier_attack" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_decay">Decay:</label></div>
+              <div class="column"><label for="amplifier_decay">Decay</label></div>
               <div class="column"><input type="number" id="amplifier_decay" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_release">Release:</label></div>
+              <div class="column"><label for="amplifier_release">Release</label></div>
               <div class="column"><input type="number" id="amplifier_release" min="0" max="1" step="0.1"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_peak">Peak:</label></div>
+              <div class="column"><label for="amplifier_peak">Peak</label></div>
               <div class="column"><input type="range" id="amplifier_peak" min="0" max="1" step="0.01"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_sustain">Sustain:</label></div>
+              <div class="column"><label for="amplifier_sustain">Sustain</label></div>
               <div class="column"><input type="range" id="amplifier_sustain" min="0" max="1" step="0.01"></div>
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row" id="amplifier_lfo">
           <div class="column">
             <div class="row">
-              <div class="column"><label for="amplifier_lfo_frequency">Frequency:</label></div>
+              <div class="column"><label for="amplifier_lfo_frequency">Frequency</label></div>
               <div class="column"><input type="range" id="amplifier_lfo_frequency" min="0" max="600"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_lfo_amplitude">Amplitude:</label></div>
+              <div class="column"><label for="amplifier_lfo_amplitude">Amplitude</label></div>
               <div class="column"><input type="range" id="amplifier_lfo_amplitude" min="0" max="1" step="0.01"></div>
             </div>
             <div class="row">
-              <div class="column"><label for="amplifier_lfo_wave">Wave:</label></div>
+              <div class="column"><label for="amplifier_lfo_wave">Wave</label></div>
               <div class="column">
                 <select id="amplifier_lfo_wave">
                   <option value="sine">sine</option>
@@ -210,19 +227,9 @@
       </div>
     </div>
     <div class="row">
-      <div class="column">
-        <div class="row">
-          <div class="column">
-            <label for="time">Time:</label>
-          </div>
-          <div class="column">
-            <input type="number" id="time" step="0.1" min="0" max="20">
-          </div>
-          <div class="column">
-            <button id="play">Play</button>
-          </div>
-        </div>
-      </div>
+      <label for="time" class="element">Time</label>
+      <input type="number" id="time" step="0.1" min="0" max="20" class="element">
+      <button id="play" class="element">Play</button>
     </div>
   </div>
   <script type="text/javascript" src="synth.js"></script>

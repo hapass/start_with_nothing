@@ -30,9 +30,13 @@ typedef UI = {
     amplifierModulation:SelectElement,
     amplifierLfo:OscillatorElements,
     amplifierEnvelope:EnvelopeElements,
+    amplifierEnvelopeRoot:Element,
+    amplifierLfoRoot:Element,
     filterModulation:SelectElement,
     filterLfo:OscillatorElements,
-    filterEnvelope:EnvelopeElements
+    filterEnvelope:EnvelopeElements,
+    filterEnvelopeRoot:Element,
+    filterLfoRoot:Element
 }
 
 class Main {
@@ -46,13 +50,17 @@ class Main {
             amplifierModulation: get("amplifier_modulation", SelectElement),
             amplifierLfo: getOscillator("amplifier_lfo"),
             amplifierEnvelope: getEnvelope("amplifier"),
+            amplifierEnvelopeRoot: get("amplifier_envelope", Element),
+            amplifierLfoRoot: get("amplifier_lfo", Element),
             filterModulation: get("filter_modulation", SelectElement),
             filterLfo: getOscillator("filter_lfo"),
-            filterEnvelope: getEnvelope("filter")
+            filterEnvelope: getEnvelope("filter"),
+            filterEnvelopeRoot: get("filter_envelope", Element),
+            filterLfoRoot: get("filter_lfo", Element)
         }
 
         var parameters = new SoundParameters();
-        setParametersToUI(parameters, ui);
+        updateUI(parameters, ui);
 
         var audio:Audio = null;
         ui.button.addEventListener("click", (event)->{
@@ -61,12 +69,23 @@ class Main {
             }
 
             audio = new Audio();
-            readParametersFromUI(parameters, ui);
+
+            updateModel(parameters, ui);
             audio.playSound(parameters);
+        });
+
+        ui.filterModulation.addEventListener("change", (event)->{
+            updateModel(parameters, ui);
+            updateUI(parameters, ui);
+        });
+
+        ui.amplifierModulation.addEventListener("change", (event)->{
+            updateModel(parameters, ui);
+            updateUI(parameters, ui);
         });
     }
 
-    public static function setParametersToUI(parameters:SoundParameters, ui:UI) {
+    public static function updateUI(parameters:SoundParameters, ui:UI) {
         //time
         ui.time.valueAsNumber = parameters.time;
 
@@ -95,6 +114,14 @@ class Main {
         ui.amplifierLfo.frequency.valueAsNumber = parameters.amplifier.lfo.frequency;
         ui.amplifierLfo.wave.value = parameters.amplifier.lfo.wave;
 
+        if (ui.amplifierModulation.value == "envelope") {
+            ui.amplifierEnvelopeRoot.classList.remove("hidden");
+            ui.amplifierLfoRoot.classList.add("hidden");
+        } else {
+            ui.amplifierEnvelopeRoot.classList.add("hidden");
+            ui.amplifierLfoRoot.classList.remove("hidden");
+        }
+
         //filter
         ui.filterModulation.value = switch(parameters.filter.modulation) {
             case ModulationType.Envelope: "envelope";
@@ -110,9 +137,17 @@ class Main {
         ui.filterLfo.amplitude.valueAsNumber = parameters.filter.lfo.amplitude;
         ui.filterLfo.frequency.valueAsNumber = parameters.filter.lfo.frequency;
         ui.filterLfo.wave.value = parameters.filter.lfo.wave;
+
+        if (ui.filterModulation.value == "envelope") {
+            ui.filterEnvelopeRoot.classList.remove("hidden");
+            ui.filterLfoRoot.classList.add("hidden");
+        } else {
+            ui.filterEnvelopeRoot.classList.add("hidden");
+            ui.filterLfoRoot.classList.remove("hidden");
+        }
     }
 
-    public static function readParametersFromUI(parameters:SoundParameters, ui:UI) {
+    public static function updateModel(parameters:SoundParameters, ui:UI) {
         //time
         parameters.time = ui.time.valueAsNumber;
 
