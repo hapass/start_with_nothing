@@ -70,19 +70,22 @@ class Main {
 
             audio = new Audio();
 
-            updateModel(parameters, ui);
+            syncModelAndUI(parameters, ui);
             audio.playSound(parameters);
         });
 
         ui.filterModulation.addEventListener("change", (event)->{
-            updateModel(parameters, ui);
-            updateUI(parameters, ui);
+            syncModelAndUI(parameters, ui);
         });
 
         ui.amplifierModulation.addEventListener("change", (event)->{
-            updateModel(parameters, ui);
-            updateUI(parameters, ui);
+            syncModelAndUI(parameters, ui);
         });
+    }
+
+    public static function syncModelAndUI(parameters:SoundParameters, ui:UI) {
+        updateModel(parameters, ui);
+        updateUI(parameters, ui);
     }
 
     public static function updateUI(parameters:SoundParameters, ui:UI) {
@@ -99,10 +102,7 @@ class Main {
         parameters.oscillatorTwo.wave = ui.secondOscillator.wave.value;
 
         //amplifier
-        ui.amplifierModulation.value = switch(parameters.amplifier.modulation) {
-            case ModulationType.Envelope: "envelope";
-            default: "lfo";
-        };
+        ui.amplifierModulation.value = parameters.amplifier.modulation;
 
         ui.amplifierEnvelope.attack.valueAsNumber = parameters.amplifier.attack;
         ui.amplifierEnvelope.decay.valueAsNumber = parameters.amplifier.decay;
@@ -123,10 +123,7 @@ class Main {
         }
 
         //filter
-        ui.filterModulation.value = switch(parameters.filter.modulation) {
-            case ModulationType.Envelope: "envelope";
-            default: "lfo";
-        };
+        ui.filterModulation.value = parameters.filter.modulation;
 
         ui.filterEnvelope.attack.valueAsNumber = parameters.filter.attack;
         ui.filterEnvelope.decay.valueAsNumber = parameters.filter.decay;
@@ -161,10 +158,7 @@ class Main {
         parameters.oscillatorTwo.wave = ui.secondOscillator.wave.value;
 
         //amplifier
-        parameters.amplifier.modulation = switch(ui.amplifierModulation.value) {
-            case "envelope": ModulationType.Envelope;
-            default: ModulationType.Lfo;
-        };
+        parameters.amplifier.modulation = ui.amplifierModulation.value;
 
         parameters.amplifier.attack = ui.amplifierEnvelope.attack.valueAsNumber;
         parameters.amplifier.decay = ui.amplifierEnvelope.decay.valueAsNumber;
@@ -177,10 +171,7 @@ class Main {
         parameters.amplifier.lfo.wave = ui.amplifierLfo.wave.value;
 
         //filter
-        parameters.filter.modulation = switch(ui.filterModulation.value) {
-            case "envelope": ModulationType.Envelope;
-            default: ModulationType.Lfo;
-        };
+        parameters.filter.modulation = ui.filterModulation.value;
 
         parameters.filter.attack = ui.filterEnvelope.attack.valueAsNumber;
         parameters.filter.decay = ui.filterEnvelope.decay.valueAsNumber;

@@ -1,21 +1,14 @@
 package engine;
 
-import js.html.audio.AudioNode;
 import js.html.audio.BiquadFilterType;
 import js.html.audio.BiquadFilterNode;
 import js.html.audio.GainNode;
-import js.html.audio.AudioContextState;
 import js.html.audio.OscillatorType;
 import js.html.audio.OscillatorNode;
 import js.html.audio.AudioContext;
 
-enum ModulationType {
-    Envelope;
-    Lfo;
-}
-
 class ModulationParameters {
-    public var modulation:ModulationType = ModulationType.Lfo;
+    public var modulation:String = "lfo";
 
     //timing percentage
     public var attack:Float = 0.0;
@@ -67,7 +60,7 @@ class Filter {
         this.oscillatorAmplifier = this.context.createGain();
 
         switch (this.parameters.modulation) {
-            case Envelope:
+            case "envelope":
                 var attackTime = this.context.currentTime + this.parameters.attack * time;
                 var decayTime = attackTime + this.parameters.decay * time;
                 var sustainTime = this.context.currentTime + time - this.parameters.release * time;
@@ -78,7 +71,7 @@ class Filter {
                 this.filter.frequency.linearRampToValueAtTime(this.parameters.sustain, decayTime);
                 this.filter.frequency.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.filter.frequency.linearRampToValueAtTime(0, releaseTime);
-            case Lfo:
+            case "lfo":
                 this.oscillator.type = switch (this.parameters.lfo.wave) {
                     case "sine": OscillatorType.SINE;
                     case "square": OscillatorType.SQUARE;
@@ -113,7 +106,7 @@ class Amplifier {
         this.oscillatorAmplifier = this.context.createGain();
 
         switch (this.parameters.modulation) {
-            case Envelope:
+            case "envelope":
                 var attackTime = this.context.currentTime + this.parameters.attack * time;
                 var decayTime = attackTime + this.parameters.decay * time;
                 var sustainTime = this.context.currentTime + time - this.parameters.release * time;
@@ -124,7 +117,7 @@ class Amplifier {
                 this.amplifier.gain.linearRampToValueAtTime(this.parameters.sustain, decayTime);
                 this.amplifier.gain.linearRampToValueAtTime(this.parameters.sustain, sustainTime);
                 this.amplifier.gain.linearRampToValueAtTime(0, releaseTime);
-            case Lfo:
+            case "lfo":
                 this.oscillator.type = switch (this.parameters.lfo.wave) {
                     case "sine": OscillatorType.SINE;
                     case "square": OscillatorType.SQUARE;
