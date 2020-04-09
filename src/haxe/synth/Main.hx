@@ -1,9 +1,9 @@
 package synth;
 
-import js.html.Storage;
-import js.html.SelectElement;
 import engine.Debug;
 import engine.Audio;
+import js.html.Storage;
+import js.html.SelectElement;
 import js.html.Element;
 import js.html.InputElement;
 import js.html.ButtonElement;
@@ -42,7 +42,6 @@ typedef UI = {
 }
 
 class Main {
-
     static function main() {
         var ui:UI = {
             play: get("play", ButtonElement),
@@ -60,33 +59,31 @@ class Main {
             filterEnvelope: getEnvelope("filter"),
             filterEnvelopeRoot: get("filter_envelope", Element),
             filterLfoRoot: get("filter_lfo", Element)
-        }
+        };
 
-        var soundName = "sound";
         var storage:Storage = Browser.getLocalStorage();
 
-        var parameters = SoundParameters.fromJSON(storage.getItem(soundName));
+        var parametersStorageKey = "sound";
+        var parameters = SoundParameters.fromJSON(storage.getItem(parametersStorageKey));
         updateUI(parameters, ui);
 
         var audio:Audio = null;
         ui.play.addEventListener("click", (event)->{
+            syncModelAndUI(parameters, ui);
+            storage.setItem(parametersStorageKey, SoundParameters.toJSON(parameters));
+
             if (audio != null) {
                 audio.dispose();
             }
-
             audio = new Audio();
-
-            syncModelAndUI(parameters, ui);
-            storage.setItem(soundName, SoundParameters.toJSON(parameters));
-
             audio.playSound(parameters);
         });
 
         ui.download.addEventListener("click", (event)->{
             syncModelAndUI(parameters, ui);
-            storage.setItem(soundName, SoundParameters.toJSON(parameters));
+            storage.setItem(parametersStorageKey, SoundParameters.toJSON(parameters));
 
-            downloadJSON(storage.getItem(soundName));
+            downloadJSON(storage.getItem(parametersStorageKey));
         });
 
         ui.filterModulation.addEventListener("change", (event)->{
@@ -98,12 +95,12 @@ class Main {
         });
     }
 
-    public static function syncModelAndUI(parameters:SoundParameters, ui:UI) {
+    static function syncModelAndUI(parameters:SoundParameters, ui:UI) {
         updateModel(parameters, ui);
         updateUI(parameters, ui);
     }
 
-    public static function updateUI(parameters:SoundParameters, ui:UI) {
+    static function updateUI(parameters:SoundParameters, ui:UI) {
         //time
         ui.time.valueAsNumber = parameters.time;
 
@@ -159,17 +156,7 @@ class Main {
         }
     }
 
-    public static function downloadJSON(json:String){
-        var data = "data:text/json;charset=utf-8," + StringTools.urlEncode(json);
-        var downloadElement = Browser.document.createElement('a');
-        downloadElement.setAttribute("href", data);
-        downloadElement.setAttribute("download", "sound.json");
-        Browser.document.body.appendChild(downloadElement);
-        downloadElement.click();
-        downloadElement.remove();
-    }
-
-    public static function updateModel(parameters:SoundParameters, ui:UI) {
+    static function updateModel(parameters:SoundParameters, ui:UI):Void {
         //time
         parameters.time = ui.time.valueAsNumber;
 
@@ -209,35 +196,37 @@ class Main {
         parameters.filter.lfo.wave = ui.filterLfo.wave.value;
     }
 
-    public static function setParametersStorage(parameters:SoundParameters) {
-        throw "not implemented";
+    static function downloadJSON(json:String):Void {
+        var data = "data:text/json;charset=utf-8," + StringTools.urlEncode(json);
+        var downloadElement = Browser.document.createElement('a');
+        downloadElement.setAttribute("href", data);
+        downloadElement.setAttribute("download", "sound.json");
+        Browser.document.body.appendChild(downloadElement);
+        downloadElement.click();
+        downloadElement.remove();
     }
 
-    public static function readParametersStorage():SoundParameters {
-        throw "not implemented";
-    }
-
-    public static function get<T:Element>(name:String, cls:Class<T>):T {
+    static function get<T:Element>(name:String, cls:Class<T>):T {
         var result:T = Std.downcast(Browser.document.getElementById(name), cls);
         Debug.assert(result != null, 'Cannot find ${name}');
         return result;
     }
 
-    public static function getOscillator(name:String):OscillatorElements {
+    static function getOscillator(name:String):OscillatorElements {
         return {
             frequency: get('${name}_frequency', InputElement),
             wave: get('${name}_wave', SelectElement),
             amplitude: get('${name}_amplitude', InputElement)
-        }
+        };
     }
 
-    public static function getEnvelope(name:String):EnvelopeElements {
+    static function getEnvelope(name:String):EnvelopeElements {
         return {
             attack: get('${name}_attack', InputElement),
             decay: get('${name}_decay', InputElement),
             release: get('${name}_release', InputElement),
             peak: get('${name}_peak', InputElement),
             sustain: get('${name}_sustain', InputElement)
-        }
+        };
     }
 }
