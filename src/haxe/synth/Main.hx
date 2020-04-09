@@ -2,7 +2,6 @@ package synth;
 
 import engine.Debug;
 import engine.Audio;
-import js.html.Storage;
 import js.html.SelectElement;
 import js.html.Element;
 import js.html.InputElement;
@@ -61,29 +60,25 @@ class Main {
             filterLfoRoot: get("filter_lfo", Element)
         };
 
-        var storage:Storage = Browser.getLocalStorage();
-
-        var parametersStorageKey = "sound";
-        var parameters = SoundParameters.fromJSON(storage.getItem(parametersStorageKey));
+        var parameters = SoundParameters.load("default");
         updateUI(parameters, ui);
 
         var audio:Audio = null;
         ui.play.addEventListener("click", (event)->{
             syncModelAndUI(parameters, ui);
-            storage.setItem(parametersStorageKey, SoundParameters.toJSON(parameters));
+            SoundParameters.save(parameters);
 
             if (audio != null) {
                 audio.dispose();
             }
             audio = new Audio();
-            audio.playSound(parameters);
+            audio.playSound(parameters.name);
         });
 
         ui.download.addEventListener("click", (event)->{
             syncModelAndUI(parameters, ui);
-            storage.setItem(parametersStorageKey, SoundParameters.toJSON(parameters));
-
-            downloadJSON(storage.getItem(parametersStorageKey));
+            SoundParameters.save(parameters);
+            downloadJSON(parameters);
         });
 
         ui.filterModulation.addEventListener("change", (event)->{
@@ -196,8 +191,8 @@ class Main {
         parameters.filter.lfo.wave = ui.filterLfo.wave.value;
     }
 
-    static function downloadJSON(json:String):Void {
-        var data = "data:text/json;charset=utf-8," + StringTools.urlEncode(json);
+    static function downloadJSON(parameters:SoundParameters):Void {
+        var data = "data:text/json;charset=utf-8," + StringTools.urlEncode(Browser.getLocalStorage().getItem(parameters.name));
         var downloadElement = Browser.document.createElement('a');
         downloadElement.setAttribute("href", data);
         downloadElement.setAttribute("download", "sound.json");

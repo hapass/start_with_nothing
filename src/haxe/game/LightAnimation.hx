@@ -1,34 +1,23 @@
 package game;
 
-#if macro
+import engine.AudioPlayer;
 import haxe.macro.Expr;
-#end
-
-#if !macro
-import engine.Audio;
-#end
 
 class LightAnimation {
     public var isPlaying:Bool = false;
     public var currentFrame:Int = 0;
     public var frames:Array<Float>;
-    #if !macro
-    public var audio:Audio;
-    #end
+    public var audio:AudioPlayer;
 
-    public function new(#if !macro audio:Audio #end) {
+    public function new(audio:AudioPlayer) {
         this.frames = getFrames();
-        #if !macro
         this.audio = audio;
-        #end
     }
 
     public function play() {
         this.currentFrame = 0;
         this.isPlaying = true;
-        #if !macro
-        this.audio.playSound(SoundParameters.fromJSON(""));
-        #end
+        //this.audio.playSound("hit");
     }
 
     public function updateRadius():Float {

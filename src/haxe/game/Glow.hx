@@ -1,11 +1,11 @@
 package game;
 
+import engine.AudioPlayer;
 import engine.Color;
 import engine.Key;
 import engine.Light;
 import engine.Vec2;
 import engine.Quad;
-import engine.Audio;
 import game.Level;
 
 using engine.FloatExtensions;
@@ -18,14 +18,15 @@ class Glow {
 
     public var light:Light = new Light();
     public var lightAnimation:LightAnimation;
-
+    public var audio:AudioPlayer;
     public var jumpCount:Int = 0;
 
-    public function new(position:Vec2, audio:Audio) {
+    public function new(position:Vec2, audio:AudioPlayer) {
         this.position = position;
+        this.audio = audio;
         this.light.position.x = getCenter(this.position.x);
         this.light.position.y = getCenter(this.position.y);
-        this.lightAnimation = new LightAnimation(audio);
+        this.lightAnimation = new LightAnimation(this.audio);
         this.shape = new Quad(Config.GLOW_COLOR, Config.TILE_SIZE, this.position);
     }
 
@@ -129,7 +130,10 @@ class Glow {
             if (left == Wall || right == Wall) {
                 this.position.y = getPosition(row - 1);
                 this.currentSpeed.y = 0;
-                this.jumpCount = Config.JUMP_COUNT;
+                if (this.jumpCount != Config.JUMP_COUNT) {
+                    this.audio.playSound("hit");
+                    this.jumpCount = Config.JUMP_COUNT;
+                }
             }
             else
                 this.position.y = y;

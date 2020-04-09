@@ -23,6 +23,7 @@ class Main {
     }
 
     public static function launch(levels:Array<Level>, currentLevel:Int) {
+        Browser.document.getElementById("play").classList.remove("hide");
         new Game().run(levels, currentLevel).then(function(result:GameResult) {
             switch(result) {
                 case GameResult.NextLevel:
@@ -40,10 +41,10 @@ class Main {
 
 class Game {
     private var keyboard:Keyboard = new Keyboard([Key.SPACE, Key.RIGHT, Key.LEFT, Key.SHIFT]);
-    private var audio:Audio = new Audio();
     private var loop:GameLoop = new GameLoop();
     private var renderer:Renderer = new Renderer(Config.GAME_WIDTH, Config.GAME_HEIGHT);
 
+    private var audio:Audio;
     private var level:Level;
     private var glow:Glow;
     private var gameResult:Promise<GameResult> = new Promise<GameResult>();
@@ -56,12 +57,16 @@ class Game {
             return this.gameResult;
         }
 
-        this.level = levels[currentLevel];
-        this.glow = new Glow(new Vec2(this.level.spawn.x, this.level.spawn.y), audio);
-        this.renderer.add([this.glow.shape]);
-        this.renderer.setLight(this.glow.light);
-        this.renderer.add(this.level.shape);
-        this.loop.start(this.update);
+        this.keyboard.onceOnUserInput = ()->{
+            this.level = levels[currentLevel];
+            this.audio = new Audio();
+            this.glow = new Glow(new Vec2(this.level.spawn.x, this.level.spawn.y), audio);
+            this.renderer.add([this.glow.shape]);
+            this.renderer.setLight(this.glow.light);
+            this.renderer.add(this.level.shape);
+            this.loop.start(this.update);
+            Browser.document.getElementById("play").classList.add("hide");
+        };
 
         return this.gameResult;
     }

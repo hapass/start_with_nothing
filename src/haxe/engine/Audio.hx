@@ -1,5 +1,7 @@
 package engine;
 
+import haxe.Resource;
+import js.Browser;
 import haxe.Json;
 import js.html.audio.BiquadFilterType;
 import js.html.audio.BiquadFilterNode;
@@ -44,9 +46,8 @@ class SoundParameters {
 
     private function new() {}
 
-    public static function toJSON(parameters:SoundParameters):String {
-        return Json.stringify({
-            name: parameters.name,
+    public static function save(parameters:SoundParameters) {
+        var json:String = Json.stringify({
             time: parameters.time,
             oscillatorOneFrequency: parameters.oscillatorOne.frequency,
             oscillatorOneAmplitude: parameters.oscillatorOne.amplitude,
@@ -73,15 +74,21 @@ class SoundParameters {
             amplifierAmplitude: parameters.amplifier.lfo.amplitude,
             amplifierWave: parameters.amplifier.lfo.wave
         });
+        Browser.getLocalStorage().setItem(parameters.name, json);
     }
 
-    public static function fromJSON(json:String):SoundParameters {
+    public static function load(name:String):SoundParameters {
         var parameters = new SoundParameters();
 
         try {
+            var json = Browser.getLocalStorage().getItem(name);
+            if (json == null) {
+                json = Resource.getString(name);
+            }
+
             var storedObject = Json.parse(json);
 
-            parameters.name = storedObject.name;
+            parameters.name = name;
             parameters.time = storedObject.time;
             parameters.oscillatorOne.frequency = storedObject.oscillatorOneFrequency;
             parameters.oscillatorOne.amplitude = storedObject.oscillatorOneAmplitude;
@@ -276,13 +283,14 @@ class Sound {
     }
 }
 
-class Audio {
+class Audio implements AudioPlayer {
     private var context:AudioContext = new AudioContext();
     private var soundMap:Map<String, Sound> = new Map<String, Sound>();
 
     public function new() {}
 
-    public function playSound(parameters:SoundParameters) {
+    public function playSound(name:String) {
+        var parameters = SoundParameters.load(name);
         if (soundMap.exists(parameters.name)) {
             Debug.log('Sound ${parameters.name} is already playing.');
         } else {

@@ -5,6 +5,7 @@
 
 -resource src/glsl/engine/FragmentShader.glsl@FragmentShader.glsl
 -resource src/glsl/engine/VertexShader.glsl@VertexShader.glsl
+-resource sounds/hit.json@hit
 
 -main game.Main
 -js bin/glow.js

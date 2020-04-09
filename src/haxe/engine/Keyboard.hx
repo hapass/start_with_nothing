@@ -19,12 +19,13 @@ class Keyboard {
     }
 
     private function onKeyDown(event:KeyboardEvent) {
-        var key = trackedKeys[event.keyCode];
-
         if (this.onceOnUserInput != null) {
             this.onceOnUserInput();
             this.onceOnUserInput = null;
+            return;
         }
+
+        var key = trackedKeys[event.keyCode];
 
         if (key == null) {
             Debug.log('Key is not tracked: ${key.code}');
