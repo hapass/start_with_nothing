@@ -34,35 +34,6 @@ class OscillatorParameters {
     public function new() {}
 }
 
-typedef SoundParametersStored = {
-    name:String,
-    time:Float,
-    oscillatorOneFrequency:Float,
-    oscillatorOneAmplitude:Float,
-    oscillatorOneWave:String,
-    oscillatorTwoFrequency:Float,
-    oscillatorTwoAmplitude:Float,
-    oscillatorTwoWave:String,
-    filterModulation:String,
-    filterAttack:Float,
-    filterDecay:Float,
-    filterRelease:Float,
-    filterSustain:Float,
-    filterPeak:Float,
-    filterFrequency:Float,
-    filterAmplitude:Float,
-    filterWave:String,
-    amplifierModulation:String,
-    amplifierAttack:Float,
-    amplifierDecay:Float,
-    amplifierRelease:Float,
-    amplifierSustain:Float,
-    amplifierPeak:Float,
-    amplifierFrequency:Float,
-    amplifierAmplitude:Float,
-    amplifierWave:String
-}
-
 class SoundParameters {
     public var name:String = "default";
     public var time:Float = 0.5;
@@ -74,7 +45,7 @@ class SoundParameters {
     private function new() {}
 
     public static function toJSON(parameters:SoundParameters):String {
-        var storedObject:SoundParametersStored = {
+        return Json.stringify({
             name: parameters.name,
             time: parameters.time,
             oscillatorOneFrequency: parameters.oscillatorOne.frequency,
@@ -101,16 +72,14 @@ class SoundParameters {
             amplifierFrequency: parameters.amplifier.lfo.frequency,
             amplifierAmplitude: parameters.amplifier.lfo.amplitude,
             amplifierWave: parameters.amplifier.lfo.wave
-        };
-
-        return Json.stringify(storedObject);
+        });
     }
 
     public static function fromJSON(json:String):SoundParameters {
         var parameters = new SoundParameters();
 
         try {
-            var storedObject:Dynamic = Json.parse(json);
+            var storedObject = Json.parse(json);
 
             parameters.name = storedObject.name;
             parameters.time = storedObject.time;
