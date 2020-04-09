@@ -77,7 +77,7 @@ class SoundParameters {
         var storedObject:SoundParametersStored = {
             name: parameters.name,
             time: parameters.time,
-            oscillatorOneFrequency: parameters.oscillatorOne.amplitude,
+            oscillatorOneFrequency: parameters.oscillatorOne.frequency,
             oscillatorOneAmplitude: parameters.oscillatorOne.amplitude,
             oscillatorOneWave: parameters.oscillatorOne.wave,
             oscillatorTwoFrequency: parameters.oscillatorTwo.frequency,
@@ -114,7 +114,7 @@ class SoundParameters {
 
             parameters.name = storedObject.name;
             parameters.time = storedObject.time;
-            parameters.oscillatorOne.amplitude = storedObject.oscillatorOneFrequency;
+            parameters.oscillatorOne.frequency = storedObject.oscillatorOneFrequency;
             parameters.oscillatorOne.amplitude = storedObject.oscillatorOneAmplitude;
             parameters.oscillatorOne.wave = storedObject.oscillatorOneWave;
             parameters.oscillatorTwo.frequency = storedObject.oscillatorTwoFrequency;

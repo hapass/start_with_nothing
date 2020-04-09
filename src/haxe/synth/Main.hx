@@ -77,11 +77,15 @@ class Main {
             audio = new Audio();
 
             syncModelAndUI(parameters, ui);
-            audio.playSound(parameters);
             storage.setItem(soundName, SoundParameters.toJSON(parameters));
+
+            audio.playSound(parameters);
         });
 
         ui.download.addEventListener("click", (event)->{
+            syncModelAndUI(parameters, ui);
+            storage.setItem(soundName, SoundParameters.toJSON(parameters));
+
             downloadJSON(storage.getItem(soundName));
         });
 
