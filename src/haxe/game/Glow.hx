@@ -20,6 +20,7 @@ class Glow {
     public var lightAnimation:LightAnimation;
     public var audio:AudioPlayer;
     public var jumpCount:Int = 0;
+    public var isOnGround:Bool = false;
 
     public function new(position:Vec2, audio:AudioPlayer) {
         this.position = position;
@@ -65,9 +66,8 @@ class Glow {
             this.currentSpeed.x = 0;
         }
 
-        if (Key.SPACE.wasPressed() && this.jumpCount > 0) {
+        if (Key.SPACE.wasPressed() && this.isOnGround) {
             this.currentSpeed.y = Config.GLOW_JUMP_ACCELERATION;
-            this.jumpCount--;
         }
     }
 
@@ -83,20 +83,20 @@ class Glow {
 
         if (x < this.position.x) {
             var column = getTileIndex(x - 1);
-            var top = level.getTileType(getTileIndex(this.position.y), column);
-            var bottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
+            var leftTop = level.getTileType(getTileIndex(this.position.y), column);
+            var leftBottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
 
-            if (top == Wall || bottom == Wall)
+            if (leftTop == Wall || leftBottom == Wall)
                 this.position.x = getPosition(column + 1);
             else
                 this.position.x = x;
         }
         else {
             var column = getTileIndex(getEnd(x) + 1);
-            var top = level.getTileType(getTileIndex(this.position.y), column);
-            var bottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
+            var rightTop = level.getTileType(getTileIndex(this.position.y), column);
+            var rightBottom = level.getTileType(getTileIndex(getEnd(this.position.y)), column);
 
-            if (top == Wall || bottom == Wall)
+            if (rightTop == Wall || rightBottom == Wall)
                 this.position.x = getPosition(column - 1);
             else
                 this.position.x = x;
@@ -112,10 +112,10 @@ class Glow {
 
         if (y < this.position.y) {
             var row = getTileIndex(y - 1);
-            var left = level.getTileType(row, getTileIndex(this.position.x));
-            var right = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
+            var topLeft = level.getTileType(row, getTileIndex(this.position.x));
+            var topRight = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
 
-            if (left == Wall || right == Wall) {
+            if (topLeft == Wall || topRight == Wall) {
                 this.position.y = getPosition(row + 1);
                 this.currentSpeed.y = 0;
             }
@@ -124,19 +124,23 @@ class Glow {
         }
         else {
             var row = getTileIndex(getEnd(y) + 1);
-            var left = level.getTileType(row, getTileIndex(this.position.x));
-            var right = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
+            var bottomLeft = level.getTileType(row, getTileIndex(this.position.x));
+            var bottomRight = level.getTileType(row, getTileIndex(getEnd(this.position.x)));
 
-            if (left == Wall || right == Wall) {
+            if (bottomLeft == Wall || bottomRight == Wall) {
                 this.position.y = getPosition(row - 1);
                 this.currentSpeed.y = 0;
-                if (this.jumpCount != Config.JUMP_COUNT) {
+
+                if (!this.isOnGround) {
                     this.audio.playSound("hit");
-                    this.jumpCount = Config.JUMP_COUNT;
                 }
+
+                this.isOnGround = true;
             }
-            else
+            else {
+                this.isOnGround = false;
                 this.position.y = y;
+            }
         }
 
         this.light.position.y = getCenter(this.position.y);
@@ -159,7 +163,7 @@ class Glow {
     }
 
     private function emitLight(tickTime:Float) {
-        if (Key.SPACE.wasPressed() && this.jumpCount > 0) {
+        if (Key.SPACE.wasPressed() && this.isOnGround) {
             this.light.color.r = Math.random();
             this.light.color.g = Math.random();
             this.light.color.b = Math.random();

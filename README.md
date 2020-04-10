@@ -22,6 +22,7 @@
 1. Play testing. Design levels.
 1. Fix window resize.
 1. Fix letterbox for portrait mode.
+1. Fix sounds are interrupted immediately when game ends.
 1. Optimize size of the app. Bezier curve calculation.
 1. Optimize size of the app. Store levels differently.
 1. Optimize allocations - target no GC.

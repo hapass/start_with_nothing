@@ -5,7 +5,6 @@ import engine.Color;
 @:expose
 class Config {
     public static var TILE_SIZE:Int = 20;
-    public static var JUMP_COUNT:Int = 1;
 
     public static var GAME_WIDTH_TILES:Int = 40;
     public static var GAME_HEIGHT_TILES:Int = 30;
